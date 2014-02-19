@@ -1,0 +1,43 @@
+<div id="Comments-<%=scribble.scribble_id%>"> 
+	<br clear="all">
+	<br clear="all"/>
+	<% scribble.posted_comments.each do |comment| %>
+	<div class="commentbox" id="record-17626" align="left">
+		<a href="#" style="float:left"><img src="assets/default_avatar.png" style="float:left; padding-right:9px;" width="40" height="40" border="0" alt=""></a>
+
+		<div class="commentorname" style="float:left">
+			<b>
+				<a href=""><%= comment.commentor %></a>
+			</b>
+			<% if comment.users.exists?(current_user.id) or current_user.beamer_id == comment.commentor_id %>            
+				<div class="comment-body-text">
+				<%= comment.body%>				
+				</div>
+				<div style=" padding-top:3px;">
+				<%= current_user.beamer_id %> --- <%= comment.commentor_id %>				
+				<% if current_user.beamer_id == comment.commentor_id %>
+				<label class="label">My Solution</label>
+				<% else %>				
+				<label class="label">Purchased (<%= comment.ask_charisma %> Charisma)</label>
+				<% end %>
+				</div>
+			<% else %>
+			<div style=" padding-top:3px;">
+				<label class="label">Buy (<%= comment.ask_charisma %> Charisma)</label>&nbsp;
+				<label class="label">Preview (5 Charisma)</label>
+			</div>
+			<% end %>		
+			<div style=" padding-top:3px;">
+				<label class="label"><%= TimelineBeautify.beauty_time(comment.created_at) %></label>&nbsp;
+				<% if current_user.beamer_id == comment.commentor_id %>
+				<a href="" class="comment_delete">Delete</a>
+				<% end %>
+			</div>
+			
+		</div>
+		<br clear="all">
+		<br clear="all"/>
+	</div>
+	<% end %>
+</div>
+</br>

@@ -1,0 +1,52 @@
+<ul class="nav nav-pills"> 
+	<li class="active">
+		<a class="tabs" href="#section-1" section="section-1">
+			<span>Friends</span> <span class="badge badge-inverse"><%= @user.friends.count %></span>
+		</a>
+	</li> 
+	<li>
+		<a class="tabs" href="#section-2" section="section-2">
+			<span>Friend Requests</span> <span class="badge badge-inverse"><%= @user.requested_friends.count %></span>
+		</a>
+	</li> 
+	<li>
+		<a class="tabs" href="#section-3" section="section-3">
+			<span>Pending</span> <span class="badge badge-inverse"><%= @user.pending_friends.count %></span>
+		</a>
+	</li> 
+	<li>
+		<a class="tabs" href="#section-4"section="section-4">
+			<span>Reechers</span>
+		</a>
+	</li>
+</ul> 
+
+<div class="content" id="section-1" style="display:block;">
+	<%= render :partial => "friendships/friends" %>
+	   
+	<%= facebook_user_token = @user.omniauth_data %>
+	--------------	
+	<%= @user.friends %>
+	
+</div>
+
+<div class="content" id="section-2" style="display:none;">
+	<%= render :partial => "friendships/friendrequests" %>
+</div>
+
+<div class="content" id="section-3" style="display:none;">
+	<%= render :partial => "friendships/friendspending" %>
+</div>
+
+<div class="content" id="section-4" style="display:none;">
+	<%= render :partial => "friendships/all_connections", :locals => {:all_connections=>@all_connections}%>
+</div>
+<script>
+$(".tabs").click(function() {
+  $(this).parent().parent().children().removeClass("active");
+  $(this).parent().addClass("active");
+  $(".content").css("display","none");
+  $('#'+$(this).attr('section')).css("display","block");
+});
+</script>
+

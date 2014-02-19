@@ -1,0 +1,21 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b><%= @scribble.posted_by %> asked: </b>
+  <%= @scribble.post %>
+</p>
+
+
+<div class="scribbletime">
+      	  		<label class="label"><%= TimelineBeautify.beauty_time(@scribble.created_at) %></label>
+      	  		<label class="label"><%= @scribble.posted_comments.count %> answers</label>
+      		</div>
+<%= current_user.beamer_id %>  --- <%= @scribble.posted_by_uid %>
+<% if @scribble.posted_comments.count == 0 and current_user.id == @scribble.posted_by_uid %>
+<%= link_to 'Edit', edit_scribble_path(@scribble) %> |
+<% else %>
+<% end %>
+<%= link_to 'Back', root_path %>
+
+<%= render :partial=>"scribble_comments/postedcomments",:locals=>{:scribble=>@scribble} %>
+<%= render :partial=>"scribble_comments/newcomment",:locals=>{:scribble=>@scribble} %>

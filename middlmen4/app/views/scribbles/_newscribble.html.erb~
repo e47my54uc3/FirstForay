@@ -1,0 +1,15 @@
+<%= simple_form_for @scribble do |f| %>
+<div class="">
+	<div class="field">
+		<%= f.text_area :post,:rows=>3,:placeholder=>"What do you need help with, #{current_user.first_name}?",
+		:class=>"sribble-status-text"
+		%>
+	</div>
+	<div class="sribble-status-actions" id="refreshscribbles">
+	Add Image: 	
+	<input type="file" capture="camera" accept="image/*" id="cameraInput" name="cameraInput">
+		
+	<%= f.submit "REECH OUT",:class=>"btn btn-info" %>
+	</div>
+</div>
+<% end %>

@@ -1,0 +1,7 @@
+<div id="sbhchatbox<%= chat.id %>" class="sbchatbox media">
+	<h6 class="muted"><%= chat.created_at.strftime("%b %d at %I:%M %P") %></h6>
+  <img class="pull-left media-object" src="/assets/default_avatar.png"/ title=<%= chat.broadcaster.full_name %>>
+  <div class="media-body">
+    <p class="speech"><%= chat.message %></p>
+  </div>
+</div>

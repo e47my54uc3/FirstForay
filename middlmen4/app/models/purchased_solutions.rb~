@@ -1,0 +1,3 @@
+class PurchasedSolutions < ActiveRecord::Base
+  attr_accessible :solution_id, :user_id
+end

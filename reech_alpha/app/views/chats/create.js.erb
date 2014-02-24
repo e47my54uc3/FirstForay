@@ -1,0 +1,6 @@
+<% publish_to "/chats/new" do %>
+  sbchat_stream = $("#sbchat_stream")
+  sbchat_stream.append("<%= j render :partial=>'chat_body', :locals=>{:chat=>@chat} %>")
+  $('.sbchat').scrollTop($('.sbchat')[0].scrollHeight); 
+<% end %>
+$("#new_chat_message_input").val('').focus()

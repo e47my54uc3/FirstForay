@@ -1,0 +1,24 @@
+<% if questions_streams.empty? %>
+  <h3> no questions yet </h3>
+<% else %>
+		<% questions_streams.each do |question| %>
+		<% if Friendship.are_friends(current_user.reecher_id,question.posted_by_uid) or (current_user.reecher_id == question.posted_by_uid) %>   	
+			<div class="questionbody" id="<%=question.question_id %>"> 
+    		<div class="questionimg"><%=image_tag 'default_avatar.png' %></div>
+    		<div class="questiontext">
+      		<blockquote>
+      		  <p><%= link_to question.post, question %></p>
+      	  		<small><%= question.posted_by %></small>
+      		</blockquote>
+      		<div class="questiontime">
+      	  		<label class="label">asked <%= TimelineBeautify.beauty_time(question.created_at) %></label>
+      	  		<label class="label"><%= question.posted_solutions.count %> answers</label>
+			  	
+      		</div>
+    		</div>
+  			<%= render :partial=>"solutions/newsolution",:locals=>{:question=>question} %>
+  			</div>
+		<% end %>
+  <% end %>
+<% end %>
+

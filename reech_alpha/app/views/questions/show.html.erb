@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b><%= @question.posted_by %> asked: </b>
+  <%= @question.post %>
+</p>
+
+
+<div class="questiontime">
+      	  		<label class="label"><%= TimelineBeautify.beauty_time(@question.created_at) %></label>
+      	  		<label class="label"><%= @question.posted_solutions.count %> answers</label>
+      		</div>
+<% if @question.posted_solutions.count == 0 and current_user.reecher_id == @question.posted_by_uid %>
+<%= link_to 'Edit', edit_question_path(@question) %> |
+<% else %>
+<% end %>
+<%= link_to 'Back', root_path %>
+
+<%= render :partial=>"solutions/postedsolutions",:locals=>{:question=>@question} %>
+<%= render :partial=>"solutions/newsolution",:locals=>{:question=>@question} %>

@@ -1,0 +1,75 @@
+<% if current_user %>
+<div class="row-fluid">
+  <div class="span8">
+    <% @question = Question.new %>
+    <%=render :partial => 'questions/newquestion'%>
+    <div id="questionsfeed">
+      <%= render :partial => 'questions/questions.html.erb', :locals => { :questions_streams => @questions_streams } %>
+    </div>
+    </br>
+    <div id="loading" class="progress progress-striped active">
+      <div class="bar" style="width:100%;">click to load more</div>
+    </div>
+  </div>
+
+<!--  
+	#NEWSFEED HERE
+	<div class="span4">
+    <%= render :partial => 'newsfeeds/shownewsfeeds', :locals => { :newsfeeds_streams => @newsfeeds_streams } %>
+  </div>
+-->
+
+</div>
+<% end %>
+<script>
+var currentPage = 1;
+$(document).ready(function(){
+  var timelyrefreshQuestionFeeds = function(){
+    url = '/refresh'
+    $.get(url,function(data,status){
+     $('#questionsfeed').html(data)
+     return false
+   });
+  };
+  setInterval(timelyrefreshQuestionFeeds,60000);
+
+  $(".votes").click(function()
+  {
+   var id = $(this).attr("id");
+   var name = $(this).attr("name");
+   var parent = $(this)
+   if (name=='up')
+   {
+
+
+    $.get('/votedup', {id: id},
+     function(data,status){
+       parent.html(data);
+     });
+  }
+  else
+  {
+   $.get('/voteddown', {id: id},
+     function(data,status){
+       parent.html(data);
+     });
+ }
+ return false;
+});
+
+  $("#loading").click(function() {
+    if (currentPage <= <%= @questions_streams.total_pages %>)
+    {
+      currentPage++;
+      $.get('/reechs/loadmorequestions',{page:currentPage},
+       function(data,status){
+        $('#questionsfeed').append(data)
+        return false
+      });
+    }else{
+      $('#loading').hide()
+    }
+  });
+
+});
+</script>

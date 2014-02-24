@@ -1,0 +1,17 @@
+<h2>REECHERS in your network</h2>
+<div>	
+	<ul>
+		<% all_connections.each do |reecher| %>
+		<% unless reecher==current_user %>
+		<li>
+			<%= link_to "#{reecher.first_name} #{reecher.last_name}", about_path(:reecher_id=>reecher.reecher_id) %>
+				<% if Friendship.are_friends(current_user.reecher_id,reecher.reecher_id) %>
+				 <label class="label">Friend</label>
+				<% else %>
+				 <%= link_to "Add Friend",addfriend_friendships_path(:reecher_id => reecher.reecher_id) %>
+			<% end %>
+			<% end %>
+		</li>	
+		<% end %>
+	</ul>
+</div>

@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+
+<title>class Message - Rails Application Documentation</title>
+
+<link type="text/css" media="screen" href="./rdoc.css" rel="stylesheet">
+
+<script type="text/javascript">
+  var rdoc_rel_prefix = "./";
+</script>
+
+<script type="text/javascript" charset="utf-8" src="./js/jquery.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/navigation.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search_index.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/search.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/searcher.js"></script>
+<script type="text/javascript" charset="utf-8" src="./js/darkfish.js"></script>
+
+
+<body id="top" class="class">
+<nav id="metadata">
+  <nav id="home-section" class="section">
+  <h3 class="section-header">
+    <a href="./index.html">Home</a>
+    <a href="./table_of_contents.html#classes">Classes</a>
+    <a href="./table_of_contents.html#methods">Methods</a>
+  </h3>
+</nav>
+
+
+  <nav id="search-section" class="section project-section" class="initially-hidden">
+  <form action="#" method="get" accept-charset="utf-8">
+    <h3 class="section-header">
+      <input type="text" name="search" placeholder="Search" id="search-field"
+             title="Type to search, Up and Down to navigate, Enter to load">
+    </h3>
+  </form>
+
+  <ul id="search-results" class="initially-hidden"></ul>
+</nav>
+
+
+  <div id="file-metadata">
+    <nav id="file-list-section" class="section">
+  <h3 class="section-header">Defined In</h3>
+  <ul>
+    <li>app/models/message.rb
+  </ul>
+</nav>
+
+    
+  </div>
+
+  <div id="class-metadata">
+    
+    <nav id="parent-class-section" class="section">
+  <h3 class="section-header">Parent</h3>
+  
+  <p class="link">ActiveRecord::Base
+  
+</nav>
+
+    
+    <!-- Method Quickref -->
+<nav id="method-list-section" class="section">
+  <h3 class="section-header">Methods</h3>
+
+  <ul class="link-list">
+    
+    <li><a href="#method-i-active-3F">#active?</a>
+    
+    <li><a href="#method-i-delete-21">#delete!</a>
+    
+    <li><a href="#method-i-draft-3F">#draft?</a>
+    
+    <li><a href="#method-i-mailbox">#mailbox</a>
+    
+    <li><a href="#method-i-read-21">#read!</a>
+    
+    <li><a href="#method-i-receive-21">#receive!</a>
+    
+    <li><a href="#method-i-recipient_list">#recipient_list</a>
+    
+    <li><a href="#method-i-recipients">#recipients</a>
+    
+    <li><a href="#method-i-recipients-3D">#recipients=</a>
+    
+    <li><a href="#method-i-reply-21">#reply!</a>
+    
+    <li><a href="#method-i-send-21">#send!</a>
+    
+    <li><a href="#method-i-sender">#sender</a>
+    
+    <li><a href="#method-i-sender-3D">#sender=</a>
+    
+    <li><a href="#method-i-sent_date">#sent_date</a>
+    
+    <li><a href="#method-i-trash-21">#trash!</a>
+    
+    <li><a href="#method-i-uneditable-3F">#uneditable?</a>
+    
+    <li><a href="#method-i-unread-3F">#unread?</a>
+    
+    <li><a href="#method-i-unsent-3F">#unsent?</a>
+    
+  </ul>
+</nav>
+
+  </div>
+
+  <div id="project-metadata">
+    <nav id="fileindex-section" class="section project-section">
+  <h3 class="section-header">Pages</h3>
+
+  <ul>
+  
+    <li class="file"><a href="./doc/README_FOR_APP.html">README_FOR_APP</a>
+  
+  </ul>
+</nav>
+
+    <nav id="classindex-section" class="section project-section">
+  <h3 class="section-header">Class and Module Index</h3>
+
+  <ul class="link-list">
+  
+    <li><a href="./ApplicationController.html">ApplicationController</a>
+  
+    <li><a href="./ApplicationHelper.html">ApplicationHelper</a>
+  
+    <li><a href="./Authorization.html">Authorization</a>
+  
+    <li><a href="./AuthorizationsController.html">AuthorizationsController</a>
+  
+    <li><a href="./Chat.html">Chat</a>
+  
+    <li><a href="./ChatsController.html">ChatsController</a>
+  
+    <li><a href="./ChatsHelper.html">ChatsHelper</a>
+  
+    <li><a href="./Conversation.html">Conversation</a>
+  
+    <li><a href="./Friendship.html">Friendship</a>
+  
+    <li><a href="./FriendshipsController.html">FriendshipsController</a>
+  
+    <li><a href="./FtpWrapper.html">FtpWrapper</a>
+  
+    <li><a href="./Mailbox.html">Mailbox</a>
+  
+    <li><a href="./Message.html">Message</a>
+  
+    <li><a href="./MessageSender.html">MessageSender</a>
+  
+    <li><a href="./MessagesController.html">MessagesController</a>
+  
+    <li><a href="./Newsfeed.html">Newsfeed</a>
+  
+    <li><a href="./NewsfeedsController.html">NewsfeedsController</a>
+  
+    <li><a href="./NewsfeedsStreamsData.html">NewsfeedsStreamsData</a>
+  
+    <li><a href="./Object.html">Object</a>
+  
+    <li><a href="./question.html">question</a>
+  
+    <li><a href="./questionSolution.html">questionSolution</a>
+  
+    <li><a href="./questionSolutionsController.html">questionSolutionsController</a>
+  
+    <li><a href="./questionSolutionsHelper.html">questionSolutionsHelper</a>
+  
+    <li><a href="./questionsController.html">questionsController</a>
+  
+    <li><a href="./questionsHelper.html">questionsHelper</a>
+  
+    <li><a href="./Scrubber.html">Scrubber</a>
+  
+    <li><a href="./ReechsController.html">ReechsController</a>
+  
+    <li><a href="./TimelineBeautify.html">TimelineBeautify</a>
+  
+    <li><a href="./User.html">User</a>
+  
+    <li><a href="./UserProfile.html">UserProfile</a>
+  
+    <li><a href="./UserProfileController.html">UserProfileController</a>
+  
+    <li><a href="./UserSession.html">UserSession</a>
+  
+    <li><a href="./UserSessionsController.html">UserSessionsController</a>
+  
+    <li><a href="./UserSessionsHelper.html">UserSessionsHelper</a>
+  
+    <li><a href="./UsersController.html">UsersController</a>
+  
+    <li><a href="./UsersHelper.html">UsersHelper</a>
+  
+  </ul>
+</nav>
+
+  </div>
+</nav>
+
+<div id="documentation">
+  <h1 class="class">class Message</h1>
+
+  <div id="description" class="description">
+    
+  </div><!-- description -->
+
+  
+  
+  
+  <section id="5Buntitled-5D" class="documentation-section">
+    
+
+    
+
+    
+
+    
+    <!-- Attributes -->
+    <section id="attribute-method-details" class="method-section section">
+      <h3 class="section-header">Attributes</h3>
+
+      
+      <div id="attribute-i-draft" class="method-detail">
+        <div class="method-heading attribute-method-heading">
+          <span class="method-name">draft</span><span
+            class="attribute-access-type">[RW]</span>
+        </div>
+
+        <div class="method-description">
+        
+        
+        
+        </div>
+      </div>
+      
+    </section><!-- attribute-method-details -->
+    
+
+    <!-- Methods -->
+    
+     <section id="public-instance-5Buntitled-5D-method-details" class="method-section section">
+      <h3 class="section-header">Public Instance Methods</h3>
+
+    
+      <div id="method-i-active-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">active?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="active-3F-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 40</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">active?</span>
+  <span class="ruby-operator">!</span><span class="ruby-identifier">trashed?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-operator">!</span><span class="ruby-identifier">deleted?</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- active-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- active-3F-method -->
+
+    
+      <div id="method-i-delete-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">delete!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="delete-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 103</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">delete!</span>
+  <span class="ruby-identifier">update_attributes</span>(<span class="ruby-value">:deleted_at=</span><span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- delete-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- delete-21-method -->
+
+    
+      <div id="method-i-draft-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">draft?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="draft-3F-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 125</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">draft?</span>
+  <span class="ruby-keyword">self</span>.<span class="ruby-identifier">draft</span> <span class="ruby-operator">==</span> <span class="ruby-string">&#39;1&#39;</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- draft-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- draft-3F-method -->
+
+    
+      <div id="method-i-mailbox" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">mailbox</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="mailbox-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 64</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">mailbox</span>
+  <span class="ruby-keyword">case</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-identifier">sent?</span> <span class="ruby-keyword">then</span> <span class="ruby-value">:outbox</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-identifier">received?</span> <span class="ruby-keyword">then</span> <span class="ruby-value">:inbox</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-operator">!</span><span class="ruby-identifier">new_record?</span> <span class="ruby-operator">&amp;&amp;</span> <span class="ruby-identifier">unsent?</span> <span class="ruby-keyword">then</span> <span class="ruby-value">:drafts</span>
+  <span class="ruby-keyword">when</span> <span class="ruby-identifier">trashed?</span> <span class="ruby-keyword">then</span> <span class="ruby-value">:trash</span>
+  <span class="ruby-keyword">else</span>
+    <span class="ruby-value">:compose</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- mailbox-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- mailbox-method -->
+
+    
+      <div id="method-i-read-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">read!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="read-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 95</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">read!</span>
+  <span class="ruby-identifier">update_attributes</span>(<span class="ruby-value">:read_at=</span><span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>) <span class="ruby-keyword">if</span> <span class="ruby-operator">!</span><span class="ruby-keyword">self</span>.<span class="ruby-identifier">read_at</span>.<span class="ruby-identifier">present?</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- read-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- read-21-method -->
+
+    
+      <div id="method-i-receive-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">receive!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="receive-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 91</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">receive!</span>
+  <span class="ruby-identifier">update_attributes</span>(<span class="ruby-value">:received_at=</span><span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- receive-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- receive-21-method -->
+
+    
+      <div id="method-i-recipient_list" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">recipient_list</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="recipient_list-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 60</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">recipient_list</span>
+  <span class="ruby-identifier">recipient_ids</span>.<span class="ruby-identifier">reject</span>(&amp;<span class="ruby-value">:blank?</span>).<span class="ruby-identifier">map</span> {<span class="ruby-operator">|</span><span class="ruby-identifier">id</span><span class="ruby-operator">|</span> <span class="ruby-constant">User</span>.<span class="ruby-identifier">find</span> <span class="ruby-identifier">id</span>}
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- recipient_list-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- recipient_list-method -->
+
+    
+      <div id="method-i-recipients" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">recipients</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="recipients-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 52</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">recipients</span>
+  <span class="ruby-identifier">sent?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">children</span>.<span class="ruby-identifier">collect</span>(&amp;<span class="ruby-value">:user</span>) <span class="ruby-operator">:</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">recipients</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- recipients-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- recipients-method -->
+
+    
+      <div id="method-i-recipients-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">recipients=</span><span
+            class="method-args">(users)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="recipients-3D-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 56</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">recipients=</span> <span class="ruby-identifier">users</span>
+  <span class="ruby-identifier">users</span>.<span class="ruby-identifier">each</span> { <span class="ruby-operator">|</span><span class="ruby-identifier">u</span><span class="ruby-operator">|</span> <span class="ruby-identifier">recipient_ids</span> <span class="ruby-operator">&lt;&lt;</span> <span class="ruby-identifier">u</span>.<span class="ruby-identifier">id</span> }
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- recipients-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- recipients-3D-method -->
+
+    
+      <div id="method-i-reply-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">reply!</span><span
+            class="method-args">(options={})</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="reply-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 81</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">reply!</span> <span class="ruby-identifier">options</span>={}
+  <span class="ruby-keyword">if</span> <span class="ruby-identifier">parent</span>
+    <span class="ruby-identifier">reply</span> = <span class="ruby-identifier">children</span>.<span class="ruby-identifier">create!</span>(<span class="ruby-identifier">subject</span><span class="ruby-operator">:</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:subject</span>, <span class="ruby-identifier">subject</span>),
+     <span class="ruby-identifier">body</span><span class="ruby-operator">:</span> <span class="ruby-identifier">options</span>.<span class="ruby-identifier">fetch</span>(<span class="ruby-value">:body</span>, <span class="ruby-keyword">nil</span>),
+     <span class="ruby-identifier">user</span><span class="ruby-operator">:</span> <span class="ruby-identifier">user</span>,
+     <span class="ruby-identifier">recipients</span><span class="ruby-operator">:</span> [<span class="ruby-identifier">parent</span>.<span class="ruby-identifier">user</span>])
+    <span class="ruby-identifier">reply</span>.<span class="ruby-identifier">send!</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- reply-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- reply-21-method -->
+
+    
+      <div id="method-i-send-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">send!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="send-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 75</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">send!</span>
+  <span class="ruby-identifier">lock</span>.<span class="ruby-identifier">synchronize</span> <span class="ruby-keyword">do</span>
+    <span class="ruby-constant">MessageSender</span>.<span class="ruby-identifier">new</span>(<span class="ruby-keyword">self</span>).<span class="ruby-identifier">run</span> <span class="ruby-keyword">unless</span> <span class="ruby-identifier">draft?</span>
+  <span class="ruby-keyword">end</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- send-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- send-21-method -->
+
+    
+      <div id="method-i-sender" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">sender</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="sender-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 48</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">sender</span>
+  <span class="ruby-identifier">sent?</span> <span class="ruby-operator">?</span> <span class="ruby-identifier">user</span> <span class="ruby-operator">:</span> <span class="ruby-identifier">parent</span>.<span class="ruby-identifier">user</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- sender-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sender-method -->
+
+    
+      <div id="method-i-sender-3D" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">sender=</span><span
+            class="method-args">(sending_user)</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="sender-3D-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 44</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">sender=</span> <span class="ruby-identifier">sending_user</span>
+  <span class="ruby-identifier">user</span> = <span class="ruby-identifier">sending_user</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- sender-3D-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sender-3D-method -->
+
+    
+      <div id="method-i-sent_date" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">sent_date</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="sent_date-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 129</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">sent_date</span>
+  <span class="ruby-identifier">sent_at</span> <span class="ruby-operator">||</span> <span class="ruby-identifier">received_at</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- sent_date-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- sent_date-method -->
+
+    
+      <div id="method-i-trash-21" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">trash!</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="trash-21-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 99</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">trash!</span>
+  <span class="ruby-identifier">update_attributes</span>(<span class="ruby-value">:trashed_at=</span><span class="ruby-operator">&gt;</span> <span class="ruby-constant">Time</span>.<span class="ruby-identifier">now</span>)
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- trash-21-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- trash-21-method -->
+
+    
+      <div id="method-i-uneditable-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">uneditable?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="uneditable-3F-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 117</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">uneditable?</span>
+  <span class="ruby-operator">!</span><span class="ruby-identifier">editable?</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- uneditable-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- uneditable-3F-method -->
+
+    
+      <div id="method-i-unread-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">unread?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="unread-3F-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 113</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">unread?</span>
+  <span class="ruby-operator">!</span><span class="ruby-identifier">read?</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- unread-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- unread-3F-method -->
+
+    
+      <div id="method-i-unsent-3F" class="method-detail ">
+        
+        <div class="method-heading">
+          <span class="method-name">unsent?</span><span
+            class="method-args">()</span>
+          <span class="method-click-advice">click to toggle source</span>
+        </div>
+        
+
+        <div class="method-description">
+          
+          
+          
+
+          
+          <div class="method-source-code" id="unsent-3F-source">
+            <pre><span class="ruby-solution"># File app/models/message.rb, line 121</span>
+<span class="ruby-keyword">def</span> <span class="ruby-identifier">unsent?</span>
+  <span class="ruby-operator">!</span><span class="ruby-identifier">sent?</span>
+<span class="ruby-keyword">end</span></pre>
+          </div><!-- unsent-3F-source -->
+          
+        </div>
+
+        
+
+        
+      </div><!-- unsent-3F-method -->
+
+    
+    </section><!-- public-instance-method-details -->
+  
+  </section><!-- 5Buntitled-5D -->
+
+</div><!-- documentation -->
+
+
+<footer id="validator-badges">
+  <p><a href="http://validator.w3.org/check/referer">[Validate]</a>
+  <p>Generated by <a href="https://github.com/rdoc/rdoc">RDoc</a> 3.12.2.
+  <p>Generated with the <a href="http://deveiate.org/projects/Darkfish-Rdoc/">Darkfish Rdoc Generator</a> 3.
+</footer>
+

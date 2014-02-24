@@ -1,0 +1,12 @@
+en:
+  hello: "Welcome to Reech"
+  mailboxes:
+    trash_emptied: "Trash has been emptied"
+  messages:
+    deleted: "Oh! The message has been deleted!"
+    invalid: "Invalid!"
+    replied: "Reply has been sent, cheers!"
+    saved: "Message saved as Draft!"
+    sent: "Yaay! Message sent"
+    trashed: "Message have been moved to trash! Bang!"
+    unauthorised: "Unauthorised!"

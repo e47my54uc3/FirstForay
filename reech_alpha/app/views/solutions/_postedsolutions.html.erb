@@ -1,0 +1,44 @@
+<div id="Solutions-<%=question.question_id%>"> 
+	<br clear="all">
+	<br clear="all"/>
+	<% @allsolutions.each do |solution| %>
+	<div class="solutionbox" id="record-17626" align="left">
+		<a href="#" style="float:left"><img src="assets/default_avatar.png" style="float:left; padding-right:9px;" width="40" height="40" border="0" alt=""></a>
+
+		<div class="solvername" style="float:left">
+			<b>
+				<a href=""><%= solution.solver %></a>
+			</b>
+			<% if solution.users.exists?(current_user.id) or current_user.reecher_id == solution.solver_id %>            
+				<div class="solution-body-text">
+					<%= solution.body%>				
+				</div>
+				<div style=" padding-top:3px;">
+					<% if current_user.reecher_id == solution.solver_id %>
+						<label class="label">My Solution</label>
+					<% else %>				
+						<label class="label">Purchased (<%= solution.ask_charisma %> Charisma)</label>
+					<% end %>
+				</div>
+			<% else %>
+				<div style=" padding-top:3px;">
+
+					<label class="label">Buy (<%= solution.ask_charisma %> Charisma)</label>&nbsp;
+
+					<label class="label">Preview (5 Charisma)</label>
+				</div>
+			<% end %>		
+			<div style=" padding-top:3px;">
+				<label class="label"><%= TimelineBeautify.beauty_time(solution.created_at) %></label>&nbsp;
+				<% if current_user.reecher_id == solution.solver_id %>
+					<a href="" class="solution_delete">Delete</a>
+				<% end %>
+			</div>
+			
+		</div>
+		<br clear="all">
+		<br clear="all"/>
+	</div>
+	<% end %>
+</div>
+</br>

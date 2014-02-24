@@ -1,0 +1,10 @@
+<h2>Friend Requests</h2>
+<ol>
+	<% @user.requested_friends.each do |friend| %>
+	<li>
+		<%=link_to "#{friend.full_name}",about_path(:reecher_id=>friend.reecher_id) %> 
+		<%= link_to "Accept",accept_fr_friendships_path(:reecher_id =>friend.reecher_id) %> |
+		<%= link_to "Reject",reject_fr_friendships_path(:reecher_id =>friend.reecher_id) %>
+	</li>
+	<% end %>
+</ol>

@@ -1,0 +1,12 @@
+      <div id="Solution-<%= question.question_id %>" class="solution">
+        <%= simple_form_for([question, question.posted_solutions.build]) do |f| %>
+          <%= f.text_area :body,:rows=>2, :placeholder=>"Do you know the answer, #{current_user.first_name}?",:maxlength=>"300" %><br>
+			 Set Charisma bid: <%= f.input :ask_charisma, as: :integer, label:false %>
+			 Or REECHout to an Expert: <%= f.input :linked_user, as: :string, label:false, disabled:true %>
+          <%= hidden_field_tag :question_id_val, question.question_id %>
+          <%= hidden_field_tag :solver_id_val,current_user.reecher_id %>
+			 
+          <br clear="all">
+          <%= f.submit "Provide Solution", :class=>"btn btn-inverse"%>
+        <% end %>
+      </div>

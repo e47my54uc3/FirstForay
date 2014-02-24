@@ -1,0 +1,6 @@
+<p></p>
+<%= form_for Chat.new, :remote => true, :html=>{:class=>"form-search"} do |f| %>
+  <%= f.hidden_field :broadcasted_by, :value => current_user.reecher_id %>
+  <%= f.text_field :message, :id => "new_chat_message_input", :class=>"input-medium search-query" %>
+  <%= f.submit 'Send', :class => 'btn btn-success' %>
+<% end %>

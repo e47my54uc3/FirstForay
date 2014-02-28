@@ -1,9 +1,9 @@
 class ApplicationController < ActionController::Base
-	protect_from_forgery
+	#protect_from_forgery
 	include ApplicationHelper
 	include NewsfeedsStreamsData
   helper :all
-  protect_from_forgery
+  #protect_from_forgery
   helper_method :current_user_session, :current_user, :require_user, :fb_user, :recipients
 
   private

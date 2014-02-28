@@ -9,6 +9,6 @@ class Authorization < ActiveRecord::Base
 
   def self.create_from_omniauth_data(hash, user = nil)
     user ||= User.create_from_omniauth_data(hash)
-    Authorization.create(:user_id => user.id, :uid => hash['uid'], :provider => hash['provider'])
+    Authorization.create(:user_id => user.id, :uid => hash['uid'], :provider => hash['provider']
   end
 end

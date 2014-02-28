@@ -3,9 +3,19 @@ class AuthorizationsController < ApplicationController
 
 	def index
 	 @auth = current_user.authorizations
-	 render :text => @auth	
 	end	
   
+  respond_to :json, :xml
+  def show
+    omniauth = request.env['omniauth.auth'] #this is where you get all the data from your provider through omniauth
+    @auth = Authorization.find_from_omniauth_data(omniauth)
+    if current_user
+      @user = current_user
+    else
+      @user = "nil"
+    end
+  end
+
 	def create
     omniauth = request.env['omniauth.auth'] #this is where you get all the data from your provider through omniauth
     @auth = Authorization.find_from_omniauth_data(omniauth)
@@ -25,7 +35,9 @@ class AuthorizationsController < ApplicationController
 		@new_auth.user.add_points(500)
 		redirect_to root_url
     end
+    
   end
+
 
   def failure
     flash[:notice] = "Sorry, You din't authorize"

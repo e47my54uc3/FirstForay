@@ -50,6 +50,11 @@ gem 'private_pub','~>1.0.3'
 # Server Required for Faye
 gem 'thin','~>1.6.1'
 
+
+#Passenger app server
+gem 'passenger'
+
+
 # Point systems
 gem 'recognition'  #to test - no generators available
 gem 'merit'
@@ -59,3 +64,8 @@ gem 'fb_graph'
 
 # nested has_many_through relation
 gem 'nested_has_many_through'
+
+gem 'api-versions'
+gem 'rabl'
+
+#gem 'doorkeeper'

@@ -1,14 +1,20 @@
 class ReechController < ApplicationController
-  respond_to :html, :xml, :js
+  respond_to :html, :xml, :js, :json
   before_filter :update_questionstreams, :only => [:home, :refreshquestions]
   before_filter :update_newsfeedsstream, :only => [:home]
   
   def home
-    #@questions = Question.find(:all)
-    #respond_to do |format|
-      #format.html # show.html.erb
-    #  format.json { render :json => @questions}
-    #end
+    @questions = Question.find(:all)
+    respond_to do |format|
+      format.html # show.html.erb
+      format.json { render :json => @questions}
+    end
+  end
+
+  def reechtest
+    respond_to do |format|
+      render :text => "Successful login"
+    end
   end
 
   def loadmorequestions

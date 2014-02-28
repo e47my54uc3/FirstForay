@@ -1,5 +1,18 @@
 Reech::Application.routes.draw do
 
+
+
+
+  namespace :api, defaults: {format: 'json'} do
+    namespace :v1 do
+      resources :questions
+      resources :solutions
+      resources :users
+    end
+  end
+
+    # /api/... Api...
+
   resources :questions do
     resources :solutions
   end
@@ -28,10 +41,25 @@ Reech::Application.routes.draw do
   match '/auth/failure' => 'authorizations#failure'
   match '/auth/:provider' => 'authorizations#blank'
 
-  
+  api vendor_string: "reech", default_version: 1 do
+    version 1 do
+      cache as: 'v1' do
+        resources :user_sessions
+        resources :authorizations
+      end
+    end
+
+    version 2 do
+      inherit from: 'v1'
+    end
+  end
+
+
   resources :newsfeeds
   root :to => 'reech#home'
   resources :chats
+
+
   get  '/sbchat' => 'chats#index', :as => :chat
   post '/new_message' => 'chats#new_message', :as => :new_message
   

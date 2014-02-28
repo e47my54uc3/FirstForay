@@ -16,6 +16,12 @@ class UsersController < ApplicationController
     end
   end
 
+
+ respond_to :json, :xml
+  def show
+    @user=current_user
+  end
+
   def showconnections
     flash[:notice]
     @user = User.find_by_reecher_id(params[:reecher_id])

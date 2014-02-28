@@ -3,6 +3,7 @@ class UserSessionsController < ApplicationController
     flash[:notice] = "Bad Request.You are already logged in!" if !current_user.nil?
     redirect_to root_url if !current_user.nil?
     @user_session = UserSession.new
+
   end
   
   def create
@@ -15,6 +16,12 @@ class UserSessionsController < ApplicationController
       render :action => :new
     end
   end
+
+  respond_to :json, :xml
+  def show
+    @user=current_user
+  end
+
   
   def destroy
     current_user_session.destroy

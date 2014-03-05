@@ -1,13 +1,38 @@
 Reech::Application.routes.draw do
 
 
-
+  use_doorkeeper
 
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
       resources :questions
       resources :solutions
       resources :users
+      resources :authorizations
+      post '/auth/:provider/callback' => 'authorizations#create'
+      get '/auth/failure' => 'authorizations#failure'
+      post '/auth/:provider' => 'authorizations#create'
+      get '/auth' => 'authorizations#index'
+      get '/auth/password/callback' => 'user_sessions#new'
+      
+      resources :user_profile
+      resources :user_sessions
+      get "logout_user" => "user_sessions#destroy", :as => "logout_user"
+      post "login_user" => "user_sessions#create", :as => "login_user"
+      post "signup" => "users#create", :as => "signup"
+      post "/myconnections/:reecher_id" => "users#showconnections", :as=>"myconnections"
+      get :profile, :to => 'user_profile#index'
+      post 'user_profile/update/:reecher_id', :to => 'user_profile#update', :as => :update_reecher_profile, :via => [:post]
+
+      resources :friendships do
+        collection do
+          get 'req',:as=>"addfriend"
+          get 'accept',:as=>"accept_fr"
+          get 'reject',:as=>"reject_fr"
+        end
+      end
+
+
     end
   end
 
@@ -36,23 +61,25 @@ Reech::Application.routes.draw do
   end
   
   resources :user_sessions
-  resources :authorizations
-  match '/auth/:provider/callback' => 'authorizations#create'
-  match '/auth/failure' => 'authorizations#failure'
-  match '/auth/:provider' => 'authorizations#blank'
+  # resources :authorizations
+  # match '/auth/:provider/callback' => 'authorizations#create'
+  # match '/auth/failure' => 'authorizations#failure'
+  # match '/auth/:provider' => 'authorizations#blank'
+  # get '/auth/password/callback' => 'user_sessions#new'
 
-  api vendor_string: "reech", default_version: 1 do
-    version 1 do
-      cache as: 'v1' do
-        resources :user_sessions
-        resources :authorizations
-      end
-    end
 
-    version 2 do
-      inherit from: 'v1'
-    end
-  end
+  # api vendor_string: "reech", default_version: 1 do
+  #   version 1 do
+  #     cache as: 'v1' do
+  #       resources :user_sessions
+  #       resources :authorizations
+  #     end
+  #   end
+
+  #   version 2 do
+  #     inherit from: 'v1'
+  #   end
+  # end
 
 
   resources :newsfeeds

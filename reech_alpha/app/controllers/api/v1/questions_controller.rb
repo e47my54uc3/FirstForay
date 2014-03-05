@@ -1,12 +1,14 @@
 module Api
 	module V1
-		class QuestionsController < ApplicationController
+		class QuestionsController < ApiController
 		#http_basic_authenticate_with name: "admin", password "secret"
 		before_filter :restrict_access
+		#doorkeeper_for :all
 		respond_to :json
 
 		def index
-    		respond_with Question.find(:all, :order => 'questions.created_at DESC')
+			@Questions = Question.filterforuser(params[:user_id])
+			respond_with @Questions 
       	end
 
 		def show
@@ -38,13 +40,7 @@ module Api
 
 private
 
-
-		def restrict_access
-			authenticate_or_request_with_http_token do |token, options|
-			ApiKey.exists?(access_token: token)
-			end
-		end
-
+		
 
 		end
 	end

@@ -7,5 +7,6 @@ Rails.application.config.middleware.use OmniAuth::Builder do
     provider :facebook, GRAPH_APP_ID, GRAPH_SECRET
     provider :linkedin, ENV['LINKEDIN_KEY'], ENV['LINKEDIN_SECRET']
     provider :open_id, :store => OpenID::Store::Filesystem.new('/tmp')
+    provider :password
     # Mention other providers here you want to allow user to sign in with
 end

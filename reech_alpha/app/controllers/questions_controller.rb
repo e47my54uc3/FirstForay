@@ -2,10 +2,10 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-    @questions = Question.find(:all, :order => 'questions.created_at DESC')
+      @Questions = Question.filterforuser(current_user)
       respond_to do |format|
       format.html # index.html.erb
-      format.json { render :json => ["Questions:", @questions] }
+      format.json { render :json => ["Questions:", @Questions] }
     end
   end
 

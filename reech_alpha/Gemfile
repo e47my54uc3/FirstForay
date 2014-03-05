@@ -68,4 +68,8 @@ gem 'nested_has_many_through'
 gem 'api-versions'
 gem 'rabl'
 
-#gem 'doorkeeper'
+gem 'doorkeeper'
+gem 'omniauth-password'
+
+#create model-diagram
+gem 'rails-erd'

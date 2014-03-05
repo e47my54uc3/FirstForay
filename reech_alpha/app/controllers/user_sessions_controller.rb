@@ -1,10 +1,9 @@
 class UserSessionsController < ApplicationController
-	def new
-    flash[:notice] = "Bad Request.You are already logged in!" if !current_user.nil?
-    redirect_to root_url if !current_user.nil?
-    @user_session = UserSession.new
-
-  end
+	 def new
+     flash[:notice] = "Bad Request.You are already logged in!" if !current_user.nil?
+     redirect_to root_url if !current_user.nil?
+     @user_session = UserSession.new
+   end
   
   def create
     @user_session = UserSession.new(params[:user_session])

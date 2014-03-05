@@ -25,15 +25,11 @@ class User < ActiveRecord::Base
       user.errors.add(:first_name, "First Name Field cannot be blank") if user.first_name.blank?
       user.errors.add(:last_name, "Last Name Field cannot be blank") if user.last_name.blank?
       user.errors.add(:password, "is required") if user.password.blank?
-      user.errors.add(:password_confirmation, "is required") if user.password_confirmation.blank?
-      user.errors.add(:password, "Password and confirmation must match") if user.password != user.password_confirmation
-    elsif !(!user.new_record? && user.password.blank? && user.password_confirmation.blank?) #adds validation only if password or password_confirmation are modified
+     elsif !(!user.new_record? && user.password.blank?) #adds validation only if password is modified
       user.errors.add(:first_name, "First Name Field cannot be blank") if user.first_name.blank?
       user.errors.add(:first_name, "Last Name Field cannot be blank") if user.last_name.blank?
       user.errors.add(:password, "is required") if user.password.blank?
-      user.errors.add(:password_confirmation, "is required") if user.password_confirmation.blank?
-      user.errors.add(:password, " and confirmation must match.") if user.password != user.password_confirmation
-      user.errors.add(:password, " and confirmation should be atleast 4 characters long.") if user.password.length < 4 || user.password_confirmation.length < 4
+      user.errors.add(:password, " and should be atleast 4 characters long.") if user.password.length < 4 || user.password_confirmation.length < 4
     end
   end
 

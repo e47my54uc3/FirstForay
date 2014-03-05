@@ -5,7 +5,10 @@ module Api
 
       def new
         if !current_user.nil?
-          respond_with "Already logged in"
+          respond_to do |format|
+            msg = { :status => "ok", :message => "Already logged in!"}
+            format.json { render :json => msg }  # note, no :location or :status options
+          end
         else
           @user_session = UserSession.new
         end
@@ -14,17 +17,20 @@ module Api
       def create
         if !current_user.nil?
           respond_to do |format|
-            format.json { render :json => "Already logged in" }  # note, no :location or :status options
+            msg = { :status => "ok", :message => "Already logged in!"}
+            format.json { render :json => msg }  # note, no :location or :status options
           end
         else
           @user_session = UserSession.new(params[:user_session])
           if @user_session.save
             respond_to do |format|
-              format.json { render :json => "Login Successful" }  # note, no :location or :status options
+              msg = { :status => "ok", :message => "Success!"}
+              format.json { render :json => msg }  # note, no :location or :status options
             end
           else
             respond_to do |format|
-              format.json { render :json => "Login Failed" }  # note, no :location or :status options
+              msg = { :status => "error", :message => "Failure!"}
+              format.json { render :json => msg }  # note, no :location or :status options
             end
           end
         end
@@ -32,16 +38,24 @@ module Api
 
       def show
         @user=current_user
-        respond_with @user
+        respond_to do |format|
+          format.json { render :json => @user }  # note, no :location or :status options
+        end
       end
 
       
       def destroy
         if current_user_session.nil?
-          respond_with "Not Logged In"
+          respond_to do |format|
+            msg = { :status => "error", :message => "Not logged in!"}
+            format.json { render :json => msg }  # note, no :location or :status options
+          end
         else
           current_user_session.destroy
-          respond_with "Logout success"
+          respond_to do |format|
+            msg = { :status => "ok", :message => "Success!"}
+            format.json { render :json => msg }  # note, no :location or :status options
+          end
         end
       end
 

@@ -37,8 +37,6 @@ module Api
         	end
         	end
 
-
-
 		  	def showconnections
         		@user=User.find_by_reecher_id(params[:user_id])
         		@all_connections = @user.friends.find(:all, :select => "first_name, last_name, email,friend_reecher_id")

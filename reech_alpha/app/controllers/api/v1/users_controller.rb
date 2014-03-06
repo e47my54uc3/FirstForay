@@ -14,7 +14,7 @@ module Api
         #@newsfeed.log(NEWSFEED_STREAM_VERBS[:new_user],'new_user',@user.reecher_id,@user.class.to_s,"#{@user.first_name} #{@user.last_name}",nil,nil,nil,nil,nil,0)
         if @user.save #&& @newsfeed.save #&& @user.create_reecher_node
           @api_key = ApiKey.create.access_token
-             msg = {:status => 201, :api_key=>@api_key, :email=>@user.email}
+             msg = {:status => 201, :api_key=>@api_key, :email=>@user.email, :user_id=>@user.reecher_id}
              render :json => msg  # note, no :location or :status options
         else
             msg = { :status => 401, :message => @user.errors.full_messages}

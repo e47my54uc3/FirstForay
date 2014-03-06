@@ -4,7 +4,7 @@ Reech::Application.routes.draw do
     namespace :v1 do
       
       resources :users
-        post "signup" => "users#new", :as => "signup"
+        post "signup" => "users#create", :as => "signup"
 
       resources :user_sessions
         post "logout_user" => "user_sessions#destroy", :as => "logout_user"

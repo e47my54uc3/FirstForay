@@ -14,19 +14,15 @@ module Api
         #@newsfeed.log(NEWSFEED_STREAM_VERBS[:new_user],'new_user',@user.reecher_id,@user.class.to_s,"#{@user.first_name} #{@user.last_name}",nil,nil,nil,nil,nil,0)
         if @user.save #&& @newsfeed.save #&& @user.create_reecher_node
           @api_key = ApiKey.create.access_token
-          respond_to do |format|
-             msg = { :status => 201, :api_key=>@api_key, :email=>@user.email}
-            format.json { render :json => msg }  # note, no :location or :status options
-          end
+             msg = {:status => 201, :api_key=>@api_key, :email=>@user.email}
+             render :json => msg  # note, no :location or :status options
         else
-          respond_to do |format|
             msg = { :status => 401, :message => @user.errors.full_messages}
-            format.json { render :json => msg }  # note, no :location or :status options
-          end
+            render :json => msg  # note, no :location or :status option
         end
       end
 
-      a
+      
       def show
         @user=current_user
         respond_to do |format|

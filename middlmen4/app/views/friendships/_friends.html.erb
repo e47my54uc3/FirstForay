@@ -1,6 +1,0 @@
-<h2>Your Friends</h2>
-<tr>
-	<% @user.friends.each do |friend| %>
-	<%=link_to "#{friend.full_name}",about_path(:beamer_id=>friend.beamer_id) %> 
-	<% end %>
-</tr>

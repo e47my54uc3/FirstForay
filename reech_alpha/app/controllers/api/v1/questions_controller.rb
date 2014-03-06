@@ -7,9 +7,10 @@ module Api
 		respond_to :json
 
 		def index
-			@Questions = Question.filterforuser(params[:user_id])
-			respond_with @Questions 
+				@Questions = Question.filterforuser(params[:user_id])
+				render :json => @Questions 
       	end
+
 
 		def show
     		@question = Question.find(params[:id])

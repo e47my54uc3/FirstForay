@@ -1,12 +1,13 @@
 module Api
   module V1
     class UserSessionsController < ApplicationController
+
     respond_to :json
 
       def new
         if !current_user.nil?
           respond_to do |format|
-            msg = { :status => "ok", :message => "Already logged in!"}
+            msg = { :status => 401, :message => "Already logged in!"}
             format.json { render :json => msg }  # note, no :location or :status options
           end
         else
@@ -17,19 +18,19 @@ module Api
       def create
         if !current_user.nil?
           respond_to do |format|
-            msg = { :status => "ok", :message => "Already logged in!"}
+            msg = { :status => 400, :message => "Already logged in!"}
             format.json { render :json => msg }  # note, no :location or :status options
           end
         else
           @user_session = UserSession.new(params[:user_session])
           if @user_session.save
             respond_to do |format|
-              msg = { :status => "ok", :message => "Success!"}
+              msg = { :status => 201, :message => "Success!", :email => @user_session.email}
               format.json { render :json => msg }  # note, no :location or :status options
             end
           else
             respond_to do |format|
-              msg = { :status => "error", :message => "Failure!"}
+              msg = { :status => 401, :message => "Failure!"}
               format.json { render :json => msg }  # note, no :location or :status options
             end
           end

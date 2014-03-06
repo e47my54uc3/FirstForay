@@ -1,28 +1,41 @@
 Reech::Application.routes.draw do
 
-
-  use_doorkeeper
-
   namespace :api, defaults: {format: 'json'} do
     namespace :v1 do
-      resources :questions
-      resources :solutions
+      
       resources :users
-      resources :authorizations
-      post '/auth/:provider/callback' => 'authorizations#create'
-      get '/auth/failure' => 'authorizations#failure'
-      post '/auth/:provider' => 'authorizations#create'
-      get '/auth' => 'authorizations#index'
-      get '/auth/password/callback' => 'user_sessions#new'
+        post "signup" => "users#new", :as => "signup"
+
+      resources :user_sessions
+        post "logout_user" => "user_sessions#destroy", :as => "logout_user"
+        post "login_user" => "user_sessions#create", :as => "login_user"
+
+      # devise_for :users, skip: :all
+      # devise_scope :api_user do
+      #   post "/register", :to => "users#create"
+      #   post "/login", :to => "sessions#create"
+      #   get "/login", :to => "user_sessions#new"
+      #   post "/logout", :to => "sessions#destroy"
+      # end
+
+
+      # to override devise controllers, must copy devise_controller.rb from gem into app
+      # devise_for :users, :controllers => {
+      #   :registrations => 'api/v1/users',
+      #   :sessions => 'devise/sessions',
+      #   :passwords => 'devise/passwords',
+      #   :confirmations => 'devise/confirmations',
+      #   :unlocks => 'devise/unlocks'
+      # }
+
+      resources :questions     
+        post "question_feed" => "questions#index"
+      
+      resources :solutions
       
       resources :user_profile
-      resources :user_sessions
-      get "logout_user" => "user_sessions#destroy", :as => "logout_user"
-      post "login_user" => "user_sessions#create", :as => "login_user"
-      post "signup" => "users#create", :as => "signup"
-      post "/myconnections/:reecher_id" => "users#showconnections", :as=>"myconnections"
-      get :profile, :to => 'user_profile#index'
-      post 'user_profile/update/:reecher_id', :to => 'user_profile#update', :as => :update_reecher_profile, :via => [:post]
+      post "/connections" => "user_profile#showconnections", :as=>"connections"
+      post "/changepassword" => "user_profile#changepass", :as=>"changepassword"
 
       resources :friendships do
         collection do
@@ -32,11 +45,24 @@ Reech::Application.routes.draw do
         end
       end
 
+     
+      # resources :authorizations
+      # post '/auth/:provider/callback' => 'authorizations#create'
+      # get '/auth/failure' => 'authorizations#failure'
+      # post '/auth/:provider' => 'authorizations#create'
+      # get '/auth' => 'authorizations#index'
+      # get '/auth/password/callback' => 'user_sessions#new'
+      
+      
+      
 
+      # post 'user_profile/update/:reecher_id', :to => 'user_profile#update', :as => :update_reecher_profile, :via => [:post]
     end
   end
 
-    # /api/... Api...
+ 
+  # WebApp routes
+
 
   resources :questions do
     resources :solutions
@@ -61,26 +87,11 @@ Reech::Application.routes.draw do
   end
   
   resources :user_sessions
-  # resources :authorizations
-  # match '/auth/:provider/callback' => 'authorizations#create'
-  # match '/auth/failure' => 'authorizations#failure'
-  # match '/auth/:provider' => 'authorizations#blank'
-  # get '/auth/password/callback' => 'user_sessions#new'
-
-
-  # api vendor_string: "reech", default_version: 1 do
-  #   version 1 do
-  #     cache as: 'v1' do
-  #       resources :user_sessions
-  #       resources :authorizations
-  #     end
-  #   end
-
-  #   version 2 do
-  #     inherit from: 'v1'
-  #   end
-  # end
-
+  resources :authorizations
+  match '/auth/:provider/callback' => 'authorizations#create'
+  match '/auth/failure' => 'authorizations#failure'
+  match '/auth/:provider' => 'authorizations#blank'
+  get '/auth/password/callback' => 'user_sessions#new'
 
   resources :newsfeeds
   root :to => 'reech#home'

@@ -1,8 +1,8 @@
 module Api
   module V1
     class AuthorizationsController < ApplicationController
-    before_filter :require_user, :only => [:destroy]
     respond_to :json
+    before_filter :require_user, :only => [:destroy]
     
     def index
       @auth = current_user.authorizations

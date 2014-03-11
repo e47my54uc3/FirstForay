@@ -1,11 +1,13 @@
 class ApplicationController < ActionController::Base
-	#protect_from_forgery
-	include ApplicationHelper
-	include NewsfeedsStreamsData
+  #protect_from_forgery
+  include ApplicationHelper
+  include NewsfeedsStreamsData
   helper :all
   #protect_from_forgery
   helper_method :current_user_session, :current_user, :require_user, :fb_user, :recipients
+  before_filter :add_common_headers #Filter for add response headers for all JSON API calls
 
+  
   private
   def recipients
     curr_u = current_user
@@ -40,17 +42,26 @@ class ApplicationController < ActionController::Base
   end
 
   def facebook_user
-		(session[:fb_access_token] && session[:fb_user_uid]) ? FBGraph::Client.new(:client_id => GRAPH_APP_ID, :secret_id => GRAPH_SECRET, :token => session[:fb_access_token]).selection.me.info! : nil
+    (session[:fb_access_token] && session[:fb_user_uid]) ? FBGraph::Client.new(:client_id => GRAPH_APP_ID, :secret_id => GRAPH_SECRET, :token => session[:fb_access_token]).selection.me.info! : nil
   end
 
-	def fb_user
-client = FBGraph::Client.new(:client_id => GRAPH_APP_ID, :secret_id => GRAPH_SECRET, :token => token)	
-	return @fbuser	
-	@fbuser = client.selection.me.info!
-	end
+  def fb_user
+client = FBGraph::Client.new(:client_id => GRAPH_APP_ID, :secret_id => GRAPH_SECRET, :token => token) 
+  return @fbuser  
+  @fbuser = client.selection.me.info!
+  end
 
   def get_user
     @user ||= User.find_by_reecher_id(params[:reecher_id])
     render(:template => "errors/error_404", :status => 404) if @user.blank?
   end
+
+  #Adding Response headers for a response of JSON API Request
+  def add_common_headers
+    if request.format == "json"
+      response['Access-Control-Allow-Origin'] = '*'
+      response['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT' 
+    end
+  end 
+  
 end

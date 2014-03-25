@@ -19,23 +19,36 @@ module Api
 
 		  	def changepass
      		 @user = User.find_by_reecher_id(params[:user_id])
-      	     @pass = params[:password]
-      	     if !@user.nil?
+     		 pwd_flag = params[:old_password].blank? ? false : @user.valid_password?(params[:old_password])
+      	 @pass = params[:new_password]
+      	  if !@user.nil? && pwd_flag
       	     	if @pass.length < 8
       	     		msg = {:status => 400, :message => "password must be at least 8 characters"}
           			render :json => msg
       	     	else
-					@user.password = @pass
-	        		@user.password_confirmation = @pass
-	        		@user.save!
-	        			msg = {:status => 200, :message => "success"}
+					       @user.password = @pass
+	        		   @user.password_confirmation = @pass
+	        		   @user.save!
+	        			  msg = {:status => 200, :message => "success"}
 	          			render :json => msg
-        		end
+        		  end
         	else
-        			msg = {:status => 400, :message => "Failed"}
-          			render :json => msg   # note, no :location or :status options
+        		msg = {:status => 400, :message => "Failed"}
+          	render :json => msg   # note, no :location or :status options
         	end
         	end
+
+        	def forget_password
+        		@user = User.find_by_email(params[:email])
+        		if !@user.nil?
+              @user.deliver_password_reset_instructions!
+        		  msg = {:status => 200, :message => "Password sent to your email"}
+          		render :json => msg
+        		else
+        		  msg = {:status => 400, :message => "Given Email not found"}
+          		render :json => msg
+        		end	
+        	end	
 
 		  	def showconnections
         		@user=User.find_by_reecher_id(params[:user_id])

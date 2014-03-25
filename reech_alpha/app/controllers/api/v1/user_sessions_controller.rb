@@ -8,6 +8,7 @@ module Api
         if !current_user.nil?
           respond_to do |format|
             msg = { :status => 401, :message => "Already logged in!"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end
         else
@@ -19,20 +20,36 @@ module Api
         if !current_user.nil?
           respond_to do |format|
             msg = { :status => 400, :message => "Already logged in!"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end
         else
-          @user_session = UserSession.new(params[:user_session])
-          if @user_session.save
-            respond_to do |format|
-              msg = { :status => 201, :message => "Success!", :email => @user_session.email}
-              format.json { render :json => msg }  # note, no :location or :status options
-            end
-          else
-            respond_to do |format|
-              msg = { :status => 401, :message => "Failure!"}
-              format.json { render :json => msg }  # note, no :location or :status options
-            end
+          if params[:provider] == "standard"
+
+            @user_session = UserSession.new(params[:user_details])
+            if @user_session.save
+              respond_to do |format|
+                @user_id = User.find_by_email(@user_session.email).reecher_id
+                @api_key = ApiKey.create(:user_id => @user_id).access_token
+                msg = { :status => 201, :message => "Success!", :email => @user_session.email, :api_key => @api_key, :user_id => @user_id}
+                logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+                format.json { render :json => msg }  # note, no :location or :status options
+              end
+            else
+              respond_to do |format|
+                msg = { :status => 401, :message => "Please check your Email/Password"}
+                logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+                format.json { render :json => msg }  # note, no :location or :status options
+              end
+            end 
+          elsif params[:provider] == "facebook"
+            msg = { :status => 200, :message => "Work Under progress"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+            render :json => msg
+          else  
+            msg = { :status => 401, :message => "Failure!"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+            render :json => msg
           end
         end
       end
@@ -49,12 +66,16 @@ module Api
         if current_user_session.nil?
           respond_to do |format|
             msg = { :status => "error", :message => "Not logged in!"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end
         else
           current_user_session.destroy
+          api_key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
+          api_key.destroy if !api_key.blank?
           respond_to do |format|
             msg = { :status => "ok", :message => "Success!"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end
         end

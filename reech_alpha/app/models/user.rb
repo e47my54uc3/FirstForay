@@ -25,7 +25,7 @@ class User < ActiveRecord::Base
   #Scrubber Fields
   before_create :create_unique_profile_id
   before_create :create_reecher_id
-  
+  validates :email, uniqueness: true
   #Authentications
   validate do |user|
     if user.new_record? #adds validation if it is a new record
@@ -130,6 +130,11 @@ class User < ActiveRecord::Base
     reecher_profile = UserProfile.new
     reecher_profile.reecher_id = self.reecher_id
     reecher_profile.save!
+  end
+
+  def deliver_password_reset_instructions!
+    reset_persistence_token!
+    UserMailer.password_reset_instructions(self).deliver
   end
 
 end

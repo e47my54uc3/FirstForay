@@ -2,7 +2,7 @@ class AuthorizationsController < ApplicationController
   before_filter :require_user, :only => [:destroy]
 
 	def index
-	 @auth = current_user.authorizations
+	 @auth = current_user.authorizations if current_user
 	end	
   
   respond_to :json, :xml

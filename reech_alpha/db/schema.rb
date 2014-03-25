@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140306080615) do
+ActiveRecord::Schema.define(:version => 20140321121602) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -177,14 +177,18 @@ ActiveRecord::Schema.define(:version => 20140306080615) do
     t.string   "post"
     t.string   "posted_by"
     t.string   "posted_by_uid"
-    t.datetime "created_at",                   :null => false
-    t.datetime "updated_at",                   :null => false
+    t.datetime "created_at",                         :null => false
+    t.datetime "updated_at",                         :null => false
     t.integer  "ups"
     t.integer  "downs"
-    t.string   "question_id",                  :null => false
+    t.string   "question_id",                        :null => false
     t.integer  "sash_id"
-    t.integer  "level",         :default => 0
+    t.integer  "level",               :default => 0
     t.integer  "Charisma"
+    t.string   "avatar_file_name"
+    t.string   "avatar_content_type"
+    t.integer  "avatar_file_size"
+    t.datetime "avatar_updated_at"
   end
 
   create_table "sashes", :force => true do |t|
@@ -224,18 +228,18 @@ ActiveRecord::Schema.define(:version => 20140306080615) do
   create_table "users", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
-    t.string   "email",                  :default => "",        :null => false
-    t.datetime "created_at",                                    :null => false
-    t.datetime "updated_at",                                    :null => false
-    t.string   "profile_name",           :default => "reecher"
-    t.string   "profile_id",                                    :null => false
-    t.string   "reecher_id",                                    :null => false
+    t.string   "email",               :default => "",        :null => false
+    t.datetime "created_at",                                 :null => false
+    t.datetime "updated_at",                                 :null => false
+    t.string   "profile_name",        :default => "reecher"
+    t.string   "profile_id",                                 :null => false
+    t.string   "reecher_id",                                 :null => false
     t.string   "crypted_password"
     t.string   "password_salt"
     t.string   "persistence_token"
     t.string   "single_access_token"
-    t.integer  "login_count",            :default => 0
-    t.integer  "failed_login_count",     :default => 0
+    t.integer  "login_count",         :default => 0
+    t.integer  "failed_login_count",  :default => 0
     t.datetime "last_request_at"
     t.datetime "current_login_at"
     t.datetime "last_login_at"
@@ -243,17 +247,13 @@ ActiveRecord::Schema.define(:version => 20140306080615) do
     t.string   "last_login_ip"
     t.text     "omniauth_data"
     t.integer  "sash_id"
-    t.integer  "level",                  :default => 0
-    t.string   "encrypted_password",     :default => "",        :null => false
-    t.string   "reset_password_token"
-    t.datetime "reset_password_sent_at"
-    t.datetime "remember_created_at"
+    t.integer  "level",               :default => 0
+    t.string   "fb_token"
+    t.string   "fb_uid"
   end
 
-  add_index "users", ["email"], :name => "index_users_on_email", :unique => true
   add_index "users", ["first_name"], :name => "index_users_on_first_name"
   add_index "users", ["profile_id"], :name => "index_users_on_profile_id", :unique => true
   add_index "users", ["reecher_id"], :name => "index_users_on_reecher_id", :unique => true
-  add_index "users", ["reset_password_token"], :name => "index_users_on_reset_password_token", :unique => true
 
 end

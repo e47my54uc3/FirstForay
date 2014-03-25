@@ -6,6 +6,7 @@
     <th>Posted by</th>
     <th>Posted by uid</th>
     <th>Charisma Points</th>
+    <th>Image</th>
 	 <th></th>
     <th></th>
     <th></th>
@@ -17,6 +18,7 @@
     <td><%= question.posted_by %></td>
     <td><%= question.posted_by_uid %></td>
 	 <td><%= question.points %></td>
+   <td><%= question.avatar_file_name==nil ? "No Image" : image_tag(question.avatar.url(:thumb)) %></td>
     <td><%= link_to 'Show', question %></td>
     <td><%= link_to 'Edit', edit_question_path(question) %></td>
     <td><%= link_to 'Destroy', question, :method => :delete, :data => { :confirm => 'Are you sure?' } %></td>

@@ -6,6 +6,7 @@ class ApplicationController < ActionController::Base
   #protect_from_forgery
   helper_method :current_user_session, :current_user, :require_user, :fb_user, :recipients
   before_filter :add_common_headers #Filter for add response headers for all JSON API calls
+  before_filter :log_request_data 
 
   
   private
@@ -63,5 +64,11 @@ client = FBGraph::Client.new(:client_id => GRAPH_APP_ID, :secret_id => GRAPH_SEC
       response['Access-Control-Allow-Methods'] = 'DELETE, HEAD, GET, OPTIONS, POST, PUT' 
     end
   end 
+
+  def log_request_data
+    if request.format == 'json'
+      logger.debug "******Request from #{request.remote_ip} at #{Time.now} => #{request.params}"
+    end
+  end  
   
 end

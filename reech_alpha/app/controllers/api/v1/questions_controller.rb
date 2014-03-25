@@ -9,7 +9,7 @@ module Api
 		def index
 				@Questions = Question.filterforuser(params[:user_id])
 				render :json => @Questions 
-      	end
+     end
 
 
 		def show
@@ -27,19 +27,45 @@ module Api
 		end
 
 
-		def create
-		    respond_with Question.new(params[:question])
-		    
-		 #    @question.posted_by_uid=current_user.reecher_id
-		 #    @question.posted_by=current_user.full_name
-		 #    @question.ups=0
-		 #    @question.downs=0
-			# @question.Charisma=5
-			# @question.save!
+		def create		    
+		    @user = User.find_by_reecher_id(params[:user_id])
+		    @question = Question.new()
+		    @question.post = params[:question]
+    		@question.posted_by_uid = @user.reecher_id
+    		@question.posted_by = @user.full_name
+    		@question.ups = 0
+    		@question.downs = 0 
+	 			@question.Charisma = 5
+				if @user.points > @question.Charisma	 
+					@question.add_points(@question.Charisma)
+					@user.subtract_points(10)
+					  if !params[:attached_image].blank? 
+    					data = StringIO.new(Base64.decode64(params[:attached_image]))
+    					@question.avatar = data
+  					end
+     			if @question.save!
+     					msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"}					    			
+        			render :json => msg 
+      		else
+      				msg = {:status => 401, :message => @question.errors}					    			
+        			render :json => msg 
+      		end
+    		
+				else
+					msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Creds to ask a Question! Earn some by providing Solutions!"}					    			
+        	render :json => msg	
+				end
+		    ##respond_with Question.new(params[:question])
+		 		# @question.posted_by_uid=current_user.reecher_id
+				# @question.posted_by=current_user.full_name
+		 		# @question.ups=0
+		 		# @question.downs=0
+				# @question.Charisma=5
+				# @question.save!
 		end
 
 
-private
+		private
 
 		
 

@@ -2,7 +2,7 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-      @Questions = Question.filterforuser(current_user)
+      @Questions = Question.filterforuser(current_user.reecher_id)
       respond_to do |format|
       format.html # index.html.erb
       format.json { render :json => ["Questions:", @Questions] }

@@ -2,7 +2,13 @@ include Scrubber
 class Question < ActiveRecord::Base
   has_merit
 
-  attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma
+  attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar
+  has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png"
+ 
+  #do_not_validate_attachment_file_type :avatar
+  validates_attachment :avatar, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:avatar].nil? }
+
+  #validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
   before_save :create_question_id
   
   belongs_to :user

@@ -36,6 +36,7 @@ Reech::Application.routes.draw do
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"
       post "/changepassword" => "user_profile#changepass", :as=>"changepassword"
+      post "/forgetpassword" => "user_profile#forget_password", :as=>"forgetpassword"
 
       resources :friendships do
         collection do
@@ -122,6 +123,8 @@ Reech::Application.routes.draw do
       get 'reject',:as=>"reject_fr"
     end
   end
+
+  resources :password_resets, :only => [ :new, :create, :edit, :update ]
  
 
 

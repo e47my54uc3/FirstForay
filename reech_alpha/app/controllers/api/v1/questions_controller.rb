@@ -8,20 +8,20 @@ module Api
 
 		def index
 			@Questions = []
-			@Questions = Question.filterforuser(params[:user_id])	
-			#if params[:type] == "feed"
-				#@Questions = Question.filterforuser(params[:user_id])			
-			#elsif params[:type] == "stared"
-			 	#@Questions = Question.get_stared_questions
-			#elsif params[:type] == "self"
-				#user = User.find_by_reecher_id(params[:user_id])
-				#@Questions = user.questions
-			#end	
+			#@Questions = Question.filterforuser(params[:user_id])	
+			if params[:type] == "feed"
+				@Questions = Question.filterforuser(params[:user_id])			
+			elsif params[:type] == "stared"
+			 	@Questions = Question.get_stared_questions
+			elsif params[:type] == "self"
+				user = User.find_by_reecher_id(params[:user_id])
+				@Questions = user.questions
+			end	
 
 			if @Questions.size > 0
 				@Questions.each do |q|
 				  q.posted_solutions.size > 0 ? q[:has_solution] = true : q[:has_solution] = false
-				  q.is_stared? ? q[:stared] = true : q[:stared] =false
+				  #q.is_stared? ? q[:stared] = true : q[:stared] =false
 				end	
 			end
 			  logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"

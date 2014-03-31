@@ -13,7 +13,7 @@ module Api
           if params[:provider] == "standard"
             if User.find_by_email(params[:user_details][:email]).nil?
                 @user = User.new(params[:user_details])
-                @user.first_name = params[:user_details][:email]
+                @user.first_name = params[:user_details][:email].split("@")[0]
                  #@newsfeed=Newsfeed.new
                   #@newsfeed.log(NEWSFEED_STREAM_VERBS[:new_user],'new_user',@user.reecher_id,@user.class.to_s,"#{@user.first_name} #{@user.last_name}",nil,nil,nil,nil,nil,0)
                 if @user.save(:validate => false) #&& @newsfeed.save #&& @user.create_reecher_node
@@ -34,15 +34,20 @@ module Api
              end   
           elsif params[:provider] == "facebook"
             fb_user = User.find_by_fb_uid(params[:user_details][:uid])
-            if fb_user.nil?
-              @graph = Koala::Facebook::API.new(params[:user_details][:access_token])
-              @profile = @graph.get_object("me")
+            @graph = Koala::Facebook::API.new(params[:user_details][:access_token])
+            @profile = @graph.get_object("me")
+            @fb_friends = @graph.get_connections("me", "friends")
+            
+            if fb_user.nil?              
             @user = User.new()
             @user.first_name = @profile["first_name"]
             @user.last_name = @profile["last_name"]
+            @user.email = @profile["email"]
             @user.fb_token = params[:user_details][:access_token]
             @user.fb_uid = params[:user_details][:uid]
             if @user.save(:validate => false)
+
+              make_friendship(@fb_friends,@user) if @fb_friends.size > 0
 
               create_session_for_fb_user(@user)
               
@@ -54,6 +59,7 @@ module Api
              render :json => msg
             end 
            else
+             make_friendship(@fb_friends,fb_user) if @fb_friends.size > 0
              create_session_for_fb_user(fb_user)
              @api_key = ApiKey.create(:user_id => fb_user.reecher_id).access_token
              msg = {:status => 201, :api_key=>@api_key, :user_id=>fb_user.reecher_id}
@@ -80,6 +86,19 @@ module Api
       def create_session_for_fb_user(user)
         user.reset_persistence_token!
         UserSession.create(user, true)
+      end  
+
+      def make_friendship(fb_friends, fb_user)
+        fb_friends_list_uids = []
+        fb_friends.select {|fu| fb_friends_list_uids << fu["id"] }
+        fb_friends_list_uids.each do |f|
+          fb_user_existed = User.find_by_fb_uid(f)
+          if !fb_user_existed.blank?
+            if Friendship.request(fb_user_existed, fb_user)
+              Friendship.accept(fb_user_existed, fb_user)
+            end  
+          end 
+        end  
       end  
 
     end

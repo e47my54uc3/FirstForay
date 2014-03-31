@@ -59,6 +59,12 @@ class User < ActiveRecord::Base
            :conditions => "status = 'pending'", 
            :order => :created_at
 
+  #Questions
+  has_many :questions, :primary_key=>"reecher_id",:foreign_key=>'posted_by_uid'
+
+  has_many :votings, :dependent => :destroy
+
+
   # purchased solutions
 	has_many :purchased_solutions
 	has_many :solutions, :through => :purchased_solutions

@@ -65,7 +65,7 @@ module Api
       def destroy
         if current_user_session.nil?
           respond_to do |format|
-            msg = { :status => "error", :message => "Not logged in!"}
+            msg = { :status => 401, :message => "Not logged in!"}
             logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end
@@ -74,7 +74,7 @@ module Api
           api_key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
           api_key.destroy if !api_key.blank?
           respond_to do |format|
-            msg = { :status => "ok", :message => "Success!"}
+            msg = { :status => 200, :message => "Success!"}
             logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
             format.json { render :json => msg }  # note, no :location or :status options
           end

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140321121602) do
+ActiveRecord::Schema.define(:version => 20140327113329) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -255,5 +255,12 @@ ActiveRecord::Schema.define(:version => 20140321121602) do
   add_index "users", ["first_name"], :name => "index_users_on_first_name"
   add_index "users", ["profile_id"], :name => "index_users_on_profile_id", :unique => true
   add_index "users", ["reecher_id"], :name => "index_users_on_reecher_id", :unique => true
+
+  create_table "votings", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "question_id"
+    t.datetime "created_at",  :null => false
+    t.datetime "updated_at",  :null => false
+  end
 
 end

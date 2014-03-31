@@ -30,6 +30,7 @@ Reech::Application.routes.draw do
 
       resources :questions     
         post "question_feed" => "questions#index"
+        post "mark_question_stared" => "questions#mark_question_stared"
       
       resources :solutions
       
@@ -40,6 +41,7 @@ Reech::Application.routes.draw do
 
       resources :friendships do
         collection do
+          post 'index'
           get 'req',:as=>"addfriend"
           get 'accept',:as=>"accept_fr"
           get 'reject',:as=>"reject_fr"

@@ -79,4 +79,5 @@ gem "paperclip"
 
 group :development do
   gem 'debugger'
+  #gem 'bullet'
 end

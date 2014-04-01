@@ -21,7 +21,7 @@ module Api
 			if @Questions.size > 0
 				@Questions.each do |q|
 				  q.posted_solutions.size > 0 ? q[:has_solution] = true : q[:has_solution] = false
-				  #q.is_stared? ? q[:stared] = true : q[:stared] =false
+				  q.is_stared? ? q[:stared] = true : q[:stared] =false
 				end	
 			end
 			  logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"
@@ -74,14 +74,20 @@ module Api
 		def mark_question_stared
 			@user = User.find_by_reecher_id(params[:user_id])
 			@question = Question.find_by_question_id(params[:question_id])
-			if params[:stared] == true
+			
+			if params[:stared] == "true"
+				@voting = Voting.where(user_id: @user.id, question_id: @question.id).first
+				if @voting.blank?
 				@voting = Voting.new do |v|
-  								u.user_id = @user.id
-  								u.question_id = @question.id
+  								v.user_id = @user.id
+  								v.question_id = @question.id
 								end
 				@voting.save ? msg = {:status => 200, :message => "Successfully Stared"} : msg = {:status => 401, :message => "Failed!"}
-			elsif params[:stared] == false
-				@voting = Voting.where(user_id: @user.id, question_id: @question.id)
+			 else
+			 	msg = {:status => 200, :message => "Already Stared"}
+			 end	
+			elsif params[:stared] == "false"
+				@voting = Voting.where(user_id: @user.id, question_id: @question.id).first
 				@voting.destroy
 				@voting.destroyed? ? msg = {:status => 200, :message => "Successfully UnStared"} : msg = {:status => 401, :message => "Failed!"}
 			end

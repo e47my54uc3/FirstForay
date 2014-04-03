@@ -9,6 +9,7 @@ Reech::Application.routes.draw do
       resources :user_sessions
         post "logout_user" => "user_sessions#destroy", :as => "logout_user"
         post "login_user" => "user_sessions#create", :as => "login_user"
+        get "check_connection" => "user_sessions#check_connection", :as => "check_connection"
 
       # devise_for :users, skip: :all
       # devise_scope :api_user do

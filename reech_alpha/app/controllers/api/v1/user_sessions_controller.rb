@@ -81,6 +81,11 @@ module Api
         end
       end
 
+      def check_connection
+        msg = { :status => 200, :message => "verified connection"}
+        render :json => msg
+      end  
+
     end
   end
 end

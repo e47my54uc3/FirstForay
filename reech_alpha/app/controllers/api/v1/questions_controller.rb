@@ -10,7 +10,8 @@ module Api
 			@Questions = []
 			#@Questions = Question.filterforuser(params[:user_id])	
 			if params[:type] == "feed"
-				@Questions = Question.filterforuser(params[:user_id])			
+				#@Questions = Question.filterforuser(params[:user_id])
+				@Questions = Question.all			
 			elsif params[:type] == "stared"
 			 	@Questions = Question.get_stared_questions
 			elsif params[:type] == "self"

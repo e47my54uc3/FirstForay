@@ -10,7 +10,8 @@ module Api
 				@friends_list = []
 				@friends.select {|f| @friends_list << {:name => f.full_name, :email => f.email} } if @friends.size > 0
 				logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ @friends_list }"
-				render :json => @friends_list
+				msg = {:status => 200, :friends_list => @friends_list }
+				render :json => msg
 			end
 
 		end

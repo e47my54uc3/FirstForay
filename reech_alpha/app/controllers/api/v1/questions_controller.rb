@@ -8,66 +8,67 @@ module Api
 
 		def index
 			@Questions = []
-			#@Questions = Question.filterforuser(params[:user_id])	
+			#@Questions = Question.filterforuser(params[:user_id])  
 			if params[:type] == "feed"
-				#@Questions = Question.filterforuser(params[:user_id])
-				@Questions = Question.all			
+				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC")     
 			elsif params[:type] == "stared"
-			 	@Questions = Question.get_stared_questions
+				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions
 			elsif params[:type] == "self"
 				user = User.find_by_reecher_id(params[:user_id])
-				@Questions = user.questions
-			end	
+				@Questions = user.questions.includes(:posted_solutions, :votings).order("created_at DESC")
+			end 
 
 			if @Questions.size > 0
 				@Questions.each do |q|
-				  q.posted_solutions.size > 0 ? q[:has_solution] = true : q[:has_solution] = false
-				  q.is_stared? ? q[:stared] = true : q[:stared] =false
-				end	
+					q.posted_solutions.size > 0 ? q[:has_solution] = true : q[:has_solution] = false
+					q.is_stared? ? q[:stared] = true : q[:stared] =false
+					q.avatar_file_name != nil ? q[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q[:image_url] = nil
+				end 
 			end
-			  logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"
-				render :json => @Questions 
-    end
+				logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"
+				msg = {:status => 200, :questions => @Questions }
+				render :json => msg 
+		end
 
 
 		def show
-    		@question = Question.find(params[:id])
-    		@solutions = Solution.filter(@question, current_user)
-    		@allsolutions = @question.posted_solutions
-		    #filter solutions by user id (ie, does user id exist in solutions?)
-		    #@allsolutions.each do |sol|
-		    #  if sol.users.exists?(current_user)
-		    #      @solutions << sol
-		    #  end  
-		    #end
-		    #@solutions = @allsolutions.find_by_uid_exist?
+				@question = Question.find(params[:id])
+				@solutions = Solution.filter(@question, current_user)
+				@allsolutions = @question.posted_solutions
+				#filter solutions by user id (ie, does user id exist in solutions?)
+				#@allsolutions.each do |sol|
+				#  if sol.users.exists?(current_user)
+				#      @solutions << sol
+				#  end  
+				#end
+				#@solutions = @allsolutions.find_by_uid_exist?
 			respond_with @question, @solutions, @allsolutions
 		end
 
 
-		def create		    
-		    @user = User.find_by_reecher_id(params[:user_id])
-		    @question = Question.new()
-		    @question.post = params[:question]
-    		@question.posted_by_uid = @user.reecher_id
-    		@question.posted_by = @user.full_name
-    		@question.ups = 0
-    		@question.downs = 0 
-	 			@question.Charisma = 5
-				if @user.points > @question.Charisma	 
+		def create        
+				@user = User.find_by_reecher_id(params[:user_id])
+				@question = Question.new()
+				@question.post = params[:question]
+				@question.posted_by_uid = @user.reecher_id
+				@question.posted_by = @user.full_name
+				@question.ups = 0
+				@question.downs = 0 
+				@question.Charisma = 5
+				if @user.points > @question.Charisma   
 					@question.add_points(@question.Charisma)
 					@user.subtract_points(10)
-					  if !params[:attached_image].blank? 
-    					data = StringIO.new(Base64.decode64(params[:attached_image]))
-    					@question.avatar = data
-  					end
-     			@question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
-    		 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-    		 render :json => msg
+						if !params[:attached_image].blank? 
+							data = StringIO.new(Base64.decode64(params[:attached_image]))
+							@question.avatar = data
+						end
+					@question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
+				 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+				 render :json => msg
 				else
-					msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Creds to ask a Question! Earn some by providing Solutions!"}					    			
-        	logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-        	render :json => msg	
+					msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
+					logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+					render :json => msg 
 				end
 
 		end
@@ -80,21 +81,25 @@ module Api
 				@voting = Voting.where(user_id: @user.id, question_id: @question.id).first
 				if @voting.blank?
 				@voting = Voting.new do |v|
-  								v.user_id = @user.id
-  								v.question_id = @question.id
+									v.user_id = @user.id
+									v.question_id = @question.id
 								end
 				@voting.save ? msg = {:status => 200, :message => "Successfully Stared"} : msg = {:status => 401, :message => "Failed!"}
 			 else
-			 	msg = {:status => 200, :message => "Already Stared"}
-			 end	
+				msg = {:status => 200, :message => "Already Stared"}
+			 end  
 			elsif params[:stared] == "false"
 				@voting = Voting.where(user_id: @user.id, question_id: @question.id).first
-				@voting.destroy
-				@voting.destroyed? ? msg = {:status => 200, :message => "Successfully UnStared"} : msg = {:status => 401, :message => "Failed!"}
+				if @voting.present?
+					@voting.destroy
+					@voting.destroyed? ? msg = {:status => 200, :message => "Successfully UnStared"} : msg = {:status => 401, :message => "Failed!"}
+				else
+					msg = {:status => 200, :message => "Already UnStared"}
+				end 
 			end
-			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"	
+			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}" 
 			render :json => msg 
-		end	
+		end 
 
 
 		private

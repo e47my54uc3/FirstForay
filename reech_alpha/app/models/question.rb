@@ -30,7 +30,7 @@ class Question < ActiveRecord::Base
 		#@Questions = @Qpostedbyuser.collect{|question| {:value=>question.id, :label=>question.post}}
 		@Questions = []
 		@Questions << @Qpostedbyuser
-		@Qbyfriendship = Question.find(:all, :order => 'questions.created_at DESC')
+		@Qbyfriendship = Question.includes(:posted_solutions, :votings).find(:all, :order => 'questions.created_at DESC')
 			@Qbyfriendship.each do |question|
 				@posting_user = question.posted_by_uid
 				if Friendship.are_friends(@posting_user,current_user.reecher_id)
@@ -40,10 +40,11 @@ class Question < ActiveRecord::Base
 			@Questions = @Questions.flatten
 	end
 
-	def self.get_stared_questions
+	def self.get_stared_questions(user_id)
 		@stared_questions = []
 		stared_question_ids = []
-		stared_questions = Voting.all
+		user = User.find_by_reecher_id(user_id)
+		stared_questions = user.votings #Voting.all
 		if stared_questions.size > 0
 			stared_questions.each do |sq|
 				stared_question_ids << sq.question_id

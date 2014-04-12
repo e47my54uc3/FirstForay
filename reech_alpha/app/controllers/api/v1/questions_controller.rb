@@ -7,12 +7,12 @@ module Api
 		respond_to :json
 
 		def index
-			@Questions = []
-			#@Questions = Question.filterforuser(params[:user_id])  
+			@Questions = [] 
 			if params[:type] == "feed"
-				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC")     
+			  @Questions = Question.filterforuser(params[:user_id])
+				#@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC")     
 			elsif params[:type] == "stared"
-				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions
+				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions(params[:user_id])
 			elsif params[:type] == "self"
 				user = User.find_by_reecher_id(params[:user_id])
 				@Questions = user.questions.includes(:posted_solutions, :votings).order("created_at DESC")

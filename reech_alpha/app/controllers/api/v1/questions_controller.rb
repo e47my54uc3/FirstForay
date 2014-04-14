@@ -8,9 +8,9 @@ module Api
 
 		def index
 			@Questions = [] 
+			questions_hash = []
 			if params[:type] == "feed"
 			  @Questions = Question.filterforuser(params[:user_id])
-				#@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC")     
 			elsif params[:type] == "stared"
 				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions(params[:user_id])
 			elsif params[:type] == "self"
@@ -20,13 +20,15 @@ module Api
 
 			if @Questions.size > 0
 				@Questions.each do |q|
-					q.posted_solutions.size > 0 ? q[:has_solution] = true : q[:has_solution] = false
-					q.is_stared? ? q[:stared] = true : q[:stared] =false
-					q.avatar_file_name != nil ? q[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q[:image_url] = nil
+					q_hash = q.attributes
+					q.posted_solutions.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
+					q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
+					q.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q_hash[:image_url] = nil
+					questions_hash << q_hash
 				end 
 			end
 				logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"
-				msg = {:status => 200, :questions => @Questions }
+				msg = {:status => 200, :questions => questions_hash }
 				render :json => msg 
 		end
 

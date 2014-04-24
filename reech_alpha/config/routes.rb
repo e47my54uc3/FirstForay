@@ -39,6 +39,8 @@ Reech::Application.routes.draw do
       post "/connections" => "user_profile#showconnections", :as=>"connections"
       post "/changepassword" => "user_profile#changepass", :as=>"changepassword"
       post "/forgetpassword" => "user_profile#forget_password", :as=>"forgetpassword"
+      post "/profile" => "user_profile#index", :as=>"profile"
+      post "/update_profile" => "user_profile#update", :as => "update_profile"
 
       resources :friendships do
         collection do

@@ -1,27 +1,56 @@
 module Api
 	module V1
 		class UserProfileController < ApiController
+		before_filter :restrict_access, :except => [:forget_password]	
 		respond_to :json
 				
 				def index
-					if current_user.nil?
-						respond_with "Must be logged in"
+					@user = User.find_by_reecher_id(params[:user_id])
+					if @user.nil?
+						msg = {:status => 400, :message => "User does not exist."}
+						render :json => msg
 					else
-						@profile = @user.user_profile
-						@badge = @user.badges
-						respond_with @profile
+						#@profile = current_user.user_profile
+						#@badge = current_user.badges
+						@profile = @user.user_profile.attributes
+						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
+						msg = {:status => 200, :user => @user, :profile => @profile }
+						render :json => msg
 					end
 				end
 
-				# POST /:username/profile/:reecher_id
+				# POST /update_profile
 				def update
+					@user = User.find_by_reecher_id(params[:user_id])
+					@user.first_name = params[:first_name]
+					@user.last_name = params[:last_name]
+					
+					@profile = @user.user_profile
+					@profile.location = params[:location]
+					@profile.bio = params[:about]
+					if !params[:profile_image].blank? 
+						data = StringIO.new(Base64.decode64(params[:profile_image]))
+						@profile.picture = data
+					end	
+
+					if @user.save && @profile.save
+						@profile_hash = @user.user_profile.attributes
+						@profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
+						msg = {:status => 200, :user => @user, :profile => @profile_hash }
+					else
+						msg = {:status => 400, :message => @user.errors + @profile.errors}
+					end	
+					render :json => msg
 				end
 
 				def changepass
 				 @user = User.find_by_reecher_id(params[:user_id])
-				 pwd_flag = params[:old_password].blank? ? false : @user.valid_password?(params[:old_password])
+				 api_key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
+				 old_pwd_flag = params[:old_password].blank? ? false : @user.valid_password?(params[:old_password])
+				 pwd_flag = params[:new_password] == params[:confirm_password] ? true : false
 				 @pass = params[:new_password]
-					if !@user.nil? && pwd_flag
+
+					if pwd_flag && old_pwd_flag
 							if @pass.length < 8
 								msg = {:status => 400, :message => "password must be at least 8 characters"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
@@ -29,13 +58,16 @@ module Api
 							else
 								@user.password = @pass
 								@user.password_confirmation = @pass
-								@user.save!
-								msg = {:status => 200, :message => "success"}
+								@user.save(:validate => false)
+								api_key.destroy
+								current_user_session.destroy if !current_user_session.nil?
+								msg = {:status => 200, :message => "Your password has been changed please login again"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 								render :json => msg
 							end
 					else
-						msg = {:status => 400, :message => "Incorrect old Password"}
+						message = old_pwd_flag ? "Password and confirm Password does not match." : "Invalid old password."
+						msg = {:status => 400, :message => message}
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 						render :json => msg   # note, no :location or :status options
 					end
@@ -62,9 +94,10 @@ module Api
 							msg = {:status=> 200, :message => @all_connections}
 							render :json => msg
 						else
-							render :json => "Filed"
+							msg = {:status=> 400, :message => "No connections"}
+							render :json => msg
 						end
-					end
+				end
 
 		end
 	end

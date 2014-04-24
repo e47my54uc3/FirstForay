@@ -75,6 +75,8 @@ gem 'koala'
 
 gem "paperclip"
 
+gem 'twilio-ruby'
+
 #For debugging application only for development ENV
 
 group :development do

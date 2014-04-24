@@ -13,16 +13,19 @@ module Api
 					if params[:provider] == "standard"
 						if User.find_by_email(params[:user_details][:email]).nil?
 								@user = User.new(params[:user_details])
-								@user.first_name = params[:user_details][:email].split("@")[0]
-								 #@newsfeed=Newsfeed.new
-									#@newsfeed.log(NEWSFEED_STREAM_VERBS[:new_user],'new_user',@user.reecher_id,@user.class.to_s,"#{@user.first_name} #{@user.last_name}",nil,nil,nil,nil,nil,0)
-								if @user.save(:validate => false) #&& @newsfeed.save #&& @user.create_reecher_node
-									 @user.reset_single_access_token
-									 @user.add_points(500)
-									 @api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
-									 msg = {:status => 201, :api_key=>@api_key, :email=>@user.email, :user_id=>@user.reecher_id}
-									 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-									 render :json => msg  # note, no :location or :status options
+								@user.password_confirmation = params[:user_details][:password]
+								if @user.save
+									if !params[:profile_image].blank? 
+										data = StringIO.new(Base64.decode64(params[:profile_image]))
+										@user.user_profile.picture = data
+										@user.save
+									end
+									@user.reset_single_access_token
+									@user.add_points(500)
+									@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
+									msg = {:status => 201, :api_key=>@api_key, :email=>@user.email, :user_id=>@user.reecher_id}
+									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+									render :json => msg  # note, no :location or :status options
 								else
 									msg = { :status => 401, :message => @user.errors.full_messages}
 									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"

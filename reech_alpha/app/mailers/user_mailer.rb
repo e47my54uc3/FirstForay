@@ -8,4 +8,9 @@ class UserMailer < ActionMailer::Base
     mail(to:  user.email, subject: "Password Reset Instructions")
   end
 
+  def send_invitation_email_for_audien(email,user)
+  	@user = user
+  	mail(to:  email, subject: "Invitation to singup Reechout")
+  end	
+
 end

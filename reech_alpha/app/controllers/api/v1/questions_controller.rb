@@ -64,9 +64,42 @@ module Api
 							data = StringIO.new(Base64.decode64(params[:attached_image]))
 							@question.avatar = data
 						end
+
+						# Setting audiens for displaying posetd user details of a question
+						if !params[:audien_details].nil?
+
+							if !params[:audien_details][:emails].nil?
+								audien_reecher_ids = []
+								params[:audien_details][:emails].each do |email|
+									user = User.find_by_email(email)
+									# If audien is a reecher store his reedher_id in question record
+									# Else send an Invitation mail to the audien
+									if user.present?
+										audien_reecher_ids << user.reecher_id
+									else
+									  UserMailer.send_invitation_email_for_audien(email, @user).deliver
+									end	
+								end	
+								@question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
+							end	
+
+							# If the audien is not a reecher and have contact number then send an SMS
+							if !params[:audien_details][:phone_numbers].nil?
+								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+								params[:audien_details][:phone_numbers].each do |number|
+									sms = client.account.sms.messages.create(
+        							from: TWILIO_CONFIG['from'],
+        							to: number,
+        							body: "#{@user.email} Invited you to answer his question in Reechout.Please Download and Install Reechout app from app store."
+      						)
+      						logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
+								end	
+							end	
+
+						end	
 					@question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
-				 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-				 render :json => msg
+				 	logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+				 	render :json => msg
 				else
 					msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
 					logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"

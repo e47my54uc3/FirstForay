@@ -2,9 +2,9 @@ include Scrubber
 class Question < ActiveRecord::Base
 	has_merit
 
-	attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url
+	attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids
 	has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png"
- 
+ serialize :audien_user_ids, Array
 	#do_not_validate_attachment_file_type :avatar
 	validates_attachment :avatar, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:avatar].nil? }
 

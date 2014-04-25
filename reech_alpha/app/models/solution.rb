@@ -1,5 +1,6 @@
 class Solution < ActiveRecord::Base
 	attr_accessible :body, :solver, :solver_id, :down, :up, :ask_charisma, :linked_user
+	acts_as_votable
 	belongs_to :forquestion,
 	:class_name => 'Question',
 	:primary_key => 'question_id',

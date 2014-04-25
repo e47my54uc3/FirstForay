@@ -71,11 +71,17 @@ gem 'rabl'
 #create model-diagram
 gem 'rails-erd'
 
+#For Facebook authentication
 gem 'koala'
 
+#For Image uplod
 gem "paperclip"
 
+#For sending SMS
 gem 'twilio-ruby'
+
+#For facebook kind like/dislike
+gem 'acts_as_votable'
 
 #For debugging application only for development ENV
 

@@ -40,15 +40,15 @@ Reech::Application.configure do
   config.assets.debug = true
 
   #required by devise. Set host to correct host in production mode
-  config.action_mailer.default_url_options = { :host => 'localhost:3000' }
+  config.action_mailer.default_url_options = { :host => '10.131.91.137:3000' }
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
   address:              'smtp.gmail.com',
   port:                 587,
   domain:               'gmail.com',
-  user_name:            'USER NAME',
-  password:             'Password',
+  user_name:            'info@reechout.co',
+  password:             'Supercashmoney1',
   authentication:       'plain',
   enable_starttls_auto: true  }
 

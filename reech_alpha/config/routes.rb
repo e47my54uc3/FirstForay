@@ -34,6 +34,8 @@ Reech::Application.routes.draw do
         post "mark_question_stared" => "questions#mark_question_stared"
       
       resources :solutions
+        post "view_solution" => "solutions#view_solution", :as => "view_solution"
+        post "solution_hi5" => "solutions#solution_hi5", :as => "solution_hi5"
       
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"
@@ -41,6 +43,7 @@ Reech::Application.routes.draw do
       post "/forgetpassword" => "user_profile#forget_password", :as=>"forgetpassword"
       post "/profile" => "user_profile#index", :as=>"profile"
       post "/update_profile" => "user_profile#update", :as => "update_profile"
+      post "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
 
       resources :friendships do
         collection do

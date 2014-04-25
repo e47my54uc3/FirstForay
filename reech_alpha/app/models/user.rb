@@ -7,6 +7,7 @@ class User < ActiveRecord::Base
 	# Setup accessible (or protected) attributes for your model
 	attr_accessible :email, :password, :password_confirmation, :remember_me
 	has_merit
+	acts_as_voter
 
 	include BCrypt
 	include Scrubber
@@ -41,7 +42,7 @@ class User < ActiveRecord::Base
 	end
 
 	# friendships
-	has_many :friendship,:primary_key=>"reecher_id",:foreign_key=>'reecher_id'
+	has_many :friendships,:primary_key=>"reecher_id",:foreign_key=>'reecher_id'
 	has_many :friends, 
 					 :through => :friendship,
 					 :conditions => "status = 'accepted'", 

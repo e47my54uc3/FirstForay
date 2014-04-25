@@ -90,7 +90,7 @@ module Api
 									sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
         							to: number,
-        							body: "#{@user.email} Invited you to answer his question in Reechout.Please Download and Install Reechout app from app store."
+        							body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
       						)
       						logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
 								end	

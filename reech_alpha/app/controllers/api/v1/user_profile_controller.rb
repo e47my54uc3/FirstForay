@@ -114,6 +114,31 @@ module Api
 					render :json => msg
 				end	
 
+				def add_contact
+				 @user = User.find_by_reecher_id(params[:user_id]
+						if !params[:contact_details].nil?
+
+							if !params[:contact_details][:emails].nil?
+								audien_reecher_ids = []
+								params[:audien_details][:emails].each do |email|
+									UserMailer.send_invitation_email_for_new_contact(email, @user).deliver
+								end	
+							end	
+
+							if !params[:contact_details][:phone_numbers].nil?
+								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+								params[:audien_details][:phone_numbers].each do |number|
+									sms = client.account.sms.messages.create(
+        							from: TWILIO_CONFIG['from'],
+        							to: number,
+        							body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+      						)
+								end	
+							end	
+
+						end	
+				end	
+
 		end
 	end
 end

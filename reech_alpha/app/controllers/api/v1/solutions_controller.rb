@@ -31,7 +31,15 @@ module Api
 				@user = User.find_by_reecher_id(params[:user_id])
 				@solution = Solution.find(params[:solution_id])
 				@preview_solution = PreviewSolution.where(:user_id => @user, :solution_id => @solution.id)
-				@preview_solution.present? ? msg = {:status => 400, :message => "You have to purchase this solution."} : msg = {:status => 200, :solution => @solution}
+				if @preview_solution.present? 
+				  msg = {:status => 400, :message => "You have to purchase this solution."}
+				else
+					preview_solution = PreviewSolution.new
+					preview_solution.user_id = @user.id
+					preview_solution.solution_id = @solution.id
+					preview_solution.save
+					msg = {:status => 200, :solution => @solution}
+				end	
 			end	
 
 			def solution_hi5

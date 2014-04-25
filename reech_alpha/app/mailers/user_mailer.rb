@@ -13,4 +13,9 @@ class UserMailer < ActionMailer::Base
   	mail(to:  email, subject: "Invitation to singup Reechout")
   end	
 
+  def send_invitation_email_for_new_contact(email,user)
+    @user = user
+    mail(to:  email, subject: "Invitation to singup Reechout")
+  end
+
 end

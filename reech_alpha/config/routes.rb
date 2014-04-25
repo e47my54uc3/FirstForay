@@ -46,6 +46,7 @@ Reech::Application.routes.draw do
       post "/update_profile" => "user_profile#update", :as => "update_profile"
       post "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
       post "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
+      post "/add_contact" => "user_profile#add_contact", :as => "add_contact"
 
       resources :user_settings
         post "/view_settings" => "user_settings#view_settings", :as=>"view_settings"

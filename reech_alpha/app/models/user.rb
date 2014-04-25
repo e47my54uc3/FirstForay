@@ -82,13 +82,16 @@ class User < ActiveRecord::Base
 					 :reecher_fav_movies=,:reecher_fav_books=, :reecher_fav_sports=, :reecher_fav_destinations=,
 					 :reecher_fav_cuisines=, :bio=, :snippet=,
 					 :to => :user_profile
+
+	has_one :user_settings, :primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
+				 
 					 
 	# Alias Profile of a reecher to be called User Profile or Reecher Profile
 	alias_attribute :reecher_profile,:user_profile
 
 	accepts_nested_attributes_for :user_profile
 
-	after_create :create_reecher_profile
+	after_create :create_reecher_profile, :create_user_settings
 
 
 	def self.create_from_omniauth_data(omniauth_data)
@@ -138,6 +141,18 @@ class User < ActiveRecord::Base
 		reecher_profile.reecher_id = self.reecher_id
 		reecher_profile.save!
 	end
+
+	def create_user_settings
+		user_settings = UserSettings.new
+		user_settings.reecher_id = self.reecher_id
+		user_settings.location_is_enabled = true
+		user_settings.pushnotif_is_enabled = false
+		user_settings.emailnotif_is_enabled = true
+		user_settings.notify_question_when_answered = true
+		user_settings.notify_linked_to_question = true
+		user_settings.notify_solution_got_highfive = true
+		user_settings.save!
+	end	
 
 	def deliver_password_reset_instructions!
 		reset_persistence_token!

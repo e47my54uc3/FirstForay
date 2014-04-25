@@ -27,6 +27,13 @@ module Api
 				render :json => msg
 			end	
 
+			def preview_solution
+				@user = User.find_by_reecher_id(params[:user_id])
+				@solution = Solution.find(params[:solution_id])
+				@preview_solution = PreviewSolution.where(:user_id => @user, :solution_id => @solution.id)
+				@preview_solution.present? ? msg = {:status => 400, :message => "You have to purchase this solution."} : msg = {:status => 200, :solution => @solution}
+			end	
+
 			def solution_hi5
 				solution = Solution.find(params[:solution_id])
 				user = User.find_by_reecher_id(params[:user_id])

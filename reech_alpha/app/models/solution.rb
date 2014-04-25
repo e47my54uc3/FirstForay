@@ -13,6 +13,7 @@ class Solution < ActiveRecord::Base
 
 	has_many :purchased_solutions
 	has_many :users, :through => :purchased_solutions
+	has_many :preview_solutions
 
 
 def buy(soln)

@@ -17,13 +17,13 @@ module Api
 			end
 			
 			def create
-				if !current_user.nil?
-					respond_to do |format|
-						msg = { :status => 400, :message => "Already logged in!"}
-						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-						format.json { render :json => msg }  # note, no :location or :status options
-					end
-				else
+				#if !current_user.nil?
+					#respond_to do |format|
+					#	msg = { :status => 400, :message => "Already logged in!"}
+					#	logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+					#	format.json { render :json => msg }  # note, no :location or :status options
+				#	end
+				#else
 					if params[:provider] == "standard"
 
 						@user_session = UserSession.new(params[:user_details])
@@ -51,7 +51,7 @@ module Api
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 						render :json => msg
 					end
-				end
+				#end
 			end
 
 			def show

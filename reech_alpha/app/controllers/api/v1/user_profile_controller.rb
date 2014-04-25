@@ -13,6 +13,7 @@ module Api
 						#@profile = current_user.user_profile
 						#@badge = current_user.badges
 						@profile = @user.user_profile.attributes
+						@profile[:hi5] = @user.user_profile.votes.size
 						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile }
 						render :json => msg
@@ -73,19 +74,19 @@ module Api
 					end
 				end
 
-					def forget_password
-						@user = User.find_by_email(params[:email])
-						if !@user.nil?
-							@user.deliver_password_reset_instructions!
-							msg = {:status => 200, :message => "Password sent to your email"}
-							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-							render :json => msg
-						else
-							msg = {:status => 400, :message => "Given Email not found"}
-							 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-							render :json => msg
-						end	
+				def forget_password
+					@user = User.find_by_email(params[:email])
+					if !@user.nil?
+						@user.deliver_password_reset_instructions!
+						msg = {:status => 200, :message => "Password sent to your email"}
+						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+						render :json => msg
+					else
+						msg = {:status => 400, :message => "Given Email not found"}
+						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+						render :json => msg
 					end	
+				end	
 
 				def showconnections
 						@user=User.find_by_reecher_id(params[:user_id])
@@ -102,6 +103,14 @@ module Api
 				def profile_dash_board
 					@user = User.find_by_reecher_id(params[:user_id])
 					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.size} : msg = {:status => 400, :message => "User doesn't exist"}
+					render :json => msg
+				end	
+
+				def profile_hi5
+					voting_user = User.find_by_reecher_id(params[:user_id])
+					votable_user = User.find_by_reecher_id(params[:voter_id])
+					votable_user.user_profile.liked_by(voting_user)
+					msg = {:status => 200 , :message => "Success"}
 					render :json => msg
 				end	
 

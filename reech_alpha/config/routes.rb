@@ -44,6 +44,7 @@ Reech::Application.routes.draw do
       post "/profile" => "user_profile#index", :as=>"profile"
       post "/update_profile" => "user_profile#update", :as => "update_profile"
       post "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
+      post "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
 
       resources :friendships do
         collection do

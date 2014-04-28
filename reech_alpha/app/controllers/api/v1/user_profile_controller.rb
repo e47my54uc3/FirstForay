@@ -52,8 +52,8 @@ module Api
 				 @pass = params[:new_password]
 
 					if pwd_flag && old_pwd_flag
-							if @pass.length < 8
-								msg = {:status => 400, :message => "password must be at least 8 characters"}
+							if @pass.length < 6
+								msg = {:status => 400, :message => "password must be at least 6 characters"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 								render :json => msg
 							else
@@ -119,7 +119,6 @@ module Api
 						if !params[:contact_details].nil?
 
 							if !params[:contact_details][:emails].nil?
-								audien_reecher_ids = []
 								params[:audien_details][:emails].each do |email|
 									UserMailer.send_invitation_email_for_new_contact(email, @user).deliver
 								end	
@@ -127,15 +126,20 @@ module Api
 
 							if !params[:contact_details][:phone_numbers].nil?
 								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-								params[:audien_details][:phone_numbers].each do |number|
+								params[:contact_details][:phone_numbers].each do |number|
 									sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
         							to: number,
-        							body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+        							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
 								end	
 							end	
-
+							
+							msg = {:status => 200, :message => "Email/SMS sent to the contact."}
+							render :json => msg
+            else
+              msg = {:status => 400, :message => "Failed to send Email/SMS."}
+							render :json => msg
 						end	
 				end	
 

@@ -115,7 +115,7 @@ module Api
 				end	
 
 				def add_contact
-				 @user = User.find_by_reecher_id(params[:user_id]
+				 @user = User.find_by_reecher_id(params[:user_id])
 						if !params[:contact_details].nil?
 
 							if !params[:contact_details][:emails].nil?

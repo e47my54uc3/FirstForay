@@ -118,21 +118,21 @@ module Api
 				 @user = User.find_by_reecher_id(params[:user_id])
 						if !params[:contact_details].nil?
 
-							if !params[:contact_details][:emails].nil?
-								params[:audien_details][:emails].each do |email|
-									UserMailer.send_invitation_email_for_new_contact(email, @user).deliver
-								end	
+							if !params[:contact_details][:email].nil?
+								#params[:audien_details][:emails].each do |email|
+									UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver
+							#	end	
 							end	
 
-							if !params[:contact_details][:phone_numbers].nil?
+							if !params[:contact_details][:phone_number].nil?
 								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-								params[:contact_details][:phone_numbers].each do |number|
+								#params[:contact_details][:phone_numbers].each do |number|
 									sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
-        							to: number,
+        							to: params[:contact_details][:phone_number],
         							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
-								end	
+								#end	
 							end	
 							
 							msg = {:status => 200, :message => "Email/SMS sent to the contact."}

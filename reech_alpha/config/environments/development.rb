@@ -40,8 +40,7 @@ Reech::Application.configure do
   config.assets.debug = true
 
   #required by devise. Set host to correct host in production mode
-  config.action_mailer.default_url_options = { :host => '10.131.91.137:3000' }
-
+  config.action_mailer.default_url_options = { :host => 'ec2-54-213-59-130.us-west-2.compute.amazonaws.com:3000' }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
   address:              'smtp.gmail.com',
@@ -51,5 +50,5 @@ Reech::Application.configure do
   password:             'Supercashmoney1',
   authentication:       'plain',
   enable_starttls_auto: true  }
-
+  
 end

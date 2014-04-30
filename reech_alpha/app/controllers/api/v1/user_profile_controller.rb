@@ -13,7 +13,7 @@ module Api
 						#@profile = current_user.user_profile
 						#@badge = current_user.badges
 						@profile = @user.user_profile.attributes
-						@profile[:hi5] = @user.user_profile.votes.size
+						#@profile[:hi5] = @user.user_profile.votes.size
 						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile }
 						render :json => msg

@@ -122,7 +122,7 @@ module Api
 								#params[:audien_details][:emails].each do |email|
 									UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver
 							#	end
-msg = {:status => 200, :message => "Email sent to the contact."	
+                            msg = {:status => 200, :message => "Email sent to the contact."}
 							end	
 
 							if !params[:contact_details][:phone_number].nil?
@@ -134,7 +134,7 @@ msg = {:status => 200, :message => "Email sent to the contact."
         							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
 								#end
-msg = {:status => 200, :message => "SMS sent to the contact."	
+                                msg = {:status => 200, :message => "SMS sent to the contact."}
 							end	
 							
 							}

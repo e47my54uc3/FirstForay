@@ -137,12 +137,11 @@ module Api
                                 msg = {:status => 200, :message => "SMS sent to the contact."}
 							end	
 							
-							}
 							render :json => msg
-            else
-              msg = {:status => 400, :message => "Failed to send Email/SMS."}
-							render :json => msg
-						end	
+                      else
+                           msg = {:status => 400, :message => "Failed to send Email/SMS."}
+                           render :json => msg
+                     end
 				end	
 
 		end

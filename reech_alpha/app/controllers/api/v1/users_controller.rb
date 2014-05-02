@@ -20,10 +20,7 @@ module Api
 										@user.user_profile.picture = data
 										@user.save
 									end
-									#@user.reset_single_access_token
 									@user.add_points(500)
-									#@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
-									#msg = {:status => 201, :api_key=>@api_key, :email=>@user.email, :user_id=>@user.reecher_id}
 									msg = {:status => 201, :message => "Success"}
 									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 									render :json => msg  # note, no :location or :status options

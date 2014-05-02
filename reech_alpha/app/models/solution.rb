@@ -11,9 +11,14 @@ class Solution < ActiveRecord::Base
 	:primary_key => 'reecher_id',
 	:foreign_key => 'solver_id'
 
+	has_attached_file :picture, :styles => { :medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png"
+
+
 	has_many :purchased_solutions
 	has_many :users, :through => :purchased_solutions
 	has_many :preview_solutions
+
+  validates_attachment :picture, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:picture].nil? }
 
 
 def buy(soln)
@@ -31,7 +36,9 @@ def self.filter(question, current_user)
 	end
 end
 
-
+def picture_url
+	picture.url(:medium)
+end
 
 
 end

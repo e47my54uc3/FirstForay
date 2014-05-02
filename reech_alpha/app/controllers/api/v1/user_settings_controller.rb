@@ -6,7 +6,7 @@ module Api
 
 			def view_settings
 				@user = User.find_by_reecher_id(params[:user_id])
-				msg = {:status => 200, :settings => @user.user_settings}_
+				msg = {:status => 200, :settings => @user.user_settings }
 				render :json => msg
 			end	
 
@@ -20,7 +20,7 @@ module Api
 				user_settings.notify_linked_to_question = params[:lquestion_option]
 				user_settings.notify_solution_got_highfive = params[:solutionhi5_option]
 				user_settings.save
-				msg = {:status => 200, :settings => @user.user_settings}_
+				msg = {:status => 200, :settings => @user.user_settings }
 				render :json => msg
 			end
 				

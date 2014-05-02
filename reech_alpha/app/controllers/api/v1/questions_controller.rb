@@ -136,11 +136,6 @@ module Api
 			render :json => msg 
 		end 
 
-
-		private
-
-		
-
 		end
 	end
 end

@@ -5,7 +5,7 @@ development:
   database: reechAlpha_dev
   pool: 5
   username: root
-  password: r33ch!
+  password: root123
   socket: /var/run/mysqld/mysqld.sock
 test:
   adapter: mysql2
@@ -14,7 +14,7 @@ test:
   database: reechAlpha_test
   pool: 5
   username: root
-  password: r33ch!
+  password: root123
   socket: /var/run/mysqld/mysqld.sock
 production:
   adapter: mysql2
@@ -23,5 +23,5 @@ production:
   database: reechAlpha_production
   pool: 5
   username: root
-  password: r33ch!
+  password: root123
   socket: /var/run/mysqld/mysqld.sock

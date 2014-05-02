@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140425125747) do
+ActiveRecord::Schema.define(:version => 20140502113740) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -207,14 +207,18 @@ ActiveRecord::Schema.define(:version => 20140425125747) do
   create_table "solutions", :force => true do |t|
     t.string   "solver_id"
     t.string   "solver"
-    t.text     "body",                        :null => false
-    t.integer  "ask_charisma", :default => 5
-    t.integer  "ups",          :default => 0
-    t.integer  "downs",        :default => 0
+    t.text     "body",                                :null => false
+    t.integer  "ask_charisma",         :default => 5
+    t.integer  "ups",                  :default => 0
+    t.integer  "downs",                :default => 0
     t.string   "question_id"
     t.string   "linked_user"
-    t.datetime "created_at",                  :null => false
-    t.datetime "updated_at",                  :null => false
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+    t.string   "picture_file_name"
+    t.string   "picture_content_type"
+    t.integer  "picture_file_size"
+    t.datetime "picture_updated_at"
   end
 
   create_table "user_profiles", :force => true do |t|
@@ -253,7 +257,7 @@ ActiveRecord::Schema.define(:version => 20140425125747) do
   create_table "users", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
-    t.string   "email"
+    t.string   "email",               :default => "",        :null => false
     t.datetime "created_at",                                 :null => false
     t.datetime "updated_at",                                 :null => false
     t.string   "profile_name",        :default => "reecher"

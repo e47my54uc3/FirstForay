@@ -10,10 +10,8 @@ module Api
 						msg = {:status => 400, :message => "User does not exist."}
 						render :json => msg
 					else
-						#@profile = current_user.user_profile
-						#@badge = current_user.badges
 						@profile = @user.user_profile.attributes
-						#@profile[:hi5] = @user.user_profile.votes.size
+						@profile[:hi5] = @user.user_profile.votes_for.size
 						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile }
 						render :json => msg
@@ -39,7 +37,7 @@ module Api
 						@profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile_hash }
 					else
-						msg = {:status => 400, :message => @user.errors + @profile.errors}
+						msg = {:status => 400, :message => @user.errors}
 					end	
 					render :json => msg
 				end
@@ -119,29 +117,25 @@ module Api
 						if !params[:contact_details].nil?
 
 							if !params[:contact_details][:email].nil?
-								#params[:audien_details][:emails].each do |email|
-									UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver
-							#	end
-                            msg = {:status => 200, :message => "Email sent to the contact."}
+								UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver
+                 msg = {:status => 200, :message => "Email sent to the contact."}
 							end	
 
 							if !params[:contact_details][:phone_number].nil?
 								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-								#params[:contact_details][:phone_numbers].each do |number|
-									sms = client.account.sms.messages.create(
+								sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
         							to: params[:contact_details][:phone_number],
         							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
-								#end
-                                msg = {:status => 200, :message => "SMS sent to the contact."}
+                msg = {:status => 200, :message => "SMS sent to the contact."}
 							end	
 							
 							render :json => msg
-                      else
-                           msg = {:status => 400, :message => "Failed to send Email/SMS."}
-                           render :json => msg
-                     end
+            else
+              msg = {:status => 400, :message => "Failed to send Email/SMS."}
+              render :json => msg
+            end
 				end	
 
 		end

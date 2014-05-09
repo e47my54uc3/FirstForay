@@ -18,4 +18,9 @@ class UserMailer < ActionMailer::Base
     mail(to:  email, subject: "Invitation to singup Reechout")
   end
 
+  def send_link_question_email(email, user)
+    @user = user
+    mail(to:  email, subject: "Invitation to Answer a question in Reechout")
+  end  
+
 end

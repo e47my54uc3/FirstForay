@@ -85,7 +85,10 @@ class User < ActiveRecord::Base
 
 	has_one :user_settings, :primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
 	
-	has_many :preview_solutions			 
+	has_many :preview_solutions	
+
+	#Linked questions
+	has_many :linked_questions, :primary_key=>"reecher_id", :foreign_key=>'user_id'		 
 					 
 	# Alias Profile of a reecher to be called User Profile or Reecher Profile
 	alias_attribute :reecher_profile,:user_profile

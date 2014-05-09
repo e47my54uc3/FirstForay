@@ -106,7 +106,7 @@ module Api
 
 				def profile_hi5
 					voting_user = User.find_by_reecher_id(params[:user_id])
-					votable_user = User.find_by_reecher_id(params[:voter_id])
+					votable_user = User.find_by_reecher_id(params[:votable_user_id])
 					votable_user.user_profile.liked_by(voting_user)
 					msg = {:status => 200 , :message => "Success"}
 					render :json => msg

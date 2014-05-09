@@ -32,12 +32,15 @@ Reech::Application.routes.draw do
       resources :questions     
         post "question_feed" => "questions#index"
         post "mark_question_stared" => "questions#mark_question_stared"
+        post "linked_questions" => "questions#linked_questions"
       
       resources :solutions
         post "view_solution" => "solutions#view_solution", :as => "view_solution"
         post "all_solutions" => "solutions#view_all_solutions", :as => "all_solutions"
         post "solution_hi5" => "solutions#solution_hi5", :as => "solution_hi5"
         post "preview_solution" => "solutions#preview_solution", :as => "preview_solution"
+        post "previewed_solutions" => "solutions#previewed_solutions", :as => "previewed_solutions"
+        post "purchase_solution" =>"solutions#purchase_solution", :as => "purchase_solution"
       
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"

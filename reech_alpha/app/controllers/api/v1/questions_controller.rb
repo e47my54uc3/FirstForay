@@ -21,9 +21,13 @@ module Api
 			if @Questions.size > 0
 				@Questions.each do |q|
 					q_hash = q.attributes
+					question_owner = User.find_by_reecher_id(q.posted_by_uid)
+					question_owner_profile = question_owner.user_profile
 					q.posted_solutions.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
 					q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
 					q.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q_hash[:image_url] = nil
+					q_hash[:owner_location] = question_owner_profile.location
+					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : q_hash[:owner_image] = nil
 					questions_hash << q_hash
 				end 
 			end
@@ -135,6 +139,28 @@ module Api
 			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}" 
 			render :json => msg 
 		end 
+
+		def linked_questions
+			user = User.find_by_reecher_id(params[:user_id])
+			linked_questions = user.linked_questions
+			linked_questions_ary = []
+			if linked_questions.size > 0
+				linked_questions.each do |lq|
+					question = Question.find_by_question_id(lq.question_id)
+					question_owner = User.find_by_reecher_id(q.posted_by_uid)
+					question_owner_profile = question_owner.user_profile
+					q_hash = question.attributes
+					question.posted_solutions.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
+					question.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
+					question.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + question.avatar_url : q_hash[:image_url] = nil
+					q_hash[:owner_location] = question_owner_profile.location
+					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : q_hash[:owner_image] = nil
+					linked_questions_ary << q_hash
+				end	
+			end	
+			msg = {:status => 200, :questions => linked_questions_ary}
+			render :json => msg
+		end	
 
 		end
 	end

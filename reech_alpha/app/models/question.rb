@@ -30,7 +30,7 @@ class Question < ActiveRecord::Base
 		#@Questions = @Qpostedbyuser.collect{|question| {:value=>question.id, :label=>question.post}}
 		@Questions = []
 		@Questions << @Qpostedbyuser
-		@Qbyfriendship = Question.includes(:posted_solutions, :votings).find(:all, :order => 'questions.created_at DESC')
+		@Qbyfriendship = Question.includes(:posted_solutions, :votings).find(:all, :order => 'questions.updated_at DESC')
 			@Qbyfriendship.each do |question|
 				@posting_user = question.posted_by_uid
 				if Friendship.are_friends(@posting_user,current_user.reecher_id)

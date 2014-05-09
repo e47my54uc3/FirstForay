@@ -16,6 +16,7 @@ module Api
 				end
 			end
 			
+			# This method is no more used in application
 			def create
 				if params[:provider] == "standard"
 					@user_session = UserSession.new(params[:user_details])
@@ -40,7 +41,7 @@ module Api
 					render :json => msg
 				end
 			end
-
+			# This method is no more used in application
 			def show
 				@user=current_user
 				respond_to do |format|
@@ -48,7 +49,8 @@ module Api
 				end
 			end
 
-			
+
+			# This method is used for destroy session.
 			def destroy
 				api_key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
 				if current_user_session.nil? && !api_key.present? 
@@ -75,6 +77,7 @@ module Api
 				end
 			end
 
+			# This method is used to check connection.
 			def check_connection
 				msg = { :status => 200, :message => "verified connection"}
 				render :json => msg

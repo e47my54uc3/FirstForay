@@ -1,3 +1,6 @@
+# Add the files or directories which you don't want to track
+
 /log
 /tmp
 /config/database.yml
+/public/system

@@ -83,6 +83,9 @@ gem 'twilio-ruby'
 #For facebook kind like/dislike
 gem 'acts_as_votable'
 
+# For push notifications both APNS & GCM
+gem 'pushmeup' 
+
 #For debugging application only for development ENV
 
 group :development do

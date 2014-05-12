@@ -88,8 +88,11 @@ class User < ActiveRecord::Base
 	has_many :preview_solutions	
 
 	#Linked questions
-	has_many :linked_questions, :primary_key=>"reecher_id", :foreign_key=>'user_id'		 
-					 
+	has_many :linked_questions, :primary_key=>"reecher_id", :foreign_key=>"user_id"
+	
+	# Devices association for push notifications
+	has_many :devices, :primary_key=>"reecher_id", :foreign_key=>"reecher_id" 
+	
 	# Alias Profile of a reecher to be called User Profile or Reecher Profile
 	alias_attribute :reecher_profile,:user_profile
 

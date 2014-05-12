@@ -16,14 +16,25 @@ module Api
 				end
 			end
 			
-			# This method is no more used in application
+			# This method is used for create a session for standard user
 			def create
 				if params[:provider] == "standard"
 					@user_session = UserSession.new(params[:user_details])
 					if @user_session.save
 						respond_to do |format|
-							@user_id = User.find_by_email(@user_session.email).reecher_id
+							@user_id = User.find_by_email(@user_session.email)
 							@api_key = ApiKey.create(:user_id => @user_id).access_token
+							#create a device token entry in device table for push notifications
+							if !params[:device_token].blank? && !params[:platform].blank?
+							  existing_device = Device.where(:device_token => params[:device_token], :platform => params[:platform], :reecher_id => @user_id)
+							  if !existing_device.present?
+							    device = Device.new()
+							    device.device_token = params[:device_token]
+							    device.platform = params[:platform]
+							    device.reecher_id = @user_id
+							    device.save
+							  end  
+							end  
 							msg = { :status => 201, :message => "Success!", :email => @user_session.email, :api_key => @api_key, :user_id => @user_id}
 							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							format.json { render :json => msg }  # note, no :location or :status options

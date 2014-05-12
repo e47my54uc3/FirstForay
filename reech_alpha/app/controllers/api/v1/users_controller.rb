@@ -49,6 +49,8 @@ module Api
 							@user.fb_uid = params[:user_details][:uid]
 							if @user.save(:validate => false)
 
+								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
+
 								make_friendship(@fb_friends,@user) if @fb_friends.size > 0
 
 								create_session_for_fb_user(@user)
@@ -62,7 +64,11 @@ module Api
 							end 
 						else
 							make_friendship(@fb_friends,fb_user) if @fb_friends.size > 0
+
+							create_device_for_user(params[:device_token], params[:platform], fb_user.reecher_id)
+
 							create_session_for_fb_user(fb_user)
+
 							@api_key = ApiKey.create(:user_id => fb_user.reecher_id).access_token
 							msg = {:status => 201, :api_key=>@api_key, :user_id=>fb_user.reecher_id}
 							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
@@ -85,6 +91,19 @@ module Api
 				end
 			end
 
+			def create_device_for_user(device_token, platform, reecher_id)
+				if !device_token.blank? && platform.blank?
+					existing_device = Device.where(:device_token => device_token, :platform => platform, :reecher_id => reecher_id)
+					if !existing_device.present?
+						device = Device.new()
+						device.device_token = device_token
+						device.platform = platform
+						device.reecher_id = reecher_id
+						device.save
+					end  
+				end  
+			end
+				
 			def create_session_for_fb_user(user)
 				user.reset_persistence_token!
 				UserSession.create(user, true)

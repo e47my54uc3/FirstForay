@@ -22,7 +22,7 @@ module Api
 					@user_session = UserSession.new(params[:user_details])
 					if @user_session.save
 						respond_to do |format|
-							@user_id = User.find_by_email(@user_session.email)
+							@user_id = User.find_by_email(@user_session.email).reecher_id
 							@api_key = ApiKey.create(:user_id => @user_id).access_token
 							#create a device token entry in device table for push notifications
 							if !params[:device_token].blank? && !params[:platform].blank?
@@ -64,6 +64,7 @@ module Api
 			# This method is used for destroy session.
 			def destroy
 				api_key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
+				device = Device.find_by_reecher_id(params[:user_id])
 				if current_user_session.nil? && !api_key.present? 
 					respond_to do |format|
 						msg = { :status => 401, :message => "Not logged in!"}
@@ -72,6 +73,7 @@ module Api
 					end
 				elsif current_user_session.nil? && api_key.present? 
 					api_key.destroy if !api_key.blank?
+					device.destroy if !device.present?
 					respond_to do |format|
 						msg = { :status => 200, :message => "Success!"}
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
@@ -80,6 +82,7 @@ module Api
 				else
 					current_user_session.destroy
 					api_key.destroy 
+					device.destroy if !device.present?
 					respond_to do |format|
 						msg = { :status => 200, :message => "Success!"}
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"

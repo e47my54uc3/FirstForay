@@ -13,7 +13,7 @@ module Api
 			  @Questions = Question.filterforuser(params[:user_id])
 			elsif params[:type] == "stared"
 				@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions(params[:user_id])
-			elsif params[:type] == "self"
+				elsif params[:type] == "self"
 				user = User.find_by_reecher_id(params[:user_id])
 				@Questions = user.questions.includes(:posted_solutions, :votings).order("created_at DESC")
 			end 

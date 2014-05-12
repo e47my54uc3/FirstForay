@@ -92,9 +92,11 @@ module Api
 
 			def view_solution
 				solution = Solution.find(params[:solution_id])
+				solution_owner_profile = User.find_by_reecher_id(solution.solver_id).user_profile
 				@solution = solution.attributes
 				@solution[:hi5] = solution.votes_for.size
 				solution.picture_file_name != nil ? @solution[:image_url] = "http://#{request.host_with_port}" + solution.picture_url : @solution[:image_url] = nil
+				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] = "http://#{request.host_with_port}" + solution_owner_profile.picture_url : @solution[:solver_image] = nil
 				msg = {:status => 200, :solution => @solution} 
 				render :json => msg
 			end	

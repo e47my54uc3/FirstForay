@@ -26,18 +26,38 @@ class Question < ActiveRecord::Base
 
 	def self.filterforuser(user_id)
 		current_user = User.find_by_reecher_id("#{user_id}")
-		@Qpostedbyuser = Question.where(:posted_by_uid => current_user.reecher_id)
+		
+=begin
+		@Qpostedbyuser = Question.where(:posted_by_uid => current_user.reecher_id).order('created_at DESC')
 		#@Questions = @Qpostedbyuser.collect{|question| {:value=>question.id, :label=>question.post}}
 		@Questions = []
-		@Questions << @Qpostedbyuser
-		@Qbyfriendship = Question.includes(:posted_solutions, :votings).find(:all, :order => 'questions.updated_at DESC')
+		@Qpostedbyuser.each do |qby_user|
+			@Questions << qby_user
+		end	
+		
+		@Qbyfriendship = Question.find(:all, :order => 'created_at DESC')
 			@Qbyfriendship.each do |question|
 				@posting_user = question.posted_by_uid
 				if Friendship.are_friends(@posting_user,current_user.reecher_id)
 					 @Questions << question
 				end
 			end
-			@Questions = @Questions.flatten
+			@Questions
+=end
+			friends_reecher_ids = []
+			friends_reecher_ids << current_user.reecher_id
+			user_friends = Friendship.where(:reecher_id => current_user.reecher_id, :status => 'accepted')
+			if user_friends.size > 0
+				user_friends.each do |uf|
+					friends_reecher_ids << uf.friend_reecher_id
+				end	
+			end
+			@Questions = []
+			questions = Question.where(:posted_by_uid => friends_reecher_ids).order("created_at DESC")
+			questions.each do |q|
+				@Questions << q
+			end	
+			@Questions
 	end
 
 	def self.get_stared_questions(user_id)

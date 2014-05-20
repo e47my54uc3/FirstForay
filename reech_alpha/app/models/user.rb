@@ -26,7 +26,7 @@ class User < ActiveRecord::Base
 	#Scrubber Fields
 	before_create :create_unique_profile_id
 	before_create :create_reecher_id
-	validates :email, uniqueness: true
+	validates :email, uniqueness: true ,allow_nil: true
 	#Authentications
 	validate do |user|
 		if user.new_record? #adds validation if it is a new record

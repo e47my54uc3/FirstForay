@@ -35,11 +35,13 @@ module Api
 							 render :json => msg
 						end   
 					elsif params[:provider] == "facebook"
+						
 						fb_user = User.find_by_fb_uid(params[:user_details][:uid])
 						@graph = Koala::Facebook::API.new(params[:user_details][:access_token])
+						fb_user_profile_pic_path = @graph.get_picture(params[:user_details][:uid])
 						@profile = @graph.get_object("me")
 						@fb_friends = @graph.get_connections("me", "friends")
-						
+
 						if fb_user.nil?              
 							@user = User.new()
 							@user.first_name = @profile["first_name"]
@@ -47,8 +49,9 @@ module Api
 							@user.email = @profile["email"]
 							@user.fb_token = params[:user_details][:access_token]
 							@user.fb_uid = params[:user_details][:uid]
+							fb_user_profile_pic	= @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
 							if @user.save(:validate => false)
-
+								
 								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
 
 								make_friendship(@fb_friends,@user) if @fb_friends.size > 0

@@ -11,7 +11,7 @@ class UserProfile < ActiveRecord::Base
 
 
   attr_accessible :reecher_interests,:reecher_hobbies,:reecher_fav_music,:reecher_fav_movies,:reecher_fav_books,
-  								:reecher_fav_sports,:reecher_fav_destinations,:reecher_fav_cuisines,:bio,:snippet
+  								:reecher_fav_sports,:reecher_fav_destinations,:reecher_fav_cuisines,:bio,:snippet,:profile_pic_path
   
   acts_as_votable
 

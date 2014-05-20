@@ -6,6 +6,7 @@ module Api
 				
 				def index
 					@user = User.find_by_reecher_id(params[:user_id])
+					
 					if @user.nil?
 						msg = {:status => 400, :message => "User does not exist."}
 						render :json => msg
@@ -13,7 +14,7 @@ module Api
 						@profile = @user.user_profile.attributes
 						@profile[:hi5] = @user.user_profile.votes_for.size
 						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
-						msg = {:status => 200, :user => @user, :profile => @profile }
+						msg = {:status => 200, :user => @user, :profile => @profile ,:curio_points=> @user.points }
 						render :json => msg
 					end
 				end

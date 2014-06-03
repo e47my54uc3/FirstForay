@@ -5,7 +5,11 @@ Reech::Application.routes.draw do
       
       resources :users
         post "signup" => "users#create", :as => "signup"
-
+        post "/send_apns_notification" => "users#send_apns_notification", :as => "send_apns_notification"
+         post "send_reech_request" => "users#send_reech_request", :as => "send_reech_request"
+        
+        
+     
       resources :user_sessions
         post "logout_user" => "user_sessions#destroy", :as => "logout_user"
         post "login_user" => "user_sessions#create", :as => "login_user"
@@ -33,7 +37,10 @@ Reech::Application.routes.draw do
         post "question_feed" => "questions#index"
         post "mark_question_stared" => "questions#mark_question_stared"
         post "linked_questions" => "questions#linked_questions"
-      
+        post "link_questions_to_expert" => "questions#link_questions_to_expert"
+        post "/send_gcm_notification" => "questions#send_gcm_notification", :as => "send_gcm_notification"
+       # post "/get_question_details" => "questions#get_question_details", :as => "get_question_details"
+        
       resources :solutions
         post "view_solution" => "solutions#view_solution", :as => "view_solution"
         post "all_solutions" => "solutions#view_all_solutions", :as => "all_solutions"
@@ -41,6 +48,8 @@ Reech::Application.routes.draw do
         post "preview_solution" => "solutions#preview_solution", :as => "preview_solution"
         post "previewed_solutions" => "solutions#previewed_solutions", :as => "previewed_solutions"
         post "purchase_solution" =>"solutions#purchase_solution", :as => "purchase_solution"
+        post "get_solution_details" =>"solutions#get_solution_details", :as => "get_solution_details"
+        post "question_details_with_solutions" =>"solutions#question_details_with_solutions", :as => "question_details_with_solutions"
       
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"
@@ -51,17 +60,20 @@ Reech::Application.routes.draw do
       post "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
       post "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
       post "/add_contact" => "user_profile#add_contact", :as => "add_contact"
+      post "/leader_board" => "user_profile#leader_board", :as => "leader_board"
 
       resources :user_settings
         post "/view_settings" => "user_settings#view_settings", :as=>"view_settings"
         post "/update_settings" => "user_settings#update_settings", :as=>"update_settings"
-
+       
+     
       resources :friendships do
         collection do
           post 'index'
           get 'req',:as=>"addfriend"
           get 'accept',:as=>"accept_fr"
           get 'reject',:as=>"reject_fr"
+          
         end
       end
 

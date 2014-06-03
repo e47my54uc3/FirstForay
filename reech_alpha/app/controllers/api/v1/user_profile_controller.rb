@@ -148,6 +148,19 @@ module Api
         ### Today
         if !all_users.blank?
           all_users.each do |user|
+            @user_profile = user.user_profile 
+            
+            profile_pic_path = (@user_profile.profile_pic_path).to_s
+            
+          
+            
+            if @user_profile.picture_file_name
+             image_url = "http://#{request.host_with_port}" + @user_profile.picture_url      
+            elsif @user_profile.profile_pic_path
+              image_url = profile_pic_path
+            else
+              image_url = nil
+            end
             questions=user.questions.where("created_at"=>(Time.now()).to_date)
             solution = user.solutions.where("created_at"=>(Time.now()).to_date)
             tot_question = questions.count
@@ -155,7 +168,8 @@ module Api
             tot_hi5 = user.user_profile.votes_for.size 
             tot_curios = user.points
             position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
-            user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>"","level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
+            user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
+ 
           end
          end
          

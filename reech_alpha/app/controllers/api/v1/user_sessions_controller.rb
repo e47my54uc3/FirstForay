@@ -73,7 +73,7 @@ module Api
 					end
 				elsif current_user_session.nil? && api_key.present? 
 					api_key.destroy if !api_key.blank?
-					device.destroy if !device.present?
+					device.destroy if !device.blank?
 					respond_to do |format|
 						msg = { :status => 200, :message => "Success!"}
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
@@ -82,7 +82,7 @@ module Api
 				else
 					current_user_session.destroy
 					api_key.destroy 
-					device.destroy if !device.present?
+					device.destroy if !device.blank?
 					respond_to do |format|
 						msg = { :status => 200, :message => "Success!"}
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"

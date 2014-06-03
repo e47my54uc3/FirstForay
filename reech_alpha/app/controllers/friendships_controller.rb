@@ -29,7 +29,7 @@ class FriendshipsController < ApplicationController
   def reject
     @user = current_user
     @friend = User.find_by_reecher_id(params[:reecher_id])
-    unless @friend.nil?
+    unless @friend.nil?a
       if Friendship.reject(@user, @friend)
         flash[:notice] = "Friendship with #{@friend.full_name} rejected"
       else

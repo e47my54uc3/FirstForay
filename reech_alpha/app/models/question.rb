@@ -3,7 +3,7 @@ class Question < ActiveRecord::Base
 	has_merit
 
 	attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids
-	has_attached_file :avatar, :styles => { :medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png"
+	has_attached_file :avatar, :styles => {:medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png" ,:default_style => :original 
  serialize :audien_user_ids, Array
 	#do_not_validate_attachment_file_type :avatar
 	validates_attachment :avatar, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:avatar].nil? }
@@ -82,4 +82,14 @@ class Question < ActiveRecord::Base
 	 self.votings.size > 0 ? true : false
 	end  
 
+  def get_geometry(style = :original)
+    begin
+      Paperclip::Geometry.from_file(pic.path(style)).to_s
+    rescue
+      nil
+    end
+  end
+  
+  
+  
 end

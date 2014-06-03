@@ -22,5 +22,11 @@ class UserMailer < ActionMailer::Base
     @user = user
     mail(to:  email, subject: "Invitation to Answer a question in Reechout")
   end  
+  
+  def send_reech_friend_request(email, user)
+    @user = user
+    mail(to:  email, subject: "Invitation to Reech Friend")
+  end  
+
 
 end

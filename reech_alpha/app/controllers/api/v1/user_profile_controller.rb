@@ -37,7 +37,7 @@ module Api
 						@profile_hash = @user.user_profile.attributes
 						@profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile_hash }
-					else
+					else:reecherid
 						msg = {:status => 400, :message => @user.errors}
 					end	
 					render :json => msg
@@ -60,7 +60,7 @@ module Api
 								@user.password_confirmation = @pass
 								@user.save(:validate => false)
 								api_key.destroy
-								current_user_session.destroy if !current_user_session.nil?
+								current_user_session.destroy if !current_user_session.n:reecheridil?
 								msg = {:status => 200, :message => "Your password has been changed please login again"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 								render :json => msg
@@ -138,6 +138,44 @@ module Api
               render :json => msg
             end
 				end	
+				
+			# leader board
+       def leader_board       
+        final_leader = {}
+        all_users= User.all
+        user_details =[]
+        current_user_hash =[]
+        ### Today
+        if !all_users.blank?
+          all_users.each do |user|
+            questions=user.questions.where("created_at"=>(Time.now()).to_date)
+            solution = user.solutions.where("created_at"=>(Time.now()).to_date)
+            tot_question = questions.count
+            tot_answer = solution.count
+            tot_hi5 = user.user_profile.votes_for.size 
+            tot_curios = user.points
+            position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
+            user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>"","level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
+          end
+         end
+         
+        current_user_hash =   user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
+        
+        sort_user_detail = user_details.sort_by{ |h| h["position"]}.reverse
+        
+        sort_user_detail=sort_user_detail.take(5)
+      
+        final_leader[:today]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
+        final_leader[:week]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
+        final_leader[:month] = {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
+    
+        ###############################################         
+        msg = { :status => 200, :message => "Success",:leader_detail=>final_leader}
+        render :json => msg
+      end
+
+      
+
 
 		end
 	end

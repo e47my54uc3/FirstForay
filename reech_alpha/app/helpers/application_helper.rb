@@ -1,19 +1,27 @@
 module ApplicationHelper
+ 
   def message_person(mailbox_name, message)
     mailbox_name == 'inbox' ? message.sender : message.recipient_list.join(', ')
   end
 
   def send_device_notification device_token,message,platform
-     puts "platform-before=#{platform}"
+    
+    puts "step11= I am here"
+    puts "step22= #{device_token}"
+    puts "step33= #{message}"
+    puts "step44= #{platform}"
+    
+     
     if platform == 'iOS' 
-      puts "platform123=#{platform}"
       n1= APNS::Notification.new(device_token, :alert => message, :badge => 1, :sound => 'default')
       APNS.send_notifications([n1])
-    elsif platform =='Andriod'
-      destination = device_token
-      data1       = message
-      options1    = {:collapse_key => "placar_score_global", :time_to_live => 3600, :delay_while_idle => false}
-      GCM.send_notification( destination,data1,options1 )
+    elsif platform =='Android'
+      require 'gcm'
+      gcm = GCM.new("AIzaSyA8LPahDEVgdPxCU4QrWOh1pF_IL655LNI")
+      puts "Before sending device token=#{device_token}"
+      registration_ids= [device_token] # an array of one or more client registration IDs
+      options = {data: {message: message}, collapse_key: "Reech",time_to_live:3600}
+      response = gcm.send_notification(registration_ids, options)
     end
 
   end
@@ -22,6 +30,9 @@ module ApplicationHelper
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
+    
+    puts "settingsetting=#{setting.inspect}"
+ 
     if ((setting[:pushnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
      check =true
     else
@@ -31,7 +42,6 @@ module ApplicationHelper
   end
 
   def notify_linked_to_question user_id
-
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
@@ -43,8 +53,7 @@ module ApplicationHelper
     check
   end
 
-  
-  
+   
   def notify_when_my_stared_question_get_answer user_id
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
@@ -68,5 +77,36 @@ module ApplicationHelper
     end
     check
   end
+  
+  def get_curio_points user_id
+  
+  @user1 = User.find_by_reecher_id(user_id)
+  points = @user1.points
+  
+  end
+  
+  def get_user_total_question user_id
+    
+  @user2 = User.find_by_reecher_id(user_id)
+  tot_question = @user2.questions.size
+  
+  end
+  
+  def get_user_total_solution user_id
+    
+  @user3 = User.find_by_reecher_id(user_id)
+  tot_question = @user3.solutions.size
+  
+  end
+  
+  def get_user_total_connection user_id
+    
+  @user4 = User.find_by_reecher_id(user_id)
+  tot_question = @user4.friendships.size
+  
+  end
+  
+   
+
 
 end

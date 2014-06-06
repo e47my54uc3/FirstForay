@@ -149,11 +149,7 @@ module Api
         if !all_users.blank?
           all_users.each do |user|
             @user_profile = user.user_profile 
-            
             profile_pic_path = (@user_profile.profile_pic_path).to_s
-            
-          
-            
             if @user_profile.picture_file_name
              image_url = "http://#{request.host_with_port}" + @user_profile.picture_url      
             elsif @user_profile.profile_pic_path
@@ -189,6 +185,41 @@ module Api
       end
 
       
+      def user_profile_info
+      @user = User.joins(:user_profile)
+                   .select("users.*,user_profiles.location,user_profiles.bio,user_profiles.picture_file_name,user_profiles.profile_pic_path,user_profiles.reecher_interests,user_profiles.reecher_fav_music,user_profiles.reecher_fav_movies,user_profiles.reecher_fav_books,user_profiles.reecher_fav_sports,user_profiles.reecher_fav_destinations,user_profiles.snippet")
+                   .where("users.reecher_id =?" ,params[:user_id])
+      profile_obj = UserProfile.find_by_reecher_id(@user[0][:reecher_id].to_s)
+      picture_file =  @user[0][:picture_file_name].to_s
+      profile_pic  =  @user[0][:profile_pic_path].to_s
+      if !picture_file.blank?
+       image_url = "http://#{request.host_with_port}" + profile_obj.picture_url      
+      elsif !profile_pic.blank?
+        image_url = profile_pic.to_s
+      else
+        image_url = nil
+      end 
+      
+      
+      user_hash = {}
+      @user.each do |u|
+        user_hash =u.attributes
+       end
+      
+      tot_curio = get_curio_points(params[:user_id])
+      tot_quest = get_user_total_question(params[:user_id])
+      tot_sol = get_user_total_solution(params[:user_id])
+      tot_conn = get_user_total_connection(params[:user_id])
+      user_hash[:image_url] = image_url
+      user_hash[:curio_points] = tot_curio
+      user_hash[:total_questions_asked] = tot_quest
+      user_hash[:total_solutions_provided] = tot_sol
+      user_hash[:total_connections] =tot_conn
+      msg = { :status => 200, :user_details => user_hash}
+      render :json =>msg            
+
+     end
+
 
 
 		end

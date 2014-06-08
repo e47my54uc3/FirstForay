@@ -84,7 +84,16 @@ gem 'twilio-ruby'
 gem 'acts_as_votable'
 
 # For push notifications both APNS & GCM
-gem 'pushmeup' 
+gem 'pushmeup','0.2.0',:path=> "vendor/plugins/pushmeup-0.2.0"
+
+gem 'gcm','0.0.7',:path=> "vendor/plugins/gcm-0.0.7"
+#gem 'speedy_gcm'
+
+
+
+
+
+
 
 #For debugging application only for development ENV
 

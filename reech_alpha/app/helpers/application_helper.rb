@@ -5,20 +5,13 @@ module ApplicationHelper
   end
 
   def send_device_notification device_token,message,platform
-    
-    puts "step11= I am here"
-    puts "step22= #{device_token}"
-    puts "step33= #{message}"
-    puts "step44= #{platform}"
-    
-     
+       
     if platform == 'iOS' 
       n1= APNS::Notification.new(device_token, :alert => message, :badge => 1, :sound => 'default')
       APNS.send_notifications([n1])
     elsif platform =='Android'
       require 'gcm'
       gcm = GCM.new("AIzaSyA8LPahDEVgdPxCU4QrWOh1pF_IL655LNI")
-      puts "Before sending device token=#{device_token}"
       registration_ids= [device_token] # an array of one or more client registration IDs
       options = {data: {message: message}, collapse_key: "Reech",time_to_live:3600}
       response = gcm.send_notification(registration_ids, options)
@@ -30,10 +23,7 @@ module ApplicationHelper
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
-    
-    puts "settingsetting=#{setting.inspect}"
- 
-    if ((setting[:pushnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
+     if ((setting[:pushnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
      check =true
     else
       check =false

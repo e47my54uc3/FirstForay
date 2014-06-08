@@ -53,6 +53,8 @@ gem 'thin','~>1.6.1'
 
 #Passenger app server
 gem 'passenger'
+#For Image uplod
+gem "paperclip"
 
 
 # Point systems
@@ -74,8 +76,6 @@ gem 'rails-erd'
 #For Facebook authentication
 gem 'koala'
 
-#For Image uplod
-gem "paperclip"
 
 #For sending SMS
 gem 'twilio-ruby'

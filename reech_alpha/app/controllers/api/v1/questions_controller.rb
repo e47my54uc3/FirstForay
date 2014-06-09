@@ -45,12 +45,14 @@ module Api
          
           #geometry = Paperclip::Geometry.from_file("data.jpeg")
           #puts "geometry2312321321-=============#{geometry}"
+=begin
 					if !q.avatar_file_name.blank?
 				    width=	Paperclip::Geometry.from_file(q.avatar.path(:medium)).width
             height=  Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
 				    q_hash[:image_width] = width
 				    q_hash[:image_height] = height
 					end
+=end
 					q_hash[:owner_location] = question_owner_profile.location
 					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : q_hash[:owner_image] = nil
 					questions_hash << q_hash
@@ -105,7 +107,8 @@ module Api
 									if user.present?
 										audien_reecher_ids << user.reecher_id
 									else
-									  UserMailer.send_invitation_email_for_audien(email, @user).deliver
+									  #UserMailer.send_invitation_email_for_audien(email, @user).deliver
+puts "Just trying to send a mail"  # please remove it
 									end	
 								end	
 								@question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0

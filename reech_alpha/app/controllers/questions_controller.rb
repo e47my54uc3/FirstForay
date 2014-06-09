@@ -73,7 +73,7 @@ class QuestionsController < ApplicationController
     respond_to do |format|
       if @question.update_attributes(params[:question])
         format.html { redirect_to @question, :notice => 'Question was successfully updated.' }
-        format.json { head :nActiveRecord:o_content }
+        format.json { head :no_content }
       else
         format.html { render :action => "edit" }
         format.json { render :json => @question.errors, :status => :unprocessable_entity }

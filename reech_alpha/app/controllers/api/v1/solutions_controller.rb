@@ -58,19 +58,20 @@ module Api
 				if @solution.save
 				    # send push notification to user who posted this question
             qust_details = Question.find_by_question_id(params[:question_id])
-          
-            user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
-            #puts "user_details=#{user_details.inspect}"
-            if !user_details.nil?
-               check_setting= check_notify_question_when_answered(user_details[0][:reecher_id])
-               # puts "check_setting=#{check_setting}"
+            #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
+            if !qust_details.nil?
+               check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
                if check_setting
-                device_details = Device.find_by_reecher_id(user_details[0][:reecher_id])
-               # puts "device_details=#{ device_details.inspect }"
-                if !device_details.blank? 
-                  #puts "I am in side device details#{device_details}"  
-                   response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
-                  send_device_notification(device_details[:device_token], response_string ,device_details[:platform])
+                #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
+                device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
+                response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
+                if !device_details.empty? 
+                    device_details.each do |d|
+                      
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                    end  
+                  
+                  
                 end 
                end
              
@@ -83,10 +84,12 @@ module Api
             #response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]
              check_setting= notify_solution_got_highfive(v.user_id)
              if check_setting
-              device_details = Device.find_by_reecher_id(v.user_id)
+              device_details = Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
+              response_string ="HGHFV,"+ @solution.solver + ","+params[:question_id]+"," +Time.now().to_s
               if !device_details.blank?   
-                 response_string ="HGHFV,"+ @solution.solver + ","+params[:question_id]+"," +Time.now().to_s
-                send_device_notification(device_details[:device_token], response_string ,device_details[:platform])
+                 device_details.each do |d|
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                 end
               end
              end
            end
@@ -237,7 +240,6 @@ module Api
         qust_details[:owner_location] = question_owner_profile.location
         qust_details[:avatar_file_name] != nil ? qust_details[:image_url] = "http://#{request.host_with_port}" + qust_details.avatar_url : qust_details[:image_url] = nil
         question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : qust_details[:owner_image] = nil
-        
         logined_user = User.find_by_reecher_id(params[:user_id])
         @solutions = []
         if solutions.size > 0
@@ -245,7 +247,7 @@ module Api
             solution_attrs = sl.attributes
             user = User.find_by_reecher_id(sl.solver_id)
             user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = "http://#{request.host_with_port}" + user.user_profile.picture_url : solution_attrs[:solver_image] = nil
-            sl.picture_file_name != nil ? solution_attrs[:image_url] = "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = "http://#{request.host_with_port}/"+"no-image.png"
+            sl.picture_file_name != nil ? solution_attrs[:image_url] = "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = nil
             purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
             if purchased_sl.present?
               solution_attrs[:purchased] = true
@@ -253,12 +255,10 @@ module Api
               solution_attrs[:purchased] = false  
             end 
             @solutions << solution_attrs
-          
           end 
         end
         msg = {:status => 200, :qust_details=>qust_details ,:solutions => @solutions} 
         logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@solutions}"
-
         render :json => msg
       end  
         

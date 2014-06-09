@@ -40,31 +40,27 @@ module Api
 							 render :json => msg
 						end   
 					elsif params[:provider] == "facebook"
-						
-						
 						fb_user = User.find_by_fb_uid(params[:user_details][:uid])
 						@graph = Koala::Facebook::API.new(params[:user_details][:access_token])
 						fb_user_profile_pic_path = @graph.get_picture(params[:user_details][:uid])
 						@profile = @graph.get_object("me")
 						@fb_friends = @graph.get_connections("me", "friends")
-           
-            
-						if fb_user.nil?              
+            if fb_user.nil?              
 							@user = User.new()
 							@user.first_name = @profile["first_name"]
 							@user.last_name = @profile["last_name"]
 							@user.email = @profile["email"]
 							@user.fb_token = params[:user_details][:access_token]
 							@user.fb_uid = params[:user_details][:uid]
-							fb_user_profile_pic	= @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
-							if @user.save(:validate => false)
-								
-								puts "1123213#{params[:device_token]}----#{params[:platform]}"
+							if @user.save(:validate => false)		
+							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
+							  @user.user_profile.save
+							  #@user.user_profile.build
+							 #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
+								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
 								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
               	make_friendship(@fb_friends,@user,params[:device_token]) if @fb_friends.size > 0
-
 								create_session_for_fb_user(@user)
-							
 								Authorization.create(:user_id => @user.id, :uid => params[:user_details][:uid], :provider => params[:provider])
 								@user.add_points(500)
 								@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
@@ -102,10 +98,7 @@ module Api
 			end
 
 			def create_device_for_user(device_token, platform, reecher_id)
-			  puts "device_token==#{device_token}"
-			  puts "platform==#{platform}"
-				if !device_token.blank? && !platform.blank?
-				  puts "aaaaaaaaaaaaaa"
+			 	if !device_token.blank? && !platform.blank?
 				  existing_device = Device.where(:device_token => device_token, :platform => platform, :reecher_id => reecher_id)
 					puts "existing_device"
 					if !existing_device.present?
@@ -170,7 +163,6 @@ module Api
      # msg = { :status => 401, :message => "success"}
      # render :json =>msg
     end
-    
 =end    
      # Method Send reech requests
       def send_reech_request
@@ -196,13 +188,14 @@ module Api
 =end
           end
         end
-        # end of outer  if loop
-     end
+      end
       msg = { :status => 200, :message => "success"}
       render :json =>msg 
      end
 
+    
 
+#End of Class User Controller class
   		end
 	end
 end

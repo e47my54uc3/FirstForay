@@ -78,6 +78,9 @@ class Question < ActiveRecord::Base
 		avatar.url(:medium)
 	end
 
+  def avatar_original_url
+    avatar.url(:original)
+  end
 	def is_stared?
 	 self.votings.size > 0 ? true : false
 	end  

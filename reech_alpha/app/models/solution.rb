@@ -40,5 +40,9 @@ def picture_url
 	picture.url(:medium)
 end
 
+def picture_original_url
+  picture.url(:original)
+end
+
 
 end

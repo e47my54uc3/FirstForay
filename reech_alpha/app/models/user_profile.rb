@@ -10,7 +10,7 @@ class UserProfile < ActiveRecord::Base
 	serialize :reecher_fav_cuisines, Array 
 
 
-  attr_accessible :reecher_interests,:reecher_hobbies,:reecher_fav_music,:reecher_fav_movies,:reecher_fav_books,
+  attr_accessible :reecher_id,:reecher_interests,:reecher_hobbies,:reecher_fav_music,:reecher_fav_movies,:reecher_fav_books,
   								:reecher_fav_sports,:reecher_fav_destinations,:reecher_fav_cuisines,:bio,:snippet,:profile_pic_path
   
   acts_as_votable
@@ -27,4 +27,9 @@ class UserProfile < ActiveRecord::Base
 	def picture_url
 		picture.url(:medium)
 	end
+ 
+  def picture_from_url(url)
+    self.picture = open(url)
+  end
+  
 end

@@ -38,8 +38,11 @@ Reech::Application.routes.draw do
       post "linked_questions" => "questions#linked_questions"
       post "link_questions_to_expert" => "questions#link_questions_to_expert"
       post "/send_gcm_notification" => "questions#send_gcm_notification", :as => "send_gcm_notification"
-      # post "/get_question_details" => "questions#get_question_details", :as => "get_question_details"
-
+      #post "/get_question_details" => "questions#get_question_details", :as => "get_question_details"
+      post "post_question_with_image" => "questions#post_question_with_image",:as =>"post_question_with_image"
+        
+        
+        
       resources :solutions
       post "view_solution" => "solutions#view_solution", :as => "view_solution"
       post "all_solutions" => "solutions#view_all_solutions", :as => "all_solutions"
@@ -49,7 +52,9 @@ Reech::Application.routes.draw do
       post "purchase_solution" =>"solutions#purchase_solution", :as => "purchase_solution"
       post "get_solution_details" =>"solutions#get_solution_details", :as => "get_solution_details"
       post "question_details_with_solutions" =>"solutions#question_details_with_solutions", :as => "question_details_with_solutions"
+      post "post_solution_with_image" =>"solutions#post_solution_with_image", :as => "post_solution_with_image"
 
+    
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"
       post "/changepassword" => "user_profile#changepass", :as=>"changepassword"

@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140502113740) do
+ActiveRecord::Schema.define(:version => 20140602160847) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -51,11 +51,38 @@ ActiveRecord::Schema.define(:version => 20140502113740) do
   add_index "chats", ["broadcasted_by"], :name => "index_chats_on_broadcasted_by"
   add_index "chats", ["broadcasted_to"], :name => "index_chats_on_broadcasted_to"
 
+  create_table "devices", :force => true do |t|
+    t.string   "device_token"
+    t.string   "platform"
+    t.string   "reecher_id"
+    t.datetime "created_at",   :null => false
+    t.datetime "updated_at",   :null => false
+  end
+
   create_table "friendships", :force => true do |t|
     t.string   "reecher_id"
     t.string   "friend_reecher_id"
     t.string   "status"
     t.datetime "created_at"
+  end
+
+  create_table "gcm_devices", :force => true do |t|
+    t.string   "registration_id",    :null => false
+    t.datetime "last_registered_at"
+    t.datetime "created_at",         :null => false
+    t.datetime "updated_at",         :null => false
+  end
+
+  add_index "gcm_devices", ["registration_id"], :name => "index_gcm_devices_on_registration_id", :unique => true
+
+  create_table "linked_questions", :force => true do |t|
+    t.string   "user_id"
+    t.string   "question_id"
+    t.string   "linked_by_uid"
+    t.datetime "created_at",    :null => false
+    t.datetime "updated_at",    :null => false
+    t.string   "email_id"
+    t.string   "phone_no"
   end
 
   create_table "merit_actions", :force => true do |t|
@@ -204,6 +231,14 @@ ActiveRecord::Schema.define(:version => 20140502113740) do
     t.datetime "updated_at", :null => false
   end
 
+  create_table "send_reech_requests", :force => true do |t|
+    t.string   "user_id"
+    t.string   "type"
+    t.string   "contact_details"
+    t.datetime "created_at",      :null => false
+    t.datetime "updated_at",      :null => false
+  end
+
   create_table "solutions", :force => true do |t|
     t.string   "solver_id"
     t.string   "solver"
@@ -238,6 +273,7 @@ ActiveRecord::Schema.define(:version => 20140502113740) do
     t.integer  "picture_file_size"
     t.datetime "picture_updated_at"
     t.string   "location"
+    t.string   "profile_pic_path"
   end
 
   add_index "user_profiles", ["reecher_id"], :name => "index_user_profiles_on_reecher_id"
@@ -249,9 +285,10 @@ ActiveRecord::Schema.define(:version => 20140502113740) do
     t.boolean  "notify_question_when_answered"
     t.boolean  "notify_linked_to_question"
     t.boolean  "notify_solution_got_highfive"
-    t.datetime "created_at",                    :null => false
-    t.datetime "updated_at",                    :null => false
+    t.datetime "created_at",                                :null => false
+    t.datetime "updated_at",                                :null => false
     t.string   "reecher_id"
+    t.boolean  "notify_when_my_stared_question_get_answer"
   end
 
   create_table "users", :force => true do |t|

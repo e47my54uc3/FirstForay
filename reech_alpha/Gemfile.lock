@@ -1,3 +1,17 @@
+PATH
+  remote: vendor/plugins/gcm-0.0.7
+  specs:
+    gcm (0.0.7)
+      httparty
+      json
+
+PATH
+  remote: vendor/plugins/pushmeup-0.2.0
+  specs:
+    pushmeup (0.2.0)
+      httparty
+      json
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -113,6 +127,9 @@ GEM
     hike (1.2.3)
     hirb (0.7.1)
     http_parser.rb (0.6.0)
+    httparty (0.11.0)
+      multi_json (~> 1.0)
+      multi_xml (>= 0.5.2)
     httpauth (0.2.0)
     httpclient (2.3.4.1)
     i18n (0.6.1)
@@ -150,6 +167,7 @@ GEM
       polyamorous (~> 0.5.0)
     mime-types (1.25.1)
     multi_json (1.8.2)
+    multi_xml (0.5.5)
     multipart-post (1.2.0)
     mysql2 (0.3.14)
     nested_has_many_through (0.0.2)
@@ -322,6 +340,7 @@ DEPENDENCIES
   execjs (~> 1.4.0)
   faye (~> 1.0.0)
   fb_graph
+  gcm (= 0.0.7)!
   haml (~> 4.0.4)
   hash_struct (~> 0.3)
   hirb (~> 0.7.1)
@@ -346,6 +365,7 @@ DEPENDENCIES
   paperclip
   passenger
   private_pub (~> 1.0.3)
+  pushmeup (= 0.2.0)!
   rabl
   rails (= 3.2.13)
   rails-erd

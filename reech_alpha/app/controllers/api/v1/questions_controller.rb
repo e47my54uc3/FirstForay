@@ -23,11 +23,9 @@ module Api
       
 			if @Questions.size > 0
 			  purchasedSolutionId =PurchasedSolution.pluck(:solution_id)			  
-			 @Questions.each do |q|
+			  @Questions.each do |q|
 				  q_hash = q.attributes
-				  puts "q.posted_by_uid==#{q.posted_by_uid}"
-					question_owner = User.find_by_reecher_id(q.posted_by_uid)
-					puts "question_owner==#{question_owner}"
+				  question_owner = User.find_by_reecher_id(q.posted_by_uid)
 					question_owner_profile = question_owner.user_profile
 					solutions = Solution.find_all_by_question_id(q.question_id)
 					#solutions = solutions.map!(&:id).to_s
@@ -38,9 +36,9 @@ module Api
 					q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
 					q.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q_hash[:image_url] = nil
 					
-				#	image_size123=Paperclip::Geometry.from_file(q_hash[:image_url])
+				  #image_size123=Paperclip::Geometry.from_file(q_hash[:image_url])
 					
-				#	geo = Paperclip::Geometry.from_file(avatar.to_file(:medium))
+				  #geo = Paperclip::Geometry.from_file(avatar.to_file(:medium))
           #geo= Paperclip::Geometry.from_file(q.avatar.path(:original)).to_s
          
           #geometry = Paperclip::Geometry.from_file("data.jpeg")
@@ -95,26 +93,34 @@ module Api
 						if !params[:attached_image].blank? 
 							data = StringIO.new(Base64.decode64(params[:attached_image]))
 							@question.avatar = data
+							
 						end
     				# Setting audiens for displaying posetd user details of a question
 						if !params[:audien_details].nil?
+						  if params[:audien_details].has_key?("emails")						  
 							if !params[:audien_details][:emails].empty?
 								audien_reecher_ids = []
-								params[:audien_details][:emails].each do |email|
+								 params[:audien_details][:emails].each do |email|
 									user = User.find_by_email(email)
 									# If audien is a reecher store his reedher_id in question record
 									# Else send an Invitation mail to the audien
 									if user.present?
 										audien_reecher_ids << user.reecher_id
 									else
-									  #UserMailer.send_invitation_email_for_audien(email, @user).deliver
-puts "Just trying to send a mail"  # please remove it
+								begin
+                    UserMailer.send_question_details_to_audien(email, @user).deliver
+                  rescue Exception => e
+                    logger.error e.backtrace.join("\n")
+                  end
+									  
+
 									end	
 								end	
 								@question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
 							end	
-
+            end
 							# If the audien is not a reecher and have contact number then send an SMS
+							if params[:audien_details].has_key?("phone_numbers")     
 							if !params[:audien_details][:phone_numbers].empty? 
 								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
 								params[:audien_details][:phone_numbers].each do |number|
@@ -128,15 +134,21 @@ puts "Just trying to send a mail"  # please remove it
 =end				
 								end	
 							end	
-							
+						 end
+						 if params[:audien_details].has_key?("reecher_ids")	
 							if !params[:audien_details][:reecher_ids].empty? 
 							   params[:audien_details][:reecher_ids].each do |reech_id|
 							   user = User.find_by_reecher_id(reech_id)
-                 UserMailer.send_invitation_email_for_audien(user.email, user).deliver
+                begin
+                 UserMailer.send_question_details_to_audien(user.email, user).deliver 
+                rescue Exception => e
+                logger.error e.backtrace.join("\n")
+                end
+                                 
                 end 
 							  
 							end
-							
+						end	
 							
 							
 
@@ -232,7 +244,11 @@ puts "Just trying to send a mail"  # please remove it
         if !params[:referral_details][:email_ids].blank?
            params[:referral_details][:email_ids].each do |email|
             LinkedQuestion.create(:user_id =>'',:question_id=>params[:question_id],:linked_by_uid=>params[:user_id],:email_id=>email,:phone_no =>'')
-              UserMailer.send_link_question_email(email, user).deliver
+                  begin
+                    UserMailer.send_link_question_email(email, user).deliver
+                  rescue Exception => e
+                    logger.error e.backtrace.join("\n")
+                  end
            end
         end
         if !params[:referral_details][:phone_no].blank?
@@ -253,13 +269,16 @@ puts "Just trying to send a mail"  # please remove it
           params[:referral_details][:reecher_ids].each do |reech_id|
           LinkedQuestion.create(:user_id =>reech_id,:question_id=>params[:question_id],:linked_by_uid=>params[:user_id],:email_id=>'',:phone_no =>'')
           check_setting= notify_when_my_stared_question_get_answer(reech_id)
-         if check_setting
+          if check_setting
            user_details = User.where("users.reecher_id" =>reech_id) 
              if !user_details.blank?
                device_details = Device.find_by_reecher_id(user_details[0][:reecher_id])
                 if !device_details.blank?
-                  notify_string ="LINKED,"+user.full_name + ","+ params[:question_id]
-                  send_device_notification(device_details[:device_token], notify_string ,user_details[0][:platform])
+                 notify_string ="LINKED,"+user.full_name + ","+ params[:question_id]
+                 device_details.each do |d|
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                 end
+                 # send_device_notification(device_details[:device_token], notify_string ,user_details[0][:platform])
                end
              end
          end     
@@ -283,30 +302,123 @@ puts "Just trying to send a mail"  # please remove it
         #data = {:alert => "Hello Android!!!" }
         # GCM.send_notification( destination,{"key" =>"HELLO WORLD"} )
         #GCM.send_notification( destination , data1, {:collapse_key => "score update", :time_to_live => 3600, :delay_while_idle => true})
-      #  msg = { :status => 200, :message => "success"}
-       # render :json =>msg
-       message_options = {
-    
-     # optional parameters below.  Read the docs here: http://developer.android.com/guide/google/gcm/gcm.html#send-msg
-  :collapse_key => "foobar",
-  :data => { :score => "3x1" },
-  :delay_while_idle => true,
-  :time_to_live => 1,
-  :registration_ids => destination
-}
-
-
-  puts "send notify=#{message_options}"
-  response = SpeedyGCM::API.send_notification(message_options)
-  puts "after send notify=#{response.inspect}"  
-  #puts "response=#{response[:code] }"  # some http response code like 200
- # puts "response1=#{response[:data]}" 
-  
-  msg = { :status => 200, :code => response[:code],:data=>response[:data]}
-  render :json =>msg 
-       
+        #msg = { :status => 200, :message => "success"}
+       #render :json =>msg
+        message_options = {
+        #optional parameters below.  Read the docs here: http://developer.android.com/guide/google/gcm/gcm.html#send-msg
+          :collapse_key => "foobar",
+          :data => { :score => "3x1" },
+          :delay_while_idle => true,
+          :time_to_live => 1,
+          :registration_ids => destination
+        }
+        response = SpeedyGCM::API.send_notification(message_options)
+        msg = { :status => 200, :code => response[:code],:data=>response[:data]}
+        render :json =>msg 
     end
-     
+    
+    
+    
+       
+   def post_question_with_image        
+        @user = User.find_by_reecher_id(params[:user_id])
+        @question = Question.new()
+        @question.post = params[:question]
+        @question.posted_by_uid = @user.reecher_id
+        @question.posted_by = @user.full_name
+        @question.ups = 0
+        @question.downs = 0 
+        @question.Charisma = 5
+        if @user.points > @question.Charisma   
+          @question.add_points(@question.Charisma)
+          @user.subtract_points(10)
+          if !params[:file].blank? 
+           @question.avatar = params[:file]  
+          end 
+           #  data = StringIO.new(Base64.decode64(params[:attached_image]))
+           # @question.avatar = data
+           #uploaded_file = params[:file]
+=begin           
+         # @question.avatar_file_name =uploaded_file.original_filename
+          
+         #@question.avatar_content_type =uploaded_file.content_type
+          puts "uploaded_file.==#{uploaded_file.inspect}"
+          image_path = (@question.id).to_s + "_question_"+ (uploaded_file.original_filename).to_s
+          File.open(Rails.root.join('public', 'uploads', image_path), 'wb') do |file|
+          file.write(uploaded_file.read)
+        end
+              
+=end
+            
+            # Setting audiens for displaying posetd user details of a question
+            if !params[:audien_details].nil?
+              if params[:audien_details].has_key?("emails")             
+              if !params[:audien_details][:emails].empty?
+                audien_reecher_ids = []
+                params[:audien_details][:emails].each do |email|
+                  user = User.find_by_email(email)
+                  # If audien is a reecher store his reedher_id in question record
+                  # Else send an Invitation mail to the audien
+                  if user.present?
+                    audien_reecher_ids << user.reecher_id
+                  else
+                  begin
+                    UserMailer.send_question_details_to_audien(email, @user).deliver
+                  rescue Exception => e
+                    logger.error e.backtrace.join("\n")
+                  end
+                    
+                  end 
+                end 
+                @question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
+              end 
+            end
+              # If the audien is not a reecher and have contact number then send an SMS
+              if params[:audien_details].has_key?("phone_numbers")     
+              if !params[:audien_details][:phone_numbers].empty? 
+                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+                params[:audien_details][:phone_numbers].each do |number|
+=begin                  
+                  sms = client.account.sms.messages.create(
+                      from: TWILIO_CONFIG['from'],
+                      to: number,
+                      body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                  )
+                  logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
+=end        
+                end 
+              end 
+             end
+             if params[:audien_details].has_key?("reecher_ids") 
+              if !params[:audien_details][:reecher_ids].empty? 
+                 params[:audien_details][:reecher_ids].each do |reech_id|
+                 user = User.find_by_reecher_id(reech_id)
+                  begin
+                    UserMailer.send_question_details_to_audien(user.email, user).deliver
+                  rescue Exception => e
+                    logger.error e.backtrace.join("\n")
+                  end
+                 
+                end 
+                
+              end
+            end 
+              
+              
+
+            end 
+          @question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
+          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+          render :json => msg
+        else
+          msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
+          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+          render :json => msg 
+        end
+
+    end
+  
+  
      
      
   #  End for class, modules

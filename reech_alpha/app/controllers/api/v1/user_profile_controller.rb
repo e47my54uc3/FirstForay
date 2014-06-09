@@ -1,5 +1,6 @@
 module Api
 	module V1
+	  require "open-uri"
 		class UserProfileController < ApiController
 		before_filter :restrict_access, :except => [:forget_password]	
 		respond_to :json
@@ -21,24 +22,36 @@ module Api
 
 				# POST /update_profile
 				def update
+					
 					@user = User.find_by_reecher_id(params[:user_id])
 					@user.first_name = params[:first_name]
 					@user.last_name = params[:last_name]
 					
 					@profile = @user.user_profile
+					#@profile.update({:location => params[:location],:bio=>params[:about]})
 					@profile.location = params[:location]
 					@profile.bio = params[:about]
 					if !params[:profile_image].blank? 
 						data = StringIO.new(Base64.decode64(params[:profile_image]))
 						@profile.picture = data
 					end	
-
-					if @user.save && @profile.save
-						@profile_hash = @user.user_profile.attributes
-						@profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
-						msg = {:status => 200, :user => @user, :profile => @profile_hash }
-					else:reecherid
-						msg = {:status => 400, :message => @user.errors}
+            
+          if ((@user.fb_token !=nil) && (@user.fb_uid !=nil ))
+            if @profile.save
+            @profile_hash = @user.user_profile.attributes
+            @profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
+            msg = {:status => 200, :user => @user, :profile => @profile_hash }
+					  else
+					   msg = {:status => 400, :message => @user.errors}
+					  end  
+					else 
+					   if @user.save &&  @profile.save
+             @profile_hash = @user.user_profile.attributes
+             @profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
+             msg = {:status => 200, :user => @user, :profile => @profile_hash }
+					   else
+					   msg = {:status => 400, :message => @user.errors}
+					   end  
 					end	
 					render :json => msg
 				end
@@ -204,7 +217,7 @@ module Api
       user_hash = {}
       @user.each do |u|
         user_hash =u.attributes
-       end
+      end
       
       tot_curio = get_curio_points(params[:user_id])
       tot_quest = get_user_total_question(params[:user_id])
@@ -219,8 +232,11 @@ module Api
       render :json =>msg            
 
      end
-
-
+      
+     def picture_from_url(url)
+     self.picture = open(url)
+     end 
+    
 
 		end
 	end

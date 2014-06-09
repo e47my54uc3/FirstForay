@@ -94,7 +94,6 @@ gem 'gcm','0.0.7',:path=> "vendor/plugins/gcm-0.0.7"
 
 
 
-
 #For debugging application only for development ENV
 
 group :development do

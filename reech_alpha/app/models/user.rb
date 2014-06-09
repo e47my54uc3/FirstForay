@@ -1,3 +1,4 @@
+
 class User < ActiveRecord::Base
 	# Include default devise modules. Others available are:
 	# :confirmable, :lockable, :timeoutable and :omniauthable
@@ -26,7 +27,7 @@ class User < ActiveRecord::Base
 	#Scrubber Fields
 	before_create :create_unique_profile_id
 	before_create :create_reecher_id
-	validates :email, uniqueness: true ,allow_nil: true
+	validates :email, uniqueness: true ,:allow_blank => true, :allow_nil => true
 	#Authentications
 	validate do |user|
 		if user.new_record? #adds validation if it is a new record
@@ -165,5 +166,11 @@ class User < ActiveRecord::Base
 		reset_persistence_token!
 		UserMailer.password_reset_instructions(self).deliver
 	end
+	
+  def picture_from_url(url)
+    self.picture = open(url)
+  end
+
+
 
 end

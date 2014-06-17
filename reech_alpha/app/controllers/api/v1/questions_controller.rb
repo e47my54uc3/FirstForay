@@ -288,9 +288,7 @@ module Api
       msg = { :status => 200, :message => "success"}
       render :json =>msg 
     end
-  
-  
-  
+    
     def send_gcm_notification
         destination = ["APA91bFbYwmetpiv96X1c52tV_sOpT9ZkAZlDyqk1AWKXvwe7bjVUJJ8QwsGB4kkHFt-JiIfIrGh7ScM6ZrTdBe5GCAXkwzncQ4ynAk9zcnVkP5OvYhwVriVcsdgrzfFqZsd4vu6CLoCGMerOP0BH1evR8YqtjcgkA"]#params[:device_token]
         #data1 = {:msg => "Hello Vijay"}

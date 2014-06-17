@@ -32,4 +32,9 @@ class UserProfile < ActiveRecord::Base
     self.picture = open(url)
   end
   
+  def thumb_picture_url
+    picture.url(:thumb)
+  end
+  
+  
 end

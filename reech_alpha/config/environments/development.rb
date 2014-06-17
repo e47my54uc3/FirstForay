@@ -46,9 +46,20 @@ Reech::Application.configure do
   address:              'smtp.gmail.com',
   port:                 587,
   domain:               'gmail.com',
-  user_name:            'info@reechout.co',
-  password:             'Supercashmoney1',
+  user_name:            'vijayprasad83@gmail.com',
+  password:             'joti@VRj2008',
   authentication:       'plain',
   enable_starttls_auto: true  }
-  
+
+  config.paperclip_defaults = {
+  :storage => :s3,
+  :s3_credentials => {
+    :bucket => 'reechattachmentstorage',
+    :access_key_id => 'AKIAIVK7XM7Q7YX72IDQ',
+    :secret_access_key => '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'
+    
+  },
+  :s3_multipart_min_part_size => 20971520
+ }
+ 
 end

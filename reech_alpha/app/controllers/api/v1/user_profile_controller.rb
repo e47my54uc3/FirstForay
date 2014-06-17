@@ -39,7 +39,7 @@ module Api
           if ((@user.fb_token !=nil) && (@user.fb_uid !=nil ))
             if @profile.save
             @profile_hash = @user.user_profile.attributes
-            @profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
+            @profile.picture_file_name != nil ? @profile_hash[:image_url] =  @profile.picture_url : @profile_hash[:image_url] = nil
             msg = {:status => 200, :user => @user, :profile => @profile_hash }
 					  else
 					   msg = {:status => 400, :message => @user.errors}
@@ -47,7 +47,7 @@ module Api
 					else 
 					   if @user.save &&  @profile.save
              @profile_hash = @user.user_profile.attributes
-             @profile.picture_file_name != nil ? @profile_hash[:image_url] = "http://#{request.host_with_port}" + @profile.picture_url : @profile_hash[:image_url] = nil
+             @profile.picture_file_name != nil ? @profile_hash[:image_url] =  @profile.picture_url : @profile_hash[:image_url] = nil
              msg = {:status => 200, :user => @user, :profile => @profile_hash }
 					   else
 					   msg = {:status => 400, :message => @user.errors}
@@ -164,7 +164,7 @@ module Api
             @user_profile = user.user_profile 
             profile_pic_path = (@user_profile.profile_pic_path).to_s
             if @user_profile.picture_file_name
-             image_url = "http://#{request.host_with_port}" + @user_profile.picture_url      
+             image_url = @user_profile.picture_url      
             elsif @user_profile.profile_pic_path
               image_url = profile_pic_path
             else
@@ -206,7 +206,7 @@ module Api
       picture_file =  @user[0][:picture_file_name].to_s
       profile_pic  =  @user[0][:profile_pic_path].to_s
       if !picture_file.blank?
-       image_url = "http://#{request.host_with_port}" + profile_obj.picture_url      
+       image_url = profile_obj.picture_url      
       elsif !profile_pic.blank?
         image_url = profile_pic.to_s
       else

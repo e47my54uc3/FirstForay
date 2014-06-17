@@ -5,7 +5,7 @@ module ApplicationHelper
   end
 
   def send_device_notification device_token,message,platform
-       
+            
     if platform == 'iOS' 
       n1= APNS::Notification.new(device_token, :alert => message, :badge => 1, :sound => 'default')
       APNS.send_notifications([n1])
@@ -20,13 +20,13 @@ module ApplicationHelper
   end
 
   def check_notify_question_when_answered user_id
-    # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
+    #UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
      if ((setting[:pushnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
      check =true
     else
-      check =false
+     check =false
     end
     check 
   end

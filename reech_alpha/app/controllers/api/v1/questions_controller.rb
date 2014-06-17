@@ -37,8 +37,7 @@ module Api
 			  my_all_question = merge_question.sort
 			  @Questions = Question.where("id in (?)", my_all_question).order("created_at DESC")
 			  
-			end 
-      
+			end    
      
       
 			if @Questions.size > 0
@@ -172,8 +171,7 @@ module Api
 							  
 							end
 						end	
-						end	
-							
+						end						
 
 						end	
 					   if @question.save

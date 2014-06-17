@@ -7,7 +7,7 @@ Reech::Application.routes.draw do
       post "signup" => "users#create", :as => "signup"
       post "/send_apns_notification" => "users#send_apns_notification", :as => "send_apns_notification"
       post "send_reech_request" => "users#send_reech_request", :as => "send_reech_request"
-      
+      post "remove_connections" => "users#remove_connections", :as => "remove_connections"
      
       
       resources :user_sessions
@@ -31,7 +31,11 @@ Reech::Application.routes.draw do
       #   :confirmations => 'devise/confirmations',
       #   :unlocks => 'devise/unlocks'
       # }
-
+      
+      resources :categories
+      post "get_category_list" => "categories#get_category_list", :as =>"get_category_list"
+      
+      
       resources :questions
       post "question_feed" => "questions#index"
       post "mark_question_stared" => "questions#mark_question_stared"
@@ -77,9 +81,16 @@ Reech::Application.routes.draw do
           get 'req',:as=>"addfriend"
           get 'accept',:as=>"accept_fr"
           get 'reject',:as=>"reject_fr"
-
+          
         end
+        
+         
       end
+      
+     resources :groups
+     post "associate_user_to_group" => "groups#associate_user_to_group", :as=>"associate_user_to_group"
+     post "reecher_personal_groups" => "groups#reecher_personal_groups" ,:as =>"reecher_personal_groups"      
+
     # resources :authorizations
     # post '/auth/:provider/callback' => 'authorizations#create'
     # get '/auth/failure' => 'authorizations#failure'
@@ -148,6 +159,7 @@ Reech::Application.routes.draw do
       get 'accept',:as=>"accept_fr"
       get 'reject',:as=>"reject_fr"
     end
+    
   end
 
   resources :password_resets, :only => [ :new, :create, :edit, :update ]

@@ -2,18 +2,19 @@ include Scrubber
 class Question < ActiveRecord::Base
 	has_merit
 
-	attr_accessible :post, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids
+	attr_accessible :post,:id, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids
 	has_attached_file :avatar, :styles => {:medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png" ,:default_style => :original 
  serialize :audien_user_ids, Array
 	#do_not_validate_attachment_file_type :avatar
 	validates_attachment :avatar, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:avatar].nil? }
-
+  
 	#validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
 	before_save :create_question_id
 	
 	belongs_to :user, :foreign_key => 'posted_by_uid', :primary_key => 'reecher_id'
 	has_many :votings, :dependent => :destroy
-
+  has_many :solutions, :primary_key=>'question_id',:foreign_key => 'question_id',:dependent => :destroy 
+	
 	has_many :posted_solutions,
 	:class_name => 'Solution',
 	:primary_key=>'question_id',
@@ -65,6 +66,8 @@ class Question < ActiveRecord::Base
 		stared_question_ids = []
 		user = User.find_by_reecher_id(user_id)
 		stared_questions = user.votings #Voting.all
+		
+		puts "stared_questions=#{stared_questions}"
 		if stared_questions.size > 0
 			stared_questions.each do |sq|
 				stared_question_ids << sq.question_id

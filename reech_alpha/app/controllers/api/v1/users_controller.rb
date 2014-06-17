@@ -171,7 +171,12 @@ module Api
         if !params[:audien_details][:email_ids].blank?
           params[:audien_details][:email_ids].each do |email|
             SendReechRequest.create(:user_id =>params[:user_id],:type=>params[:type],:contact_details=>params[:email])
-            UserMailer.send_reech_friend_request(email, user.full_name).deliver
+              begin
+                 UserMailer.send_reech_friend_request(email, user.full_name).deliver
+              rescue Exception => e
+                 logger.error e.backtrace.join("\n")
+              end
+          
           end
         end
         if !params[:audien_details][:phone_numbers].blank?
@@ -192,7 +197,15 @@ module Api
       msg = { :status => 200, :message => "success"}
       render :json =>msg 
      end
-
+  
+    def remove_connections
+        my_connection = Friendship.where("reecher_id=? && friend_reecher_id =? ", params[:user_id],params[:friend_id]).first
+        friend_connection = Friendship.where("reecher_id=? && friend_reecher_id =? ", params[:friend_id],params[:user_id]).first
+        my_connection.destroy unless  my_connection.blank?
+        friend_connection.destroy unless  friend_connection.blank?
+        msg = {:status => 200, :messgae => "User is removed from your connection" }
+        render :json => msg  
+    end
     
 
 #End of Class User Controller class

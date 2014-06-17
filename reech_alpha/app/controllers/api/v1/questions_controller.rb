@@ -13,10 +13,30 @@ module Api
 			  @Questions = Question.filterforuser(params[:user_id])
 			elsif params[:type] == "stared"
 				#@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions(params[:user_id])
-				@Questions = Question.includes(:votings).order("created_at DESC").get_stared_questions(params[:user_id])
+				#@Questions = Question.includes(:votings).order("created_at DESC").get_stared_questions(params[:user_id])
+			  user = User.find_by_reecher_id(params[:user_id])
+			  question_ids = Voting.select("question_id").where("user_id = ?", user.id) unless user.blank?  
+			  #puts "question_ids==#{question_ids.inspect}"
+			  question_ids = question_ids.map{|q| q.question_id}
+			  @Questions = Question.where("id in (?)", question_ids).order("created_at DESC")  unless user.blank?  
+			 			
 				elsif params[:type] == "self"
 				user = User.find_by_reecher_id(params[:user_id])
-				@Questions = user.questions.includes(:posted_solutions, :votings).order("created_at DESC")
+				@Questions = user.questions.includes(:solutions, :votings).order("created_at DESC")
+			  # question which whose solution is purchased.
+			  my_purchases_solid = PurchasedSolution.select(:solution_id).where("user_id = ?", user.id) 
+			  quest_hash =[]
+			  my_purchases_solid.each do |sid|
+			  qust_purc_sol=Question.joins(:solutions)
+                   .select("questions.*,solutions.id as sol_id,solutions.question_id as sol_question_id")
+                   .where("solutions.id = ?", sid.solution_id)
+         quest_hash.push(qust_purc_sol[0][:id])
+			  end
+			  my_quest= @Questions.map{|q| q.id}
+			  merge_question = quest_hash + my_quest
+			  my_all_question = merge_question.sort
+			  @Questions = Question.where("id in (?)", my_all_question).order("created_at DESC")
+			  
 			end 
       
      
@@ -34,7 +54,7 @@ module Api
 					has_solution.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
 					
 					q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
-					q.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q_hash[:image_url] = nil
+					q.avatar_file_name != nil ? q_hash[:image_url] = q.avatar_url : q_hash[:image_url] = nil
 					
 				  #image_size123=Paperclip::Geometry.from_file(q_hash[:image_url])
 					
@@ -43,14 +63,17 @@ module Api
          
           #geometry = Paperclip::Geometry.from_file("data.jpeg")
           #puts "geometry2312321321-=============#{geometry}"
+
+=begin					
 					if !q.avatar_file_name.blank?
 				    width=	Paperclip::Geometry.from_file(q.avatar.path(:medium)).width
-            height=  Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
+            height= Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
 				    q_hash[:image_width] = width
 				    q_hash[:image_height] = height
 					end
+=end					
 					q_hash[:owner_location] = question_owner_profile.location
-					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : q_hash[:owner_image] = nil
+					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =  question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
 					questions_hash << q_hash
 					
 				end 
@@ -85,6 +108,7 @@ module Api
 				@question.ups = 0
 				@question.downs = 0 
 				@question.Charisma = 5
+				@question.category_id = params[:category_id]
 				if @user.points > @question.Charisma   
 					@question.add_points(@question.Charisma)
 					@user.subtract_points(10)
@@ -93,7 +117,9 @@ module Api
 							@question.avatar = data
 							
 						end
-    				# Setting audiens for displaying posetd user details of a question
+    			# Setting audiens for displaying posetd user details of a question
+					if params[:audien_details].class == 'String' 
+					  params[:audien_details] = JSON.parse(params[:audien_details])
 						if !params[:audien_details].nil?
 						  if params[:audien_details].has_key?("emails")						  
 							if !params[:audien_details][:emails].empty?
@@ -136,21 +162,27 @@ module Api
 							if !params[:audien_details][:reecher_ids].empty? 
 							   params[:audien_details][:reecher_ids].each do |reech_id|
 							   user = User.find_by_reecher_id(reech_id)
-                begin
-                 UserMailer.send_question_details_to_audien(user.email, user).deliver 
-                rescue Exception => e
-                logger.error e.backtrace.join("\n")
-                end
+                    begin
+                     UserMailer.send_question_details_to_audien(user.email, user).deliver 
+                    rescue Exception => e
+                    logger.error e.backtrace.join("\n")
+                    end
                                  
                 end 
 							  
 							end
 						end	
-							
+						end	
 							
 
 						end	
-					@question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
+					   if @question.save
+					   catgory = Category.find(@question.category_id)
+					   @question[:category_name] = catgory.title
+					   msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
+					   else 
+					     msg = {:status => 401, :message => @question.errors}
+					   end
 				 	logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 				 	render :json => msg
 				else
@@ -213,14 +245,14 @@ module Api
     					question.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + question.avatar_url : q_hash[:image_url] = nil
     					q_hash[:owner_location] = question_owner_profile.location
     					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : q_hash[:owner_image] = nil
-    					
+=begin    					
           		if !question.avatar_file_name.blank?
               width=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).width
               height=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).height
               q_hash[:image_width] = width
               q_hash[:image_height] = height
               end
-    					
+=end    					
     					linked_questions_ary << q_hash
     				end	
     			
@@ -317,7 +349,7 @@ module Api
     
     
        
-   def post_question_with_image        
+   def post_question_with_image            
         @user = User.find_by_reecher_id(params[:user_id])
         @question = Question.new()
         @question.post = params[:question]
@@ -326,6 +358,7 @@ module Api
         @question.ups = 0
         @question.downs = 0 
         @question.Charisma = 5
+        @question.category_id = params[:category_id]
         if @user.points > @question.Charisma   
           @question.add_points(@question.Charisma)
           @user.subtract_points(10)
@@ -347,28 +380,35 @@ module Api
               
 =end
             
+            if params[:audien_details].class == 'String' 
+            params[:audien_details] = JSON.parse(params[:audien_details])
             # Setting audiens for displaying posetd user details of a question
-            if !params[:audien_details].nil?
-              if params[:audien_details].has_key?("emails")             
-              if !params[:audien_details][:emails].empty?
-                audien_reecher_ids = []
-                params[:audien_details][:emails].each do |email|
-                  user = User.find_by_email(email)
-                  # If audien is a reecher store his reedher_id in question record
-                  # Else send an Invitation mail to the audien
-                  if user.present?
-                    audien_reecher_ids << user.reecher_id
-                  else
-                  begin
-                    UserMailer.send_question_details_to_audien(email, @user).deliver
-                  rescue Exception => e
-                    logger.error e.backtrace.join("\n")
-                  end
-                    
+            if !params[:audien_details].nil? 
+              
+              
+                  if params[:audien_details].has_key?("emails")             
+                  if !params[:audien_details][:emails].empty?
+                    audien_reecher_ids = []
+                    params[:audien_details][:emails].each do |email|
+                      user = User.find_by_email(email)
+                      # If audien is a reecher store his reedher_id in question record
+                      # Else send an Invitation mail to the audien
+                      if user.present?
+                        audien_reecher_ids << user.reecher_id
+                      else
+                      begin
+                        UserMailer.send_question_details_to_audien(email, @user).deliver
+                      rescue Exception => e
+                        logger.error e.backtrace.join("\n")
+                      end
+                        
+                      end 
+                    end 
+                    @question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
                   end 
-                end 
-                @question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
-              end 
+              
+              
+              
             end
               # If the audien is not a reecher and have contact number then send an SMS
               if params[:audien_details].has_key?("phone_numbers")     
@@ -401,10 +441,16 @@ module Api
               end
             end 
               
-              
+            end  
 
             end 
-          @question.save ? msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} : msg = {:status => 401, :message => @question.errors}
+             if @question.save
+             catgory = Category.find(@question.category_id)
+             @question[:category_name] = catgory.title
+               msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
+             else 
+               msg = {:status => 401, :message => @question.errors}
+             end
           logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
           render :json => msg
         else

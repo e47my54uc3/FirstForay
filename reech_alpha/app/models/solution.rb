@@ -43,6 +43,9 @@ end
 def picture_original_url
   picture.url(:original)
 end
+def picture_thumb_url
+  picture.url(:thumb)
+end
 
 
 end

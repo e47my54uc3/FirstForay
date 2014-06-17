@@ -65,29 +65,26 @@ module Api
 				    # send push notification to user who posted this question
             qust_details = Question.find_by_question_id(params[:question_id])
             #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
+            puts "question posted by= #{qust_details.posted_by_uid}"
             if !qust_details.nil?
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
+               
                if check_setting
                 #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
+               
                 response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
-                     
-                      begin
-                        send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
-                      rescue Exception => e
-                        logger.error e.backtrace.join("\n")
-                      end
+                      
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
                     end  
-                  
-                  
                 end 
                end
              
             end
            
-           # Send push notification to those who starred this question
+           #Send push notification to those who starred this question
            @voting = Voting.where(question_id: params[:question_id],)
 				   if @voting.blank?
             @voting = Voting.new do |v|
@@ -98,12 +95,8 @@ module Api
               response_string ="HGHFV,"+ @solution.solver + ","+params[:question_id]+"," +Time.now().to_s
               if !device_details.blank?   
                  device_details.each do |d|
-                    
-                    begin
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
-                    rescue Exception => e
-                      logger.error e.backtrace.join("\n")
-                    end
+                   
+                   send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
                       
                  end
               end
@@ -154,8 +147,8 @@ module Api
 				solution_owner_profile = User.find_by_reecher_id(solution.solver_id).user_profile
 				@solution = solution.attributes
 				@solution[:hi5] = solution.votes_for.size
-				solution.picture_file_name != nil ? @solution[:image_url] = "http://#{request.host_with_port}" + solution.picture_original_url : @solution[:image_url] = nil
-				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] = "http://#{request.host_with_port}" + solution_owner_profile.picture_url : @solution[:solver_image] = nil
+				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_original_url : @solution[:image_url] = nil
+				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] =  solution_owner_profile.picture_url : @solution[:solver_image] = nil
 			  msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
 				msg = {:status => 200, :solution => @solution} 
 				render :json => msg
@@ -233,7 +226,7 @@ module Api
 				solution.liked_by(user)
 				@solution = solution.attributes
 				@solution[:hi5] = solution.votes_for.size
-				solution.picture_file_name != nil ? @solution[:image_url] = "http://#{request.host_with_port}" + solution.picture_url : @solution[:image_url] = nil
+				solution.picture_file_name != nil ? @solution[:image_url] = solution.picture_url : @solution[:image_url] = nil
 				msg = {:status => 200, :solution => @solution}
 				render :json => msg
 			end	
@@ -254,22 +247,30 @@ module Api
         question_owner_profile = question_owner.user_profile
         qust_details.is_stared? ? qust_details[:stared] = true : qust_details[:stared] =false
         qust_details[:owner_location] = question_owner_profile.location
-        qust_details[:avatar_file_name] != nil ? qust_details[:image_url] = "http://#{request.host_with_port}" + qust_details.avatar_original_url : qust_details[:image_url] = nil
-        question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.picture_url : qust_details[:owner_image] = nil
+        qust_details[:avatar_file_name] != nil ? qust_details[:image_url] = qust_details.avatar_original_url : qust_details[:image_url] = nil
+        question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = question_owner_profile.thumb_picture_url : qust_details[:owner_image] = nil
         logined_user = User.find_by_reecher_id(params[:user_id])
         @solutions = []
         if solutions.size > 0
           solutions.each do |sl|
             solution_attrs = sl.attributes
             user = User.find_by_reecher_id(sl.solver_id)
-            user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = "http://#{request.host_with_port}" + user.user_profile.picture_url : solution_attrs[:solver_image] = nil
-            sl.picture_file_name != nil ? solution_attrs[:image_url] = "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = nil
-            purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
-            if purchased_sl.present?
-              solution_attrs[:purchased] = true
-            else
-              solution_attrs[:purchased] = false  
-            end 
+            user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] =  user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+            sl.picture_file_name != nil ? solution_attrs[:image_url] =  sl.picture_url : solution_attrs[:image_url] = nil
+=begin           
+          if !sl.picture_file_name.blank?
+            width=  Paperclip::Geometry.from_file(sl.picture.path(:medium)).width
+            height=  Paperclip::Geometry.from_file(sl.picture.path(:medium)).height
+            solution_attrs[:image_width] = width
+            solution_attrs[:image_height] = height
+          end
+=end           
+          purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
+          if purchased_sl.present?
+            solution_attrs[:purchased] = true
+          else
+            solution_attrs[:purchased] = false  
+          end 
             @solutions << solution_attrs
           end 
         end
@@ -308,7 +309,12 @@ module Api
                   link_question.save
                 end 
               else
-                UserMailer.send_link_question_email(email, @solver).deliver
+                   begin
+                      UserMailer.send_link_question_email(email, @solver).deliver
+                    rescue Exception => e
+                      logger.error e.backtrace.join("\n")
+                    end
+                
               end 
             end 
           end
@@ -347,11 +353,7 @@ module Api
                     rescue Exception => e
                       logger.error e.backtrace.join("\n")
                     end
-                                  
-                      
                     end  
-                  
-                  
                 end 
                end
              

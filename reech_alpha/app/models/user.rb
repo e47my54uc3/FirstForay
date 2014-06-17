@@ -65,7 +65,9 @@ class User < ActiveRecord::Base
 	has_many :questions, :primary_key=>"reecher_id",:foreign_key=>'posted_by_uid'
 
 	has_many :votings, :through => :questions , :dependent => :destroy
-
+  
+  
+  has_and_belongs_to_many :groups 
 
 	# purchased solutions
 	has_many :purchased_solutions

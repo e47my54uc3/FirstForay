@@ -3,7 +3,7 @@ development:
   encoding: utf8
   reconnect: false
   database: reechAlpha_dev
-  host: reechdb.cjtueze66lis.us-west-2.rds.amazonaws.com
+  host: reechdbproduction.cjtueze66lis.us-west-2.rds.amazonaws.com
   port: 3306
   pool: 5
   username: reechDev
@@ -14,7 +14,7 @@ test:
   encoding: utf8
   reconnect: false
   database: reechAlpha_test
-  host: reechdb.cjtueze66lis.us-west-2.rds.amazonaws.com
+  host: reechdbproduction.cjtueze66lis.us-west-2.rds.amazonaws.com
   port: 3306
   pool: 5
   username: reechDev
@@ -25,7 +25,7 @@ production:
   encoding: utf8
   reconnect: false
   database: reechAlpha_prod
-  host: reechdb.cjtueze66lis.us-west-2.rds.amazonaws.com
+  host: reechdbproduction.cjtueze66lis.us-west-2.rds.amazonaws.com
   port: 3306
   pool: 5
   username: reechDev

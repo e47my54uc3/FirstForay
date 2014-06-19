@@ -8,7 +8,8 @@ Reech::Application.routes.draw do
       post "/send_apns_notification" => "users#send_apns_notification", :as => "send_apns_notification"
       post "send_reech_request" => "users#send_reech_request", :as => "send_reech_request"
       post "remove_connections" => "users#remove_connections", :as => "remove_connections"
-     
+      post "validate_referral_code" => "users#validate_referral_code", :as => "validate_referral_code"
+      
       
       resources :user_sessions
       post "logout_user" => "user_sessions#destroy", :as => "logout_user"

@@ -1,0 +1,43 @@
+<style>
+    .table {
+        background-color: #FCFCFC;
+        border: 1px solid #D4D4D4;
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
+        font-size: 16px;
+        border-collapse: collapse;
+    }
+
+    .table-striped {
+        background-color: #EAFBFF;
+    }
+
+    .table th, .table td {
+        border-top: 1px solid #DDDDDD;
+        line-height: 18px;
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+    }
+</style>
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="content-disposition" content="description">
+  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
+  <meta name="content-disposition" content="inline; filename=all-report.html"/>
+</head>
+<body>
+<p>	Hi Friend,</p>
+
+<p>You have been invited to use the Reech application which can be downloaded from the URL</p>
+
+<p>iOS - <a href="http://install.diawi.com/xijBAm?token=<%=@token%>" target="_blank"> Download link for iOS</a></p>
+<p>Android - <a href=" https://www.dropbox.com/s/g6q54cle6mozqql/Reech.apk?token=<%=@token%>" target="_blank"> Download link for Android</a></p>
+<p>Invitation Code: <span><%=@referral_code%></span><p>
+
+<p>You need to enter the invitation code <%=@referral_code%> before you start using the app.</p>
+<p>Thanks</p>
+<p>Reech Development Team</p>
+
+</body>
+</html>

@@ -40,17 +40,18 @@ Reech::Application.configure do
   config.assets.debug = true
 
   #required by devise. Set host to correct host in production mode
-  config.action_mailer.default_url_options = { :host => 'ec2-54-213-59-130.us-west-2.compute.amazonaws.com:3000' }
+
+  config.action_mailer.default_url_options = { :host => 'ec2-54-213-83-147.us-west-2.compute.amazonaws.com:3000' }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
   address:              'smtp.gmail.com',
-  port:                 587,
+  port:                 465,
   domain:               'gmail.com',
-  user_name:            'vijayprasad83@gmail.com',
-  password:             'joti@VRj2008',
+  user_name:            'info@reechout.co',
+  password:             'Supercashmoney1!',
   authentication:       'plain',
   enable_starttls_auto: true  }
-
+  
   config.paperclip_defaults = {
   :storage => :s3,
   :s3_credentials => {
@@ -61,5 +62,5 @@ Reech::Application.configure do
   },
   :s3_multipart_min_part_size => 20971520
  }
- 
+
 end

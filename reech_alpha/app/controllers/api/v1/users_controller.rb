@@ -1,7 +1,7 @@
 module Api
 	module V1
 		class UsersController < ApplicationController
-		respond_to :json ,:except =>[:send_apns_notification,:send_gcm_notification]
+		respond_to :json ,:except =>[:send_apns_notification,:send_gcm_notification,:validate_referral_code]
 			#http_basic_authenticate_with name: "admin", password: "secret"
 			def new
 				@user = User.new
@@ -207,7 +207,22 @@ module Api
         render :json => msg  
     end
     
-
+    def validate_referral_code
+      
+      current_date_time =Time.now
+      referral_code = params[:referral_code]
+      user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ?", params[:referral_code] ,current_date_time)
+      
+      if !user_ref.blank?
+        link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
+      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id }
+      else
+      msg = {:status => 200, :is_valid => false }
+      end 
+      render :json => msg 
+      
+    end
+      
 #End of Class User Controller class
   		end
 	end

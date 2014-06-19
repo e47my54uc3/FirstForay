@@ -54,7 +54,7 @@ module Api
 					has_solution.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
 					
 					q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
-					q.avatar_file_name != nil ? q_hash[:image_url] = "http://#{request.host_with_port}" + q.avatar_url : q_hash[:image_url] = nil
+					q.avatar_file_name != nil ? q_hash[:image_url] = q.avatar_url : q_hash[:image_url] = nil
 					
 				  #image_size123=Paperclip::Geometry.from_file(q_hash[:image_url])
 					
@@ -62,16 +62,18 @@ module Api
           #geo= Paperclip::Geometry.from_file(q.avatar.path(:original)).to_s
          
           #geometry = Paperclip::Geometry.from_file("data.jpeg")
+         
           #puts "geometry2312321321-=============#{geometry}"
-					
-					if !q.avatar_file_name.blank?
-				    width=	Paperclip::Geometry.from_file(q.avatar.path(:medium)).width
-            height= Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
+=begin					if !q.avatar_file_name.blank?
+				    width=	Paperclip::Geometry.from_file(avatar.path(:medium)).width
+				      
+                    height= Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
 				    q_hash[:image_width] = width
 				    q_hash[:image_height] = height
 					end
+=end					
 					q_hash[:owner_location] = question_owner_profile.location
-					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = "http://#{request.host_with_port}" + question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
+					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
 					questions_hash << q_hash
 					
 				end 
@@ -243,14 +245,14 @@ module Api
     					question.avatar_file_name != nil ? q_hash[:image_url] = question.avatar_url : q_hash[:image_url] = nil
     					q_hash[:owner_location] = question_owner_profile.location
     					question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] = question_owner_profile.picture_url : q_hash[:owner_image] = nil
-    					
+=begin    					
           		if !question.avatar_file_name.blank?
               width=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).width
               height=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).height
               q_hash[:image_width] = width
               q_hash[:image_height] = height
               end
-    					
+=end    					
     					linked_questions_ary << q_hash
     				end	
     			

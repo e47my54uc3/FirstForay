@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140612132725) do
+ActiveRecord::Schema.define(:version => 20140620072945) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -104,6 +104,15 @@ ActiveRecord::Schema.define(:version => 20140612132725) do
   create_table "groups_users", :id => false, :force => true do |t|
     t.integer "group_id"
     t.integer "user_id"
+  end
+
+  create_table "invite_users", :force => true do |t|
+    t.string   "linked_question_id"
+    t.text     "token"
+    t.string   "referral_code"
+    t.datetime "token_validity_time"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
   end
 
   create_table "linked_questions", :force => true do |t|
@@ -255,7 +264,7 @@ ActiveRecord::Schema.define(:version => 20140612132725) do
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
     t.text     "audien_user_ids"
-    t.integer  "catgory_id"
+    t.integer  "category_id"
   end
 
   create_table "sashes", :force => true do |t|

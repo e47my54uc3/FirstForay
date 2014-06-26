@@ -64,7 +64,7 @@ module Api
   
           # format.html { redirect_to @group, notice: 'Group was successfully created.' }
           #@group=@group.collect { |i| i  if i !='created_at' && i != "updated_at"}   
-          msg = {:status => 200, :message => "success" }
+          msg = {:status => 200, :message => "success"}
           render :json => msg 
           else
           msg = {:status => 401, :message => "Group name has already been taken" }
@@ -72,7 +72,7 @@ module Api
           end
           
       end
-    
+=begin    
       def associate_user_to_group
         user = User.find_by_reecher_id(params[:user_id])
         group = Group.find(params[:group_id]) if params[:group_id]
@@ -97,12 +97,40 @@ module Api
         
         render :json => msg   
       end
+=end
+
+  def associate_user_to_group
+      user = User.find_by_reecher_id(params[:user_id])
+      groups_created_by_login_user = Group.select("id").where(:reecher_id => params[:user_id])
+      
+      ids=[]
+      groups_created_by_login_user.each do |i|
+        ids << i.id
+      end
+      groups = params[:group_id]
+      associated_user = User.find_by_reecher_id(params[:associated_user_id])
+      # add_to_group = params[:add_to_group]   
+      ActiveRecord::Base.connection.execute("DELETE FROM `groups_users` WHERE `groups_users`.`group_id` IN (#{ids.join(',')}) AND user_id = #{associated_user.id}")
+      if !groups.blank?
+          groups.each do |g|
+           group = Group.find(g) 
+            ActiveRecord::Base.connection.execute("INSERT INTO `groups_users` (`group_id` ,`user_id`) VALUES (#{group.id} , #{associated_user.id})") 
+          end
+      msg = {:status => 200, :message => "User is Associated to the  groups",:group_ids=>groups} 
+      else
+      msg = {:status => 401, :message => "No group is selected." }  
+      end
+      
+      render :json => msg   
+end    
+    
+    
     
       
       def reecher_personal_groups
         user = User.find_by_reecher_id(params[:user_id])   unless params[:user_id].blank?
         groups = Group.select("id,name").where("reecher_id =?",user.reecher_id)
-         msg = {:status => 200, :groups =>groups }            
+        msg = {:status => 200, :groups =>groups }            
          render :json => msg   
       end
     

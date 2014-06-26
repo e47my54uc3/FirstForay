@@ -156,7 +156,7 @@ class User < ActiveRecord::Base
 		user_settings = UserSettings.new
 		user_settings.reecher_id = self.reecher_id
 		user_settings.location_is_enabled = true
-		user_settings.pushnotif_is_enabled = false
+		user_settings.pushnotif_is_enabled = true
 		user_settings.emailnotif_is_enabled = true
 		user_settings.notify_question_when_answered = true
 		user_settings.notify_linked_to_question = true

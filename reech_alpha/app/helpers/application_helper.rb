@@ -7,14 +7,17 @@ module ApplicationHelper
   def send_device_notification device_token,message,platform
             
     if platform == 'iOS' 
+      puts "I am in iOS mobile notification"
       n1= APNS::Notification.new(device_token, :alert => message, :badge => 1, :sound => 'default')
       APNS.send_notifications([n1])
     elsif platform =='Android'
+      puts "I am in Android mobile notification"
       require 'gcm'
       gcm = GCM.new("AIzaSyA8LPahDEVgdPxCU4QrWOh1pF_IL655LNI")
       registration_ids= [device_token] # an array of one or more client registration IDs
       options = {data: {message: message}, collapse_key: "Reech",time_to_live:3600}
       response = gcm.send_notification(registration_ids, options)
+      puts "response==#{response.inspect}"
     end
 
   end
@@ -96,9 +99,5 @@ module ApplicationHelper
   
   end
   
-   
-   
-   
-
 
 end

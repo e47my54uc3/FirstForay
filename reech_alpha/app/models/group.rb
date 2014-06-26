@@ -1,7 +1,7 @@
 class Group < ActiveRecord::Base
   attr_accessible :name,:reecher_id
   has_and_belongs_to_many :users
-  validates :name, uniqueness: true
+  validates :name, uniqueness: { :scope => [:reecher_id], :case_sensitive => false}
   def self.get_group_association user_id, group_id
 
     ActiveRecord::Base.connection.select("SELECT * FROM `groups_users` WHERE group_id =#{group_id} AND user_id = #{user_id}")

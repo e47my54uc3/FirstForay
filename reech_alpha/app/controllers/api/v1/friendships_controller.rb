@@ -20,11 +20,11 @@ module Api
           userProfile = user.user_profile if user
           
           if !userProfile.picture_file_name.blank?  
-          image_url ="http://#{request.host_with_port}" + userProfile.picture_url 
+          image_url =   userProfile.picture_url 
           else 
           image_url =  userProfile.profile_pic_path 
           end
-          userProfile.picture_file_name != nil ? userProfile[:image_url] = userProfile.picture_url : userProfile[:image_url] = nil
+          userProfile.picture_file_name != nil ? userProfile[:image_url] =  userProfile.picture_url : userProfile[:image_url] = nil
           @friends_list << {:name => user.first_name + " " + user.last_name,:email=> user.email,"reecherId" =>user.reecher_id,:location=>userProfile.location ,:image_url =>image_url,:associated_group_ids=>user_group_ids }
           end 
 				end

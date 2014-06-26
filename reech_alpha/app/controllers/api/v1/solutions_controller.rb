@@ -68,11 +68,11 @@ module Api
             puts "question posted by= #{qust_details.posted_by_uid}"
             if !qust_details.nil?
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
-               
+               puts "check_setting==#{check_setting}"
                if check_setting
                 #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
-               
+                puts "device_details==#{device_details.inspect}"
                 response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
@@ -83,7 +83,7 @@ module Api
                end
              
             end
-           
+=begin           
            #Send push notification to those who starred this question
            @voting = Voting.where(question_id: params[:question_id],)
 				   if @voting.blank?
@@ -103,7 +103,7 @@ module Api
              end
            end
           end
-				
+=end				
 					msg = {:status => 200, :solution => @solution}
 					
 				else
@@ -167,9 +167,9 @@ module Api
 						
 						user = User.find_by_reecher_id(sl.solver_id)
 						
-						user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = "http://#{request.host_with_port}" + user.user_profile.picture_url : solution_attrs[:solver_image] = nil
+						user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] =  "http://#{request.host_with_port}" + user.user_profile.picture_url : solution_attrs[:solver_image] = nil
 						
-						sl.picture_file_name != nil ? solution_attrs[:image_url] = "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = "http://#{request.host_with_port}/"+"no-image.png"
+						sl.picture_file_name != nil ? solution_attrs[:image_url] =  "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = "http://#{request.host_with_port}/"+"no-image.png"
 						
 						purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
 					 
@@ -226,9 +226,24 @@ module Api
 				solution.liked_by(user)
 				@solution = solution.attributes
 				@solution[:hi5] = solution.votes_for.size
-				solution.picture_file_name != nil ? @solution[:image_url] = solution.picture_url : @solution[:image_url] = nil
+				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_url : @solution[:image_url] = nil
+				# send push notification while hi5 solution
+				check_setting= notify_solution_got_highfive(solution.solver_id)
+               puts "check_setting==#{check_setting}"
+               if check_setting
+                device_details=Device.select("device_token,platform").where("reecher_id=?",solution.solver_id.to_s)
+                response_string ="HGHFV,"+ user.full_name + "," + params[:solution_id] +","+Time.now().to_s
+                if !device_details.empty? 
+                    device_details.each do |d|
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                    end  
+                end 
+               end
+				
 				msg = {:status => 200, :solution => @solution}
 				render :json => msg
+				
+				
 			end	
       
        def get_solution_details
@@ -247,7 +262,7 @@ module Api
         question_owner_profile = question_owner.user_profile
         qust_details.is_stared? ? qust_details[:stared] = true : qust_details[:stared] =false
         qust_details[:owner_location] = question_owner_profile.location
-        qust_details[:avatar_file_name] != nil ? qust_details[:image_url] = qust_details.avatar_original_url : qust_details[:image_url] = nil
+        qust_details[:avatar_file_name] != nil ? qust_details[:image_url] =  qust_details.avatar_original_url : qust_details[:image_url] = nil
         question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = question_owner_profile.thumb_picture_url : qust_details[:owner_image] = nil
         logined_user = User.find_by_reecher_id(params[:user_id])
         @solutions = []
@@ -273,9 +288,33 @@ module Api
           end 
             @solutions << solution_attrs
           end 
+          
+          
+          
+          sorted_sol = []
+          
+          @solutions.each do |sol|
+            
+            if sol[:purchased]
+            sorted_sol << sol
+            end
+            
+          end
+          @solutions.each do |sol|
+            
+            if !sol[:purchased]
+            sorted_sol << sol
+            end
+          end  
+          
+          puts "@solutions before123==#{sorted_sol}"
+         
+          #@solutions = @solutions.sort_by{ |arr| arr.purchased  } if !@solutions.blank?
+          
+         # puts "@solutions after==#{@solutions.inspect}"
         end
-        msg = {:status => 200, :qust_details=>qust_details ,:solutions => @solutions} 
-        logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@solutions}"
+        msg = {:status => 200, :qust_details=>qust_details ,:solutions => sorted_sol} 
+        logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{sorted_sol}"
         render :json => msg
       end  
         
@@ -339,31 +378,36 @@ module Api
             # send push notification to user who posted this question
             qust_details = Question.find_by_question_id(params[:question_id])
             #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
+            puts "question posted by= #{qust_details.posted_by_uid}"
             if !qust_details.nil?
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
+               puts "check_setting==#{check_setting}"
                if check_setting
                 #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
+              
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
+               puts "device_details==#{device_details.inspect}"
                 response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
+                
                 if !device_details.empty? 
                     device_details.each do |d|
                       
-                    begin
+                   # begin
                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
-                    rescue Exception => e
-                      logger.error e.backtrace.join("\n")
-                    end
+                    #rescue Exception => e
+                    #  logger.error e.backtrace.join("\n")
+                    #end
                     end  
                 end 
                end
              
             end
-           
+=begin           
            # Send push notification to those who starred this question
-           @voting = Voting.where(question_id: params[:question_id],)
+           @voting = Voting.where(question_id: params[:question_id])
            if @voting.blank?
             @voting = Voting.new do |v|
-            #response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]
+            response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]
              check_setting= notify_solution_got_highfive(v.user_id)
              if check_setting
               device_details = Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
@@ -380,7 +424,7 @@ module Api
              end
            end
           end
-        
+=end        
           msg = {:status => 200, :solution => @solution}
           
         else

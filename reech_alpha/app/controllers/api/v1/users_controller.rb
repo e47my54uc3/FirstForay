@@ -1,7 +1,7 @@
 module Api
 	module V1
 		class UsersController < ApplicationController
-		respond_to :json ,:except =>[:send_apns_notification,:send_gcm_notification]
+		respond_to :json ,:except =>[:send_apns_notification,:send_gcm_notification,:validate_referral_code]
 			#http_basic_authenticate_with name: "admin", password: "secret"
 			def new
 				@user = User.new
@@ -12,8 +12,7 @@ module Api
 				if !params.blank?
 					if params[:provider] == "standard"
 					  
-					  user = User.find_by_email(params[:user_details][:email])
-					  
+					  user = User.find_by_email(params[:user_details][:email])					  
 						if user.nil?
 								@user = User.new(params[:user_details])
 								@user.password_confirmation = params[:user_details][:password]
@@ -21,10 +20,11 @@ module Api
 									if !params[:profile_image].blank? 
 										data = StringIO.new(Base64.decode64(params[:profile_image]))
 										@user.user_profile.picture = data
-										@user.save
+										@user.user_profile.save
 									end
-									@user.add_points(500)
-									@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
+	  							@user.add_points(500)
+	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
+									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
 									msg = {:status => 201, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email}
 									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 									render :json => msg  # note, no :location or :status options
@@ -34,8 +34,9 @@ module Api
 									render :json => msg  # note, no :location or :status option
 								end
 						else
-						   @api_key = ApiKey.create(:user_id => user.reecher_id).access_token
-							 msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
+						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
+							 #msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
+							 msg = { :status => 401, :message => "Email Already exists"}
 							 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							 render :json => msg
 						end   
@@ -52,23 +53,22 @@ module Api
 							@user.email = @profile["email"]
 							@user.fb_token = params[:user_details][:access_token]
 							@user.fb_uid = params[:user_details][:uid]
-							if @user.save(:validate => false)		
-							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
-							  @user.user_profile.save
-							  #@user.user_profile.build
-							 #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
-								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
-								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
-              	make_friendship(@fb_friends,@user,params[:device_token]) if @fb_friends.size > 0
-								create_session_for_fb_user(@user)
-								Authorization.create(:user_id => @user.id, :uid => params[:user_details][:uid], :provider => params[:provider])
-								@user.add_points(500)
-								@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
-								msg = {:status => 201, :api_key=>@api_key, :user_id=>@user.reecher_id,:email=>@user.email}
-								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-								render :json => msg
-							end 
-							
+  							if @user.save(:validate => false)		
+  							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
+  							  @user.user_profile.save
+  							  #@user.user_profile.build
+  							 #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
+  								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
+  								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
+                	make_friendship(@fb_friends,@user,params[:device_token]) if @fb_friends.size > 0
+  								create_session_for_fb_user(@user)
+  								Authorization.create(:user_id => @user.id, :uid => params[:user_details][:uid], :provider => params[:provider])
+  								@user.add_points(500)
+  								@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
+  								msg = {:status => 201, :api_key=>@api_key, :user_id=>@user.reecher_id,:email=>@user.email}
+  								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+  								render :json => msg
+  							end 
 						else
 						  make_friendship(@fb_friends,fb_user,params[:device_token]) if @fb_friends.size > 0
               create_device_for_user(params[:device_token], params[:platform], fb_user.reecher_id)
@@ -78,8 +78,6 @@ module Api
 							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							render :json => msg
 						end 
-						
-      
 					end  
 				else
 					msg = { :status => 401, :message => "Failure!"}
@@ -207,7 +205,22 @@ module Api
         render :json => msg  
     end
     
-
+    def validate_referral_code
+      
+      current_date_time =Time.now
+      referral_code = params[:referral_code]
+      user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ?", params[:referral_code] ,current_date_time)
+      
+      if !user_ref.blank?
+        link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
+      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id }
+      else
+      msg = {:status => 200, :is_valid => false }
+      end 
+      render :json => msg 
+      
+    end
+      
 #End of Class User Controller class
   		end
 	end

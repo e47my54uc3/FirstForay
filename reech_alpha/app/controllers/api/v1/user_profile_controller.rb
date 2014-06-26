@@ -14,7 +14,7 @@ module Api
 					else
 						@profile = @user.user_profile.attributes
 						@profile[:hi5] = @user.user_profile.votes_for.size
-						@user.user_profile.picture_file_name != nil ? @profile[:image_url] = "http://#{request.host_with_port}" + @user.user_profile.picture_url : @profile[:image_url] = nil
+						@user.user_profile.picture_file_name != nil ? @profile[:image_url] =  @user.user_profile.picture_url : @profile[:image_url] = nil
 						msg = {:status => 200, :user => @user, :profile => @profile ,:curio_points=> @user.points }
 						render :json => msg
 					end
@@ -164,7 +164,7 @@ module Api
             @user_profile = user.user_profile 
             profile_pic_path = (@user_profile.profile_pic_path).to_s
             if @user_profile.picture_file_name
-             image_url = @user_profile.picture_url      
+             image_url =  @user_profile.picture_url      
             elsif @user_profile.profile_pic_path
               image_url = profile_pic_path
             else
@@ -206,7 +206,7 @@ module Api
       picture_file =  @user[0][:picture_file_name].to_s
       profile_pic  =  @user[0][:profile_pic_path].to_s
       if !picture_file.blank?
-       image_url = profile_obj.picture_url      
+       image_url =  profile_obj.picture_url      
       elsif !profile_pic.blank?
         image_url = profile_pic.to_s
       else
@@ -220,6 +220,7 @@ module Api
       end
       
       tot_curio = get_curio_points(params[:user_id])
+      #tot_curio = current_user.points
       tot_quest = get_user_total_question(params[:user_id])
       tot_sol = get_user_total_solution(params[:user_id])
       tot_conn = get_user_total_connection(params[:user_id])

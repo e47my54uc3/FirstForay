@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140602160847) do
+ActiveRecord::Schema.define(:version => 20140620072945) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -38,6 +38,12 @@ ActiveRecord::Schema.define(:version => 20140602160847) do
   add_index "badges_sashes", ["badge_id", "sash_id"], :name => "index_badges_sashes_on_badge_id_and_sash_id"
   add_index "badges_sashes", ["badge_id"], :name => "index_badges_sashes_on_badge_id"
   add_index "badges_sashes", ["sash_id"], :name => "index_badges_sashes_on_sash_id"
+
+  create_table "categories", :force => true do |t|
+    t.string   "title"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
 
   create_table "chats", :force => true do |t|
     t.string   "broadcasted_by"
@@ -74,6 +80,40 @@ ActiveRecord::Schema.define(:version => 20140602160847) do
   end
 
   add_index "gcm_devices", ["registration_id"], :name => "index_gcm_devices_on_registration_id", :unique => true
+
+  create_table "gcm_notifications", :force => true do |t|
+    t.integer  "device_id",        :null => false
+    t.string   "collapse_key"
+    t.text     "data"
+    t.boolean  "delay_while_idle"
+    t.datetime "sent_at"
+    t.integer  "time_to_live"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
+
+  add_index "gcm_notifications", ["device_id"], :name => "index_gcm_notifications_on_device_id"
+
+  create_table "groups", :force => true do |t|
+    t.string   "name"
+    t.string   "reecher_id"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  create_table "groups_users", :id => false, :force => true do |t|
+    t.integer "group_id"
+    t.integer "user_id"
+  end
+
+  create_table "invite_users", :force => true do |t|
+    t.string   "linked_question_id"
+    t.text     "token"
+    t.string   "referral_code"
+    t.datetime "token_validity_time"
+    t.datetime "created_at",          :null => false
+    t.datetime "updated_at",          :null => false
+  end
 
   create_table "linked_questions", :force => true do |t|
     t.string   "user_id"
@@ -224,6 +264,7 @@ ActiveRecord::Schema.define(:version => 20140602160847) do
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
     t.text     "audien_user_ids"
+    t.integer  "category_id"
   end
 
   create_table "sashes", :force => true do |t|
@@ -294,7 +335,7 @@ ActiveRecord::Schema.define(:version => 20140602160847) do
   create_table "users", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
-    t.string   "email",               :default => "",        :null => false
+    t.string   "email",               :default => ""
     t.datetime "created_at",                                 :null => false
     t.datetime "updated_at",                                 :null => false
     t.string   "profile_name",        :default => "reecher"

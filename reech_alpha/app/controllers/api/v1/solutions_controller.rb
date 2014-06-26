@@ -148,7 +148,7 @@ module Api
 				@solution = solution.attributes
 				@solution[:hi5] = solution.votes_for.size
 				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_original_url : @solution[:image_url] = nil
-				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] =  solution_owner_profile.picture_url : @solution[:solver_image] = nil
+				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] = solution_owner_profile.picture_url : @solution[:solver_image] = nil
 			  msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
 				msg = {:status => 200, :solution => @solution} 
 				render :json => msg
@@ -239,7 +239,7 @@ module Api
                     end  
                 end 
                end
-				
+				solution.picture_file_name != nil ? @solution[:image_url] =solution.picture_url : @solution[:image_url] = nil
 				msg = {:status => 200, :solution => @solution}
 				render :json => msg
 				
@@ -258,7 +258,7 @@ module Api
        def question_details_with_solutions
         solutions = Solution.find_all_by_question_id(params[:question_id])
         qust_details =Question.find_by_question_id(params[:question_id])
-        question_owner = User.find_by_reecher_id(qust_details [:posted_by_uid])
+        question_owner = User.find_by_reecher_id(qust_details[:posted_by_uid])
         question_owner_profile = question_owner.user_profile
         qust_details.is_stared? ? qust_details[:stared] = true : qust_details[:stared] =false
         qust_details[:owner_location] = question_owner_profile.location
@@ -270,8 +270,8 @@ module Api
           solutions.each do |sl|
             solution_attrs = sl.attributes
             user = User.find_by_reecher_id(sl.solver_id)
-            user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] =  user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
-            sl.picture_file_name != nil ? solution_attrs[:image_url] =  sl.picture_url : solution_attrs[:image_url] = nil
+            user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+            sl.picture_file_name != nil ? solution_attrs[:image_url] = sl.picture_url : solution_attrs[:image_url] = nil
 =begin           
           if !sl.picture_file_name.blank?
             width=  Paperclip::Geometry.from_file(sl.picture.path(:medium)).width

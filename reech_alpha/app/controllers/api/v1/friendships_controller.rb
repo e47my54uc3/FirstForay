@@ -20,7 +20,7 @@ module Api
           userProfile = user.user_profile if user
           
           if !userProfile.picture_file_name.blank?  
-          image_url =   userProfile.picture_url 
+          image_url = userProfile.picture_url 
           else 
           image_url =  userProfile.profile_pic_path 
           end

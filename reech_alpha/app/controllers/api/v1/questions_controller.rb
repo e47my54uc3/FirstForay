@@ -78,13 +78,14 @@ module Api
          
           #geometry = Paperclip::Geometry.from_file("data.jpeg")
           #puts "geometry2312321321-=============#{geometry}"
-          
+=begin          
           if !q.avatar_file_name.blank?
             width=  Paperclip::Geometry.from_file(q.avatar.path(:medium)).width
             height= Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
             q_hash[:image_width] = width
             q_hash[:image_height] = height
           end
+=end
           q_hash[:owner_location] = question_owner_profile.location
           question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
           questions_hash << q_hash

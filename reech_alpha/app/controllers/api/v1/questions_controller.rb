@@ -70,22 +70,12 @@ module Api
           #has_solution.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
           q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
           q.avatar_file_name != nil ? q_hash[:image_url] =   q.avatar_url : q_hash[:image_url] = nil
-          
-          #image_size123=Paperclip::Geometry.from_file(q_hash[:image_url])
-          
-          #geo = Paperclip::Geometry.from_file(avatar.to_file(:medium))
-          #geo= Paperclip::Geometry.from_file(q.avatar.path(:original)).to_s
-         
-          #geometry = Paperclip::Geometry.from_file("data.jpeg")
-          #puts "geometry2312321321-=============#{geometry}"
-=begin          
           if !q.avatar_file_name.blank?
-            width=  Paperclip::Geometry.from_file(q.avatar.path(:medium)).width
-            height= Paperclip::Geometry.from_file(q.avatar.path(:medium)).height
-            q_hash[:image_width] = width
-            q_hash[:image_height] = height
-          end
-=end
+             avatar_geo=((q.avatar_geometry).to_s).split('x') 	
+	     q_hash[:image_width]=avatar_geo[0]	
+	     q_hash[:image_height] = avatar_geo[1] 	
+	  end
+
           q_hash[:owner_location] = question_owner_profile.location
           question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
           questions_hash << q_hash
@@ -161,14 +151,14 @@ module Api
               if !params[:audien_details][:phone_numbers].empty? 
                 client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 params[:audien_details][:phone_numbers].each do |number|
-=begin                  
+                  
                   sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
                       body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
-=end        
+       
                 end 
               end 
              end
@@ -262,10 +252,13 @@ module Api
               question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.picture_url : q_hash[:owner_image] = nil
               
               if !question.avatar_file_name.blank?
-              width=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).width
-              height=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).height
-              q_hash[:image_width] = width
-              q_hash[:image_height] = height
+              #width=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).width
+              #height=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).height
+              #q_hash[:image_width] = width
+              #q_hash[:image_height] = height
+             avatar_geo=((question.avatar_geometry).to_s).split('x') 	
+	     q_hash[:image_width]=avatar_geo[0]	
+	     q_hash[:image_height] = avatar_geo[1] 
               end
               
               linked_questions_ary << q_hash
@@ -440,14 +433,14 @@ module Api
               if !params[:audien_details][:phone_numbers].empty? 
                 client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 params[:audien_details][:phone_numbers].each do |number|
-=begin                  
+                  
                   sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
                       body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
-=end        
+        
                 end 
               end 
              end

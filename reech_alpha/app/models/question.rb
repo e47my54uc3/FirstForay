@@ -96,6 +96,11 @@ class Question < ActiveRecord::Base
     end
   end
   
+def avatar_geometry(style = :medium)
+  @geometry ||= {}
+  photo_path = (avatar.options[:storage] == :s3) ? avatar.url(style) : avatar.path(style)
+  @geometry[style] ||= Paperclip::Geometry.from_file(photo_path)
+end	
   
   
 end

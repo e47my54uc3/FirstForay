@@ -149,8 +149,17 @@ module Api
 				@solution[:hi5] = solution.votes_for.size
 				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_original_url : @solution[:image_url] = nil
 				solution_owner_profile.picture_file_name != nil ? @solution[:solver_image] = solution_owner_profile.picture_url : @solution[:solver_image] = nil
-			  msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
-				msg = {:status => 200, :solution => @solution} 
+			    user = User.find_by_reecher_id(params[:user_id])
+			    res  =  ActiveRecord::Base.connection.select("Select count(*) as num_row from votes where voter_id=#{user.id} and votable_id=#{solution.id} and votable_type ='Solution';")
+			    res_num_row =res[0]
+			    if res_num_row["num_row"] >0
+			     hi5 =true	
+			     else
+			     hi5 =false	
+			    end	
+			    
+			    msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
+				msg = {:status => 200, :solution => @solution ,:has_hi5=>hi5} 
 				render :json => msg
 			end	
 			
@@ -229,7 +238,7 @@ module Api
 				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_url : @solution[:image_url] = nil
 				# send push notification while hi5 solution
 				check_setting= notify_solution_got_highfive(solution.solver_id)
-               puts "check_setting==#{check_setting}"
+                puts "check_setting==#{check_setting}"
                if check_setting
                 device_details=Device.select("device_token,platform").where("reecher_id=?",solution.solver_id.to_s)
                 response_string ="HGHFV,"+ user.full_name + "," + params[:solution_id] +","+Time.now().to_s
@@ -306,9 +315,6 @@ module Api
             sorted_sol << sol
             end
           end  
-          
-          puts "@solutions before123==#{sorted_sol}"
-         
           #@solutions = @solutions.sort_by{ |arr| arr.purchased  } if !@solutions.blank?
           
          # puts "@solutions after==#{@solutions.inspect}"

@@ -61,7 +61,7 @@ module Api
         
       
         
-				if @solution.save
+			if @solution.save
 				    # send push notification to user who posted this question
             qust_details = Question.find_by_question_id(params[:question_id])
             #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
@@ -115,6 +115,9 @@ module Api
 			def purchase_solution
 				user = User.find_by_reecher_id(params[:user_id])
 				solution = Solution.find(params[:solution_id])
+				question = Question.where(:question_id =>solution.question_id)
+				puts "question==#{question.inspect}"
+				#sfdsdfs
 				purchased_sl = PurchasedSolution.where(:user_id => user.id, :solution_id => solution.id)
 				if purchased_sl.present?
 					msg = {:status => 400, :message => "You have Already Purchased this Solution."}
@@ -129,11 +132,38 @@ module Api
 
 						#Add points to solution provider
 						solution_provider = User.find_by_reecher_id(solution.solver_id)
-						solution_provider.add_points(solution.ask_charisma)
-
+	
 						#Revert back the points to user who post the question
-						user.add_points(10)
+						
+					    linked_by = LinkedQuestion.find_by_question_id(solution.question_id)
+					   	
+					   	if linked_by.blank?					   		
+						    quest_asker = question[0][:posted_by_uid]
+						    solution_provider.add_points(solution.ask_charisma)						   
+						    if quest_asker == params[:user_id]
+							user.subtract_points(solution.ask_charisma)
+							user.add_points(10)
+						    else
+						    user.subtract_points(solution.ask_charisma)	
+						    end	
+						    
+					    else
+					    	linked_by_user = User.find_by_reecher_id(linked_by.linked_by_uid)
+					    	linked_by_user.add_points(10)
+					    	solution_provider.add_points((solution.ask_charisma).to_i-10)
 
+					    	quest_asker = question[0][:posted_by_uid]
+					    	if quest_asker== params[:user_id]
+							user.subtract_points(solution.ask_charisma)
+							user.add_points(10)
+						    else
+						    user.subtract_points(solution.ask_charisma)	
+						    end	
+
+					    end 	
+
+
+                         
 						msg = {:status => 200, :message => "Success"}
 					else
 						msg = {:status => 400, :message => "Sorry, you need at least #{solution.ask_charisma} Charisma Credits to purchase this Solution! Earn some by providing Solutions!"}
@@ -281,14 +311,13 @@ module Api
             user = User.find_by_reecher_id(sl.solver_id)
             user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
             sl.picture_file_name != nil ? solution_attrs[:image_url] = sl.picture_url : solution_attrs[:image_url] = nil
-=begin           
+           
           if !sl.picture_file_name.blank?
-            width=  Paperclip::Geometry.from_file(sl.picture.path(:medium)).width
-            height=  Paperclip::Geometry.from_file(sl.picture.path(:medium)).height
-            solution_attrs[:image_width] = width
-            solution_attrs[:image_height] = height
+          	sol_pic_geo=((sl.sol_pic_geometry).to_s).split('x') 	
+	        solution_attrs[:image_width]=sol_pic_geo[0]	
+	        solution_attrs[:image_height] = sol_pic_geo[1]
           end
-=end           
+          
           purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
           if purchased_sl.present?
             solution_attrs[:purchased] = true
@@ -297,9 +326,6 @@ module Api
           end 
             @solutions << solution_attrs
           end 
-          
-          
-          
           sorted_sol = []
           
           @solutions.each do |sol|
@@ -315,9 +341,7 @@ module Api
             sorted_sol << sol
             end
           end  
-          #@solutions = @solutions.sort_by{ |arr| arr.purchased  } if !@solutions.blank?
-          
-         # puts "@solutions after==#{@solutions.inspect}"
+         
         end
         msg = {:status => 200, :qust_details=>qust_details ,:solutions => sorted_sol} 
         logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{sorted_sol}"

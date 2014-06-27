@@ -251,14 +251,10 @@ module Api
               q_hash[:owner_location] = question_owner_profile.location
               question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.picture_url : q_hash[:owner_image] = nil
               
-              if !question.avatar_file_name.blank?
-              #width=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).width
-              #height=  Paperclip::Geometry.from_file(question.avatar.path(:medium)).height
-              #q_hash[:image_width] = width
-              #q_hash[:image_height] = height
+             if !question.avatar_file_name.blank?
              avatar_geo=((question.avatar_geometry).to_s).split('x') 	
-	     q_hash[:image_width]=avatar_geo[0]	
-	     q_hash[:image_height] = avatar_geo[1] 
+	           q_hash[:image_width]=avatar_geo[0]	
+	           q_hash[:image_height] = avatar_geo[1] 
               end
               
               linked_questions_ary << q_hash
@@ -283,7 +279,7 @@ module Api
              @linkquest = LinkedQuestion.new()
              @linkquest.user_id =''
              @linkquest.question_id = params[:question_id]
-             @linkquest.linked_by_uid = params[:question_id]
+             @linkquest.linked_by_uid = params[:user_id]
              @linkquest.email_id = email
              @linkquest.phone_no = ''
              @linkquest.save

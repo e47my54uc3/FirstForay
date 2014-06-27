@@ -47,5 +47,10 @@ def picture_thumb_url
   picture.url(:thumb)
 end
 
+def sol_pic_geometry(style = :medium)
+  @geometry ||= {}
+  photo_path = (picture.options[:storage] == :s3) ? picture.url(style) : picture.path(style)
+  @geometry[style] ||= Paperclip::Geometry.from_file(photo_path)
+end	
 
 end

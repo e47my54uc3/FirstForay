@@ -148,9 +148,11 @@ module Api
 						    end	
 						    
 					    else
-					    	linked_by_user = User.find_by_reecher_id(linked_by.linked_by_uid)
-					    	linked_by_user.add_points(10)
-					    	solution_provider.add_points((solution.ask_charisma).to_i-10)
+					    	linked_by_user = User.find_by_reecher_id(linked_by.linked_by_uid)					    	
+					    	one_by_five = (((solution.ask_charisma).to_i ) * 1/5).floor
+					    	fourth_by_five = (((solution.ask_charisma).to_i ) * 4/5).floor
+					    	linked_by_user.add_points(one_by_five)
+					    	solution_provider.add_points((solution.ask_charisma).to_i +fourth_by_five)
 
 					    	quest_asker = question[0][:posted_by_uid]
 					    	if quest_asker== params[:user_id]

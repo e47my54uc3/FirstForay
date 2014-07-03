@@ -87,9 +87,8 @@ module ApplicationHelper
   
   def get_user_total_solution user_id
     
-  @user3 = User.find_by_reecher_id(user_id)
-  tot_question = @user3.solutions.size
-  
+  sols = Solution.where(:solver_id=>user_id)
+  tot_sol = sols.size
   end
   
   def get_user_total_connection user_id

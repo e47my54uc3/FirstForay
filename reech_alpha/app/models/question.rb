@@ -56,7 +56,47 @@ class Question < ActiveRecord::Base
 			@Questions = []
 			questions = Question.where(:posted_by_uid => friends_reecher_ids).order("created_at DESC")
 			questions.each do |q|
+			 # if question owner have add current login user for this question then his will show otherwise it will show Friend  
+			#	puts "current_user--object#{current_user.inspect}"
+				#puts "question--object#{q.inspect}"
+			#	puts "question--posted_by_uid#{q.posted_by_uid}"
+				#puts "question--question_id#{q.question_id}"
+			#	puts "current_user==#{current_user.inspect}"
+				#question_owner_name = Question::show_question_owner_name(current_user.reecher_id, q.question_id, q.posted_by_uid)
+				@question_owner_name = PostQuestionToFriend.where("user_id = ? AND friend_reecher_id= ? AND question_id = ?", q.posted_by_uid, current_user.reecher_id, q.question_id)
+				#puts "@question_owner_name#{@question_owner_name.inspect}"
+				#purchased_sl = PurchasedSolution.where(:user_id => current_user.id, :solution_id => sl.id)
+				
+				if @question_owner_name.size > 0
+				 q[:question_referee] = q.posted_by
+				 q[:no_profile_pic] = false 
+				elsif current_user.reecher_id == q.posted_by_uid
+				 q[:question_referee] = q.posted_by		
+				 q[:no_profile_pic] = false          		  
+				else
+				 @all_sol= Solution.where(:question_id=>q.question_id) 
+				 unless @all_sol.blank?
+				 all_sol_id   = @all_sol.collect{|sol| sol.id}
+				 all_user = PurchasedSolution.where(:solution_id=>all_sol_id)
+				 get_all_user = all_user.collect{ |u| u.user_id} unless all_user.blank?
+				 all_reecher_id = User.where(:id=>get_all_user) unless all_user.blank?
+				 all_reecher = all_reecher_id.collect{|ur| ur.reecher_id} unless all_reecher_id.blank?
+								if (!all_reecher.blank?) && (all_reecher.include? q.posted_by_uid)
+            		   q[:question_referee] =  q.posted_by
+                   q[:no_profile_pic] = false 
+    				   else
+    				    q[:question_referee] = "Friend"  
+                q[:no_profile_pic] = true 
+    				   end
+				 else  
+				    q[:question_referee] = "Friend"  
+            q[:no_profile_pic] = true
+				 end
+				 			  			 
+				end
 				@Questions << q
+				
+				
 			end	
 			@Questions
 	end
@@ -65,8 +105,7 @@ class Question < ActiveRecord::Base
 		@stared_questions = []
 		stared_question_ids = []
 		user = User.find_by_reecher_id(user_id)
-		stared_questions = user.votings #Voting.all
-		
+		stared_questions = user.votings #Voting.all		
 		puts "stared_questions=#{stared_questions}"
 		if stared_questions.size > 0
 			stared_questions.each do |sq|
@@ -96,11 +135,30 @@ class Question < ActiveRecord::Base
     end
   end
   
-def avatar_geometry(style = :medium)
+  def avatar_geometry(style = :medium)
   @geometry ||= {}
   photo_path = (avatar.options[:storage] == :s3) ? avatar.url(style) : avatar.path(style)
+  puts "photo_path== #{photo_path.inspect}"
   @geometry[style] ||= Paperclip::Geometry.from_file(photo_path)
-end	
+  end	
+
+ def show_question_owner_name (current_user_id ,question_id,question_owner)
+ owner_name = false
+ @pqtf = PostQuestionToFriend.select.where("user_id = ? AND friend_reecher_id=? AND question_id =?", question_owner, current_user_id, question_id)
+ if pqtf.blank?
+   owner_name
+  else
+   owner_name = true  
+ end 
+  owner_name
+  
+end 
+  
+def check_question_refer_to_me user_id , friend_reecher_id, question_id
+  @question_owner_name = PostQuestionToFriend.where("user_id = ? AND friend_reecher_id= ? AND question_id = ?", q.posted_by_uid, current_user.reecher_id, q.question_id)
+  
+end
+  
   
   
 end

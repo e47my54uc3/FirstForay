@@ -20,28 +20,29 @@ module Api
 			def create
 				if params[:provider] == "standard"
 					@user_session = UserSession.new(params[:user_details])
+			
 					if @user_session.save
 						respond_to do |format|
-							@user_id = User.find_by_email(@user_session.email).reecher_id
-							@api_key = ApiKey.create(:user_id => @user_id).access_token
+							@user_id = User.find_by_phone_number(@user_session.phone_number)							
+							@api_key = ApiKey.create(:user_id => @user_id.reecher_id).access_token
 							#create a device token entry in device table for push notifications
 							if !params[:device_token].blank? && !params[:platform].blank?
-							  existing_device = Device.where(:device_token => params[:device_token], :platform => params[:platform], :reecher_id => @user_id)
+							  existing_device = Device.where(:device_token => params[:device_token], :platform => params[:platform], :reecher_id => @user_id.reecher_id)
 							  if !existing_device.present?
 							    device = Device.new()
 							    device.device_token = params[:device_token]
 							    device.platform = params[:platform]
-							    device.reecher_id = @user_id
+							    device.reecher_id = @user_id.reecher_id
 							    device.save
 							  end  
 							end  
-							msg = { :status => 201, :message => "Success!", :email => @user_session.email, :api_key => @api_key, :user_id => @user_id}
+							msg = { :status => 201, :message => "Success!", :api_key => @api_key, :user_id => @user_id.reecher_id,:email=>@user_id.email,:phone_number=>@user_id.phone_number.to_i}
 							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							format.json { render :json => msg }  # note, no :location or :status options
 						end
 					else
 						respond_to do |format|
-							msg = { :status => 401, :message => "Please check your Email/Password"}
+							msg = { :status => 401, :message => @user_session.errors}
 							logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							format.json { render :json => msg }  # note, no :location or :status options
 						end

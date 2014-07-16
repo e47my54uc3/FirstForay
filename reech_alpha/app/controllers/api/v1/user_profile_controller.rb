@@ -87,7 +87,44 @@ module Api
 				end
 
 				def forget_password
-					@user = User.find_by_email(params[:email])
+					@user = User.find_by_phone_number(params[:phone_number])
+					puts "@user ==#{@user.inspect}"
+					rand_str = (('A'..'Z').to_a + (0..9).to_a)
+          pass_token = (0...8).map { |n| rand_str.sample }.join
+          puts "pass_token== #{pass_token}"
+          #@user.update_attributes(:password=> pass_token) unless @user.blank?
+          @user.password = 'test123' unless @user.blank?
+          @user.save(:validate=> false)  unless @user.blank?
+
+					if !@user.blank?           
+              begin
+               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+                sms = client.account.sms.messages.create(
+                          from: TWILIO_CONFIG['from'],
+                          to: @user.phone_number,
+                          body: "Username= #{@user.phone_number} and Temporay password=#{pass_token}"  
+                          #body: "Dear #{@user.full_name},We are providing you a temporary password for login into application and later on you can reset it. Your Username= #{@user.phone_number} and Temporay password=#{pass_token}"
+                      )
+              rescue Exception => e
+              logger.error e.backtrace.join("\n")
+              end
+                logger.debug ">>>>>>>>>Sending sms to #{@user.phone_number} with text #{sms.body}"
+                msg = {:status => 200, :message => "Password sent to your phone number"}
+                logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+                render :json => msg
+         
+         else
+            msg = {:status => 400, :message => "Given phone number found"}
+            logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+            render :json => msg
+          end 
+          
+         end
+         
+         
+         
+         
+=begin					
 					if !@user.nil?
 						@user.deliver_password_reset_instructions!
 						msg = {:status => 200, :message => "Password sent to your email"}
@@ -98,7 +135,8 @@ module Api
 						logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 						render :json => msg
 					end	
-				end	
+=end					
+			#	end	
 
 				def showconnections
 						@user=User.find_by_reecher_id(params[:user_id])
@@ -176,7 +214,9 @@ module Api
             tot_answer = solution.count
             tot_hi5 = user.user_profile.votes_for.size 
             tot_curios = user.points
-            position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
+           # position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
+           #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
+             position =  ((0.15 * tot_curios) + (0.2*tot_question) + (0.3*tot_answer) + (0.35*tot_hi5)).floor
             user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
  
           end

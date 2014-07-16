@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 	#       :recoverable, :rememberable  #, :trackable, :validatable
 
 	# Setup accessible (or protected) attributes for your model
-	attr_accessible :email, :password, :password_confirmation, :remember_me
+	attr_accessible :email,:phone_number ,:password, :password_confirmation, :remember_me
 	has_merit
 	acts_as_voter
 
@@ -20,6 +20,7 @@ class User < ActiveRecord::Base
 	#For Authlogic
 	acts_as_authentic do |c|
 		c.ignore_blank_passwords = true #ignoring passwords
+		 c.login_field = :phone_number
 	end
 
 	attr_accessible :email, :first_name, :last_name, :password, :password_confirmation, :points
@@ -28,6 +29,7 @@ class User < ActiveRecord::Base
 	before_create :create_unique_profile_id
 	before_create :create_reecher_id
 	validates :email, uniqueness: true ,:allow_blank => true, :allow_nil => true
+	validates :phone_number, uniqueness: true ,:allow_blank => true, :allow_nil => true
 	#Authentications
 	validate do |user|
 		if user.new_record? #adds validation if it is a new record
@@ -161,6 +163,9 @@ class User < ActiveRecord::Base
 		user_settings.notify_question_when_answered = true
 		user_settings.notify_linked_to_question = true
 		user_settings.notify_solution_got_highfive = true
+		user_settings.notify_audience_if_ask_for_help = true
+		user_settings.notify_when_someone_grab_my_answer = true
+		user_settings.notify_when_my_stared_question_get_answer = true
 		user_settings.save!
 	end	
 
@@ -173,6 +178,5 @@ class User < ActiveRecord::Base
     self.picture = open(url)
   end
 
-
-
+  
 end

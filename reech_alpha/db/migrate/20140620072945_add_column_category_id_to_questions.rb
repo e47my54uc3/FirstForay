@@ -3,6 +3,7 @@ class AddColumnCategoryIdToQuestions < ActiveRecord::Migration
   	 remove_column :questions, :catgory_id
  end
  def self.up
-          add_column  :questions, :category_id, :integer
-  end
+    add_column  :questions, :category_id, :integer
+    
+ end
 end 

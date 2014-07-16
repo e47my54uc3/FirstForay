@@ -12,7 +12,7 @@ module Api
 				if !params.blank?
 					if params[:provider] == "standard"
 					  
-					  user = User.find_by_email(params[:user_details][:email])					  
+					  user = User.find_by_phone_number(params[:user_details][:phone_number])					  
 						if user.nil?
 								@user = User.new(params[:user_details])
 								@user.password_confirmation = params[:user_details][:password]
@@ -25,7 +25,7 @@ module Api
 	  							@user.add_points(500)
 	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
 									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
-									msg = {:status => 201, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email}
+									msg = {:status => 201, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
 									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 									render :json => msg  # note, no :location or :status options
 								else
@@ -36,7 +36,7 @@ module Api
 						else
 						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
 							 #msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
-							 msg = { :status => 401, :message => "Email Already exists"}
+							 msg = { :status => 401, :message => "Phone number Already exists"}
 							 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
 							 render :json => msg
 						end   
@@ -181,16 +181,16 @@ module Api
            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
            params[:audien_details][:phone_numbers].each do |phone|
            SendReechRequest.create(:user_id =>params[:user_id],:type=>params[:type],:contact_details=>params[:phone])
-=begin          
            sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: phone,
                       body: "your friend #{user.first_name} #{user.last_name}  want to send you a friend request from Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{phone} with text #{sms.body}"
-=end
+
           end
         end
+        
       end
       msg = { :status => 200, :message => "success"}
       render :json =>msg 
@@ -212,10 +212,10 @@ module Api
       user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ?", params[:referral_code] ,current_date_time)
       
       if !user_ref.blank?
-        link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
+      link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
       msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id }
       else
-      msg = {:status => 200, :is_valid => false }
+      msg = {:status => 200, :is_valid => true }
       end 
       render :json => msg 
       

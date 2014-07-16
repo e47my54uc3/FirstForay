@@ -5,6 +5,10 @@ module ApplicationHelper
   end
 
   def send_device_notification device_token,message,platform
+     
+     puts "device_token=#{device_token}"
+     puts "message=#{message}"
+     puts "platform=#{platform}"
             
     if platform == 'iOS' 
       puts "I am in iOS mobile notification"
@@ -17,7 +21,7 @@ module ApplicationHelper
       registration_ids= [device_token] # an array of one or more client registration IDs
       options = {data: {message: message}, collapse_key: "Reech",time_to_live:3600}
       response = gcm.send_notification(registration_ids, options)
-      puts "response==#{response.inspect}"
+      #puts "response==#{response.inspect}"
     end
 
   end
@@ -48,7 +52,6 @@ module ApplicationHelper
 
    
   def notify_when_my_stared_question_get_answer user_id
-    # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_when_my_stared_question_get_answer] == true))
@@ -60,7 +63,6 @@ module ApplicationHelper
   end
   
   def notify_solution_got_highfive user_id
-    # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
     user = User.find_by_reecher_id(params[:user_id])
     setting =user.user_settings
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_solution_got_highfive] == true))
@@ -70,6 +72,31 @@ module ApplicationHelper
     end
     check
   end
+  
+  
+  def notify_audience_if_ask_for_help user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_audience_if_ask_for_help] == true))
+      check =true
+    else
+      check =false
+    end
+    check
+    
+  end
+  
+  def notify_when_someone_grab_my_answer user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_when_someone_grab_my_answer] == true))
+      check =true
+    else
+      check =false
+    end
+    check
+ end
+  
   
   def get_curio_points user_id
   
@@ -98,5 +125,7 @@ module ApplicationHelper
   
   end
   
+  
+ 
 
 end

@@ -671,22 +671,9 @@ module Api
       end    
         
 		def check_one_time_bonus_distribution (q_id,sol_id,asker_id)
-		 
-		 puts " q_id====#{q_id}"
-		 puts " sol_id====#{sol_id}"
-		 puts " asker_id====#{asker_id}"
 		 flag =true ;
-		  #purchased_sl_for_q_id = PurchasedSolution.joins(:solution)
-		                  #  .select("purchased_solutions.id")
-		                  #  .where("purchased_solutions.user_id =? AND purchased_solutions.solution_id=? AND solutions.question_id=?", asker_id , sol_id ,q_id ) 
-		
-		 purchased_sl_for_q_id = PurchasedSolution.where(:user_id =>asker_id ,:solution_id=>sol_id)
-		
+		  purchased_sl_for_q_id = PurchasedSolution.where(:user_id =>asker_id ,:solution_id=>sol_id)
 		  tot_row = purchased_sl_for_q_id.size
-		  
-		  puts "purchased_sl_for_q_id====#{purchased_sl_for_q_id.inspect}"     
-		  
-		  puts "purchased_sl_for_q_id_num====#{purchased_sl_for_q_id.size}"   
 		  if tot_row >1
 		  flag =false
 		  end
@@ -702,9 +689,8 @@ module Api
       end
 		  
 		end
-		
+=begin		
 		def make_friendship_standard(friends, user)
-		  
 		#  Friendship.create(:reecher_id=>friends,:friend_reecher_id=>user,:status=>"accepted")
 		# Friendship.create(:reecher_id=>user,:friend_reecher_id=>friends,:status=>"accepted")		 
 		friend =  Friendship.new()
@@ -718,11 +704,8 @@ module Api
     friend2.friend_reecher_id = friends
     friend2.status = "accepted"
     friend2.save
-    
-  
-        
     end  
-		
+=end		
 		end
 	end
 end			

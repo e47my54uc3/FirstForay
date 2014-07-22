@@ -12,7 +12,7 @@ module ApplicationHelper
             
     if platform == 'iOS' 
       puts "I am in iOS mobile notification"
-      n1= APNS::Notification.new(device_token, :alert => message, :badge => 1, :sound => 'default')
+      n1= APNS::Notification.new(device_token, :alert => {"body"=> message }, :badge => 1, :sound => 'default')
       APNS.send_notifications([n1])
     elsif platform =='Android'
       puts "I am in Android mobile notification"
@@ -125,6 +125,19 @@ module ApplicationHelper
   
   end
   
+  def make_friendship_standard(friends, user)
+    friend =  Friendship.new()
+    friend.reecher_id = friends
+    friend.friend_reecher_id = user
+    friend.status = "accepted"
+    friend.save
+
+    friend2 =  Friendship.new()
+    friend2.reecher_id = user
+    friend2.friend_reecher_id = friends
+    friend2.status = "accepted"
+    friend2.save
+  end  
   
  
 

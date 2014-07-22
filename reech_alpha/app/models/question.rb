@@ -64,12 +64,16 @@ class Question < ActiveRecord::Base
 			#	puts "current_user==#{current_user.inspect}"
 				#question_owner_name = Question::show_question_owner_name(current_user.reecher_id, q.question_id, q.posted_by_uid)
 				@question_owner_name = PostQuestionToFriend.where("user_id = ? AND friend_reecher_id= ? AND question_id = ?", q.posted_by_uid, current_user.reecher_id, q.question_id)
+				checked_is_question_linked = LinkedQuestion.where("question_id = ?",q.question_id)				
 				#puts "@question_owner_name#{@question_owner_name.inspect}"
 				#purchased_sl = PurchasedSolution.where(:user_id => current_user.id, :solution_id => sl.id)
 				
 				if @question_owner_name.size > 0
 				 q[:question_referee] = q.posted_by
 				 q[:no_profile_pic] = false 
+				elsif (checked_is_question_linked == 0 && @question_owner_name.size == 0)
+				 q[:question_referee] = q.posted_by
+         q[:no_profile_pic] = false 
 				elsif current_user.reecher_id == q.posted_by_uid
 				 q[:question_referee] = q.posted_by		
 				 q[:no_profile_pic] = false          		  

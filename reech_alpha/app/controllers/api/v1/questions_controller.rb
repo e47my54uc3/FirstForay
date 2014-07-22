@@ -404,7 +404,7 @@ module Api
     end
     
     
-  def send_posted_question_notification_to_reech_users audien_details ,user,question_id
+  def send_posted_question_notification_to_reech_users audien_details ,user,question
      
      if !audien_details.blank?
      if audien_details.has_key?("reecher_ids") 
@@ -425,7 +425,7 @@ module Api
                                  if !user.blank?
                                      device_details = Device.where(:reecher_id=>user_details_with_reech_id.reecher_id)
                                      if !device_details.blank?
-                                     notify_string ="ASKHELP,"+user.full_name + ","+ question_id + "," + Time.now().to_s
+                                     notify_string = "ASKHELP," + user.full_name + "," + question.question_id.to_s + "," + Time.now().to_s
                                        device_details.each do |d|
                                          puts "VIJAY________________________"
                                             send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s)
@@ -522,7 +522,7 @@ module Api
                                             if !user_details_for_phone.blank?
                                               device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
                                                if !device_details.blank?
-                                                notify_string ="INVITE,"+user.full_name + ","+ question.question_id + "," + Time.now().to_s
+                                                notify_string ="INVITE,"+user.full_name + ","+ question.question_id.to_s + "," + Time.now().to_s
                                                 device_details.each do |d|
                                                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s)
                                                 end

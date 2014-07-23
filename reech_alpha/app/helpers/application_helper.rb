@@ -160,7 +160,34 @@ def filter_phone_number phone_number
    phone_num
     
   end  
+
   
+  def linked_question_with_type linker_id,question_id, email,phone,linked_type
+    
+             
+             @linkquest = LinkedQuestion.new()
+             @linkquest.user_id =''
+             @linkquest.question_id = question_id
+             @linkquest.linked_by_uid = linker_id
+             @linkquest.email_id = email
+             @linkquest.phone_no = phone
+             @linkquest.linked_type = linked_type
+             @linkquest.save
+             #@rand_has_key = random_key_generator(Time.now)
+             rand_str = (('A'..'Z').to_a + (0..9).to_a)
+             token = (0...32).map { |n| rand_str.sample }.join
+             referral_code = (0...8).map { |n| rand_str.sample }.join
+             validity= 15.days.from_now
+             tries = 0
+             invite_user_object= InviteUser.create(:linked_question_id=>@linkquest.id,:token=>token,:referral_code=>referral_code,:token_validity_time =>validity)
+        
+          arr =[]
+          arr.push(:referral_code=>referral_code)  
+          arr.push(:token=>token)
+          arr
+    
+  end
+       
   
  
 

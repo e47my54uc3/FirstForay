@@ -16,8 +16,8 @@ module Api
 						if user.nil?
 								@user = User.new(params[:user_details])
 								@user.password_confirmation = params[:user_details][:password]
-								#friend_con=make_auto_connection_with_referral_code params[:user_details][:referral_code]
-    							#	if friend_con[:message] =='success'
+							#	friend_con=JSON.parse(friend_con.join())     
+								    								
       								if @user.save
       									if !params[:profile_image].blank? 
       										data = StringIO.new(Base64.decode64(params[:profile_image]))
@@ -25,7 +25,7 @@ module Api
       										@user.user_profile.save
       									end
       	  							@user.add_points(500)
-      	  							make_auto_connection_with_referral_code params[:user_details][:referral_code]
+      	  							friend_con=make_auto_connection_with_referral_code @user.reecher_id, params[:referral_code]
       	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
       									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
       									msg = {:status => 201, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
@@ -36,11 +36,7 @@ module Api
       									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
       									render :json => msg  # note, no :location or :status option
       								end
-      							#else
-      							#  msg = { :status => 401, :message => "Cann't make friend connection..."}
-                   # #  logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-                   #  render :json => msg 
-      							#end  	
+      							 	
       								
 						else
 						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
@@ -56,8 +52,9 @@ module Api
 						@profile = @graph.get_object("me")
 						@fb_friends = @graph.get_connections("me", "friends")
             if fb_user.nil?  
-             # friend_con=make_auto_connection_with_referral_code params[:user_details][:referral_code] 
-               #if friend_con[:message] =='success'         
+              
+              #friend_con123=JSON.parse(friend_con.join())
+                   
   							@user = User.new()
   							@user.first_name = @profile["first_name"]
   							@user.last_name = @profile["last_name"]
@@ -67,6 +64,7 @@ module Api
     							if @user.save(:validate => false)		
     							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
     							  @user.user_profile.save
+    							  friend_con=make_auto_connection_with_referral_code @user.reecher_id, params[:referral_code] 
     							  #@user.user_profile.build
     							 #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
     								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
@@ -80,11 +78,7 @@ module Api
     								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
     								render :json => msg
     							end 
-    						#else
-    						# msg = { :status => 401, :message => "Cann't make friend connection..."}
-                #  logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-                # render :json => msg  
-    						#end  	
+    					 	
 						else
 						  make_friendship(@fb_friends,fb_user,params[:device_token]) if @fb_friends.size > 0
               create_device_for_user(params[:device_token], params[:platform], fb_user.reecher_id)
@@ -184,18 +178,68 @@ module Api
       if !user.blank?
         if !params[:audien_details][:email_ids].blank?
           params[:audien_details][:email_ids].each do |email|
+=begin
             SendReechRequest.create(:user_id =>params[:user_id],:type=>params[:type],:contact_details=>params[:email])
               begin
                  UserMailer.send_reech_friend_request(email, user.full_name).deliver
               rescue Exception => e
                  logger.error e.backtrace.join("\n")
               end
-          
+               get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,'ASK'
+=end          
+                              user_details_for_email = User.find_by_email(email)
+                                # If audien is a reecher store his reedher_id in question record
+                                # Else send an Invitation mail to the audien
+                                    if user_details_for_email.present?
+                                         
+                                          #send notification to existing user
+                                            if !user_details_for_email.blank?
+                                              device_details = Device.where(:reecher_id=>user_details_for_email.reecher_id)
+                                               if !device_details.blank?
+                                                notify_string ="INVITE,"+user.full_name + "," + Time.now().to_s
+                                                device_details.each do |d|
+                                                 send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_INVITE)
+                                                end
+                          
+                                              end
+                                            end
+                                           if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
+                                           
+                                             phone_number = filter_phone_number(user_details_for_email.phone_number)
+                                               begin
+                                               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
+                                                sms = client.account.sms.messages.create(
+                                                    from: TWILIO_CONFIG['from'],
+                                                    to: phone_number,
+                                                    body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                                                )
+                                                logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
+                                               rescue Exception => e
+                                               logger.error e.backtrace.join("\n")
+                                               end 
+                                           end      
+                                     make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                     
+                                    else
+                                       begin
+                                        get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,'INVITE'  
+                                        
+                                        UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id).deliver
+                                          
+                                       rescue Exception => e
+                                         logger.error e.backtrace.join("\n")
+                                       end
+                                      
+                                    end  
+           
+           
+
           end
         end
         if !params[:audien_details][:phone_numbers].blank?
            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
            params[:audien_details][:phone_numbers].each do |phone|
+             
+=begin             
            SendReechRequest.create(:user_id =>params[:user_id],:type=>params[:type],:contact_details=>params[:phone])
            sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
@@ -203,6 +247,66 @@ module Api
                       body: "your friend #{user.first_name} #{user.last_name}  want to send you a friend request from Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{phone} with text #{sms.body}"
+=end
+ number = filter_phone_number(number)
+                    
+  user_details_for_phone = User.find_by_phone_number(number) 
+        if user_details_for_phone.present?                                          
+                      #send notification to existing user
+                        if !user_details_for_phone.blank?
+                          device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
+                           if !device_details.blank?
+                            notify_string ="INVITE,"+user.full_name + ","+ question.question_id.to_s + "," + Time.now().to_s
+                            device_details.each do |d|
+                             send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_INVITE)
+                            end
+      
+                          end
+                        end
+                       
+                       
+                         if !user_details_for_phone.blank? && user_details_for_phone.email != nil
+                           
+                           phone_number = filter_phone_number(user_details_for_phone.phone_number)
+                            begin 
+                            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+                                             
+                              sms = client.account.sms.messages.create(
+                                  from: TWILIO_CONFIG['from'],
+                                  to: phone_number,
+                                  body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                              )
+                              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
+                              rescue Exception => e
+                              logger.error e.backtrace.join("\n")
+                              end
+                         end                                          
+                      
+                make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)             
+          else
+                    
+                      
+              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,'INVITE'  
+              refral_code = get_referal_code_and_token[0][:referal_code]
+              puts "PHONE--get_referal_code_and_token===#{get_referal_code_and_token.inspect}"
+                       # UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code[:token],get_referal_code[:referral_code],question.question_id).deliver 
+                           
+               phone_number = filter_phone_number(user_details_for_phone.phone_number)
+                    begin                                           
+                      client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
+                                                                                 
+                        sms = client.account.sms.messages.create(
+                            from: TWILIO_CONFIG['from'],
+                            to: phone_numberr,
+                            body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
+                        )
+                        logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
+                    rescue Exception => e
+                      logger.error e.backtrace.join("\.n")
+                    end
+                  
+         end 
+
 
           end
         end
@@ -229,7 +333,7 @@ module Api
       
       if !user_ref.blank? 
       link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
-      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id ,:referral_code=>params[:referral_code]}
+      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id }
       elsif params[:referral_code].to_i == 1111
       msg = {:status => 200, :is_valid => true }  
       else
@@ -239,20 +343,25 @@ module Api
       
     end
       
-    def make_auto_connection_with_referral_code referral_code
+    def make_auto_connection_with_referral_code reecher_id, referral_code
       current_date_time =Time.now
+      msg=''
       user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ?", referral_code ,current_date_time)
       if !user_ref.blank? 
       link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
-      make_friendship_standard(link_question.user_id, link_question.linked_by_uid)      
-      link_question.update_attributes(:status=>0) 
-      msg = {:status => 200, :is_valid => true,:message=>"success"}
+      
+      
+      make_friendship_standard(reecher_id, link_question.linked_by_uid)   
+        
+      link_question.update_attributes(:user_id=>reecher_id,:status=>0) 
+     
+      msg = true
       elsif params[:referral_code].to_i == 1111
-      msg = {:status => 200, :is_valid => true }  
+      msg = false 
       else
-      msg = {:status => 200, :is_valid => false ,:message=>"failure"}
+      msg = false 
       end 
-      render :json => msg 
+      msg 
     end  
       
 #End of Class User Controller class

@@ -4,22 +4,23 @@ module ApplicationHelper
     mailbox_name == 'inbox' ? message.sender : message.recipient_list.join(', ')
   end
 
-  def send_device_notification device_token,message,platform
+  def send_device_notification device_token,message,platform,title="Title"
      
      puts "device_token=#{device_token}"
      puts "message=#{message}"
      puts "platform=#{platform}"
+     puts "title===#{title.inspect}"      
             
     if platform == 'iOS' 
       puts "I am in iOS mobile notification"
-      n1= APNS::Notification.new(device_token, :alert => {"body"=> message }, :badge => 1, :sound => 'default')
+      n1= APNS::Notification.new(device_token, :alert => title, :badge => 1, :sound => 'default',:other=>{:message=>message,:title=>title,:badge => 1})
       APNS.send_notifications([n1])
     elsif platform =='Android'
       puts "I am in Android mobile notification"
       require 'gcm'
       gcm = GCM.new("AIzaSyA8LPahDEVgdPxCU4QrWOh1pF_IL655LNI")
       registration_ids= [device_token] # an array of one or more client registration IDs
-      options = {data: {message: message}, collapse_key: "Reech",time_to_live:3600}
+      options = {data: {payload_body:message ,message: title ,title:"Reech"}, collapse_key: "Reech",time_to_live:3600}
       response = gcm.send_notification(registration_ids, options)
       #puts "response==#{response.inspect}"
     end
@@ -126,18 +127,28 @@ module ApplicationHelper
   end
   
   def make_friendship_standard(friends, user)
+    
+    are_friends1 = Friendship::are_friends(friends,user)
+    are_friends2 = Friendship::are_friends(user,friends)
+    
+    if !are_friends1
     friend =  Friendship.new()
     friend.reecher_id = friends
     friend.friend_reecher_id = user
     friend.status = "accepted"
     friend.save
-
+    end
+    if !are_friends2
     friend2 =  Friendship.new()
     friend2.reecher_id = user
     friend2.friend_reecher_id = friends
     friend2.status = "accepted"
     friend2.save
+    end
   end  
+  
+
+  
   
  
 

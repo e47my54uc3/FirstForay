@@ -1,0 +1,8 @@
+PUSH_TITLE_PRSLN    = " provided a solution. Hi5 them if it worked!"
+PUSH_TITLE_LINKED   = " linked you to a question."
+PUSH_TITLE_HGHFV    = " high fived your solution."
+PUSH_TITLE_LNKSN    = " provided a solution to starred question."
+PUSH_TITLE_STARSOLS = " provided a solution to starred question."
+PUSH_TITLE_ASKHELP  = " has asked for your help."
+PUSH_TITLE_GRABSOLS = " grabbed your solution."
+PUSH_TITLE_INVITE   = " is now a part of your REECH" 

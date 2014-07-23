@@ -77,7 +77,7 @@ module Api
                 if !device_details.empty? 
                     device_details.each do |d|
                       
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s, @solution.solver+PUSH_TITLE_PRSLN)
                     end  
                 end 
                end
@@ -86,10 +86,8 @@ module Api
           
            #Send push notification to those who starred this question
            @voting = Voting.where(question_id: qust_details.id)
-           puts "solution-provide====#{@voting.inspect}"
-				   if !@voting.blank?
+           if !@voting.blank?
             @voting.each do |v|
-            response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]
              check_setting= notify_when_my_stared_question_get_answer(v.user_id)
              puts "check_setting====#{check_setting}"
              puts "check_setting---user====#{v.user_id}"
@@ -102,7 +100,7 @@ module Api
                   if !device_details.blank?   
                      device_details.each do |d|
                        puts "SEND NOTIFCAITION TO ===#{d[:device_token].to_s}"
-                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,@solution.solver+PUSH_TITLE_STARSOLS)
                      end
                   end
                end
@@ -118,8 +116,7 @@ module Api
 			end
 
 			def purchase_solution
-			  
-				user = User.find_by_reecher_id(params[:user_id])
+			  user = User.find_by_reecher_id(params[:user_id])
 				solution = Solution.find(params[:solution_id])
 				question = Question.where(:question_id =>solution.question_id)
 				puts "question==#{question.inspect}"
@@ -152,7 +149,7 @@ module Api
                          if !device_details.blank?
                          notify_string ="GRABSOLS," + user.full_name + "," + (solution.id).to_s + "," + Time.now().to_s
                            device_details.each do |d|
-                                send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s)
+                                send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_GRABSOLS)
                            end
 
                          end
@@ -315,7 +312,7 @@ module Api
                 response_string ="HGHFV,"+ user.full_name + "," + params[:solution_id] +","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_HGHFV)
                     end  
                 end 
                end
@@ -594,12 +591,16 @@ module Api
           if !params[:expert_details][:phone_numbers].nil?
             client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
             params[:expert_details][:phone_numbers].each do |number|
+              begin
               sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
                       body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
+             rescue Exception => e
+                      logger.error e.backtrace.join("\n")
+             end
             end
           end 
        end  
@@ -629,7 +630,7 @@ module Api
                     device_details.each do |d|
                       
                    # begin
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,@solution.solver+PUSH_TITLE_PRSLN)
                     #rescue Exception => e
                     #  logger.error e.backtrace.join("\n")
                     #end

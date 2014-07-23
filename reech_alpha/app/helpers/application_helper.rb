@@ -148,6 +148,18 @@ module ApplicationHelper
   end  
   
 
+def filter_phone_number phone_number    
+    phone_number.strip!
+    check_plus_sign = phone_number.chr
+    if check_plus_sign == "+"      
+      phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
+    else
+      phone_num =  phone_number.gsub(/[^0-9]/, '')      
+    end
+    
+   phone_num
+    
+  end  
   
   
  

@@ -127,29 +127,34 @@ module ApplicationHelper
   end
   
   def make_friendship_standard(friends, user)
-    
-    are_friends1 = Friendship::are_friends(friends,user)
-    are_friends2 = Friendship::are_friends(user,friends)
-    
-    if !are_friends1
-    friend =  Friendship.new()
-    friend.reecher_id = friends
-    friend.friend_reecher_id = user
-    friend.status = "accepted"
-    friend.save
-    end
-    if !are_friends2
-    friend2 =  Friendship.new()
-    friend2.reecher_id = user
-    friend2.friend_reecher_id = friends
-    friend2.status = "accepted"
-    friend2.save
+    # Proceed only if both the IDs are not same 
+    if friends != user
+	    are_friends1 = Friendship::are_friends(friends,user)
+	    are_friends2 = Friendship::are_friends(user,friends)
+	    
+	    if !are_friends1
+		    friend =  Friendship.new()
+		    friend.reecher_id = friends
+		    friend.friend_reecher_id = user
+		    friend.status = "accepted"
+		    friend.save
+	    end
+	    if !are_friends2
+		    friend2 =  Friendship.new()
+		    friend2.reecher_id = user
+		    friend2.friend_reecher_id = friends
+		    friend2.status = "accepted"
+		    friend2.save
+	    end
+    else
+	puts "Error : Cant make friendship between same users." 
     end
   end  
   
 
-def filter_phone_number phone_number    
-    phone_number.strip!
+def filter_phone_number phone_number  
+    puts "filter_phone_number has received phone_number===#{phone_number}" 
+    phone_number.strip
     check_plus_sign = phone_number.chr
     if check_plus_sign == "+"      
       phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
@@ -162,8 +167,10 @@ def filter_phone_number phone_number
   end  
 
   
-  def linked_question_with_type linker_id,question_id, email,phone,linked_type
-    
+  def linked_question_with_type linker_id,question_id, email,phone,linked_type_str
+    puts "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
+             puts "linked_type==#{linked_type.inspect}"
+             puts "phone==#{phone.inspect}"
              
              @linkquest = LinkedQuestion.new()
              @linkquest.user_id =''
@@ -171,7 +178,7 @@ def filter_phone_number phone_number
              @linkquest.linked_by_uid = linker_id
              @linkquest.email_id = email
              @linkquest.phone_no = phone
-             @linkquest.linked_type = linked_type
+             @linkquest.linked_type = linked_type_str
              @linkquest.save
              #@rand_has_key = random_key_generator(Time.now)
              rand_str = (('A'..'Z').to_a + (0..9).to_a)

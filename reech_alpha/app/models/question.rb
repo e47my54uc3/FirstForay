@@ -68,24 +68,34 @@ class Question < ActiveRecord::Base
 				#puts "@question_owner_name#{@question_owner_name.inspect}"
 				#purchased_sl = PurchasedSolution.where(:user_id => current_user.id, :solution_id => sl.id)
 				
-				if @question_owner_name.size > 0
+				puts "@question_owner_name=#{@question_owner_name.inspect}"
+				puts "checked_is_question_linked=#{checked_is_question_linked.inspect}"
+				puts "@question_owner_name_size=#{@question_owner_name.size}"
+        puts "checked_is_question_linked_size=#{checked_is_question_linked.size}"
+         @all_sol= Solution.where(:question_id=>q.question_id) 
+			 #	reecher_associated_to_question=@question_owner_name.collect{|pq| pq.friend_reecher_id} 
+				if @question_owner_name.blank? 
+         q[:question_referee] = "Friend"   
+         q[:no_profile_pic] = true  
+				elsif @question_owner_name.size > 0
 				 q[:question_referee] = q.posted_by
 				 q[:no_profile_pic] = false 
-				elsif (checked_is_question_linked == 0 && @question_owner_name.size == 0)
+				elsif (checked_is_question_linked.size == 0 && @question_owner_name.size == 0)
 				 q[:question_referee] = q.posted_by
          q[:no_profile_pic] = false 
-				elsif current_user.reecher_id == q.posted_by_uid
+				elsif current_user.reecher_id.to_s == q.posted_by_uid.to_s
 				 q[:question_referee] = q.posted_by		
-				 q[:no_profile_pic] = false          		  
+				 q[:no_profile_pic] = false 
+				 
 				else
-				 @all_sol= Solution.where(:question_id=>q.question_id) 
+			  
 				 unless @all_sol.blank?
 				 all_sol_id   = @all_sol.collect{|sol| sol.id}
 				 all_user = PurchasedSolution.where(:solution_id=>all_sol_id)
 				 get_all_user = all_user.collect{ |u| u.user_id} unless all_user.blank?
 				 all_reecher_id = User.where(:id=>get_all_user) unless all_user.blank?
 				 all_reecher = all_reecher_id.collect{|ur| ur.reecher_id} unless all_reecher_id.blank?
-								if (!all_reecher.blank?) && (all_reecher.include? q.posted_by_uid)
+							if (!all_reecher.blank?) && (all_reecher.include? q.posted_by_uid)
             		   q[:question_referee] =  q.posted_by
                    q[:no_profile_pic] = false 
     				   else

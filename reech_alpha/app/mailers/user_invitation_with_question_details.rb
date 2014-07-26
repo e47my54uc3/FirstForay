@@ -9,7 +9,11 @@ class UserInvitationWithQuestionDetails < ActionMailer::Base
     @token = token
     @referral_code = referral_code
     @question_id = question_id
-    mail(to:  email, subject: "Invitation to Answer a question in Reechout")
+    if question_id != 0
+       mail(to:  email, subject: "Invitation to Answer a question in Reechout")
+    else
+       mail(to:  email, subject: "Invitation to join Reechout")
+    end
   end 
   
 end

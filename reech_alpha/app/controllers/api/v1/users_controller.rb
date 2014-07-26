@@ -221,9 +221,9 @@ module Api
                                      make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                     
                                     else
                                        begin
-                                        get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,'INVITE'  
+                                        get_referal_code_and_token = linked_question_with_type user.reecher_id,0,'',email,'INVITE'  
                                         
-                                        UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id).deliver
+                                        UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],0).deliver
                                           
                                        rescue Exception => e
                                          logger.error e.backtrace.join("\n")
@@ -248,7 +248,7 @@ module Api
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{phone} with text #{sms.body}"
 =end
- number = filter_phone_number(number)
+ number = filter_phone_number(phone)
                     
   user_details_for_phone = User.find_by_phone_number(number) 
         if user_details_for_phone.present?                                          
@@ -286,28 +286,24 @@ module Api
           else
                     
                       
-              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,'INVITE'  
-              refral_code = get_referal_code_and_token[0][:referal_code]
+              get_referal_code_and_token = linked_question_with_type user.reecher_id,0,'',number,'INVITE'  
+              refral_code = get_referal_code_and_token[0][:referral_code]
               puts "PHONE--get_referal_code_and_token===#{get_referal_code_and_token.inspect}"
                        # UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code[:token],get_referal_code[:referral_code],question.question_id).deliver 
                            
-               phone_number = filter_phone_number(user_details_for_phone.phone_number)
-                    begin                                           
-                      client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
-                                                                                 
-                        sms = client.account.sms.messages.create(
-                            from: TWILIO_CONFIG['from'],
-                            to: phone_numberr,
-                            body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
-                        )
-                        logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-                    rescue Exception => e
-                      logger.error e.backtrace.join("\.n")
+               #phone_number = filter_phone_number(number)
+                    begin
+                      client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+                      sms = client.account.sms.messages.create(
+                      from: TWILIO_CONFIG['from'],
+                      to: number,
+                      body: "Your friend #{user.first_name} #{user.last_name} has invited you to signup with Reech using referal code=#{refral_code}"
+                      )
+                      logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
+                      rescue Exception => e
+                      logger.error e.backtrace.join("\n")
                     end
-                  
-         end 
-
-
+              end 
           end
         end
         

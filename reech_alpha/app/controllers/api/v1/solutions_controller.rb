@@ -373,7 +373,7 @@ module Api
         question_asker = qust_details.posted_by_uid
         question_asker_name = qust_details.posted_by
         question_is_public = qust_details.is_public
-        if (( qust_details.reecher_id ==  question_asker) || question_is_public)
+        if ((logined_user.reecher_id ==  question_asker) || question_is_public)
            qust_details[:question_referee] = qust_details.posted_by   
            qust_details[:no_profile_pic] = false 
         elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? logined_user.reecher_id.to_s)) 

@@ -122,6 +122,11 @@ module Api
               @question.avatar = data
               
             end
+            
+           if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
+              @question.is_public = true
+           end 
+            
              if @question.save
              catgory = Category.find(@question.category_id)             
              if !post_quest_to_frnd.blank? 
@@ -304,6 +309,9 @@ module Api
                @pqtf.update_attributes(:question_id=>@question.question_id) 
                end
              end
+            if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
+              @question.is_public = true
+             end 
             if params[:audien_details].class.to_s == 'String'            
              params[:audien_details] = JSON.parse(params[:audien_details])            
             # Setting audiens for displaying posetd user details of a question

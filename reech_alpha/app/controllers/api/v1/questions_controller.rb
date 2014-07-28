@@ -234,7 +234,7 @@ module Api
     def link_questions_to_expert
       @user = User.find_by_reecher_id(params[:user_id])
       @question = Question.find_by_question_id(params[:question_id]) 
-      if ((!user.blank?) && (!question.blank?))
+      if ((!@user.blank?) && (!@question.blank?))
       # Outer if condition    
           if !params[:audien_details].nil? 
              Thread.new{link_questions_to_expert_for_users params[:audien_details] ,@user,@question.question_id}

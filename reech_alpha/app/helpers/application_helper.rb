@@ -7,7 +7,7 @@ module ApplicationHelper
   def send_device_notification device_token,message,platform,title="Title"
      
      puts "device_token=#{device_token}"
-     puts "message=#{message}"
+     puts "message123=#{message}"
      puts "platform=#{platform}"
      puts "title===#{title.inspect}"      
             
@@ -152,7 +152,7 @@ module ApplicationHelper
   end  
   
 
-def filter_phone_number phone_number  
+  def filter_phone_number phone_number  
     puts "filter_phone_number has received phone_number===#{phone_number}" 
     phone_number.strip
     check_plus_sign = phone_number.chr
@@ -168,10 +168,8 @@ def filter_phone_number phone_number
 
   
   def linked_question_with_type linker_id,question_id, email,phone,linked_type_str
-    puts "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
-             puts "linked_type==#{linked_type.inspect}"
-             puts "phone==#{phone.inspect}"
-             
+          puts " I am in lnked question with type block"
+          puts "linked_type_str==#{linked_type_str}"   
              @linkquest = LinkedQuestion.new()
              @linkquest.user_id =''
              @linkquest.question_id = question_id
@@ -195,7 +193,157 @@ def filter_phone_number phone_number
     
   end
        
-  
+  def send_posted_question_notification_to_chosen_phones audien_details ,user,question,push_title_msg,push_contant_str,linked_quest_type
+    # Check whether the audience details contains the phone numbers list or not
+    if audien_details.has_key?("phone_numbers")  
+      # If the phone numbers list is present, check whether it is empty or not   
+      if !audien_details[:phone_numbers].empty? 
+        # If the list is not empty then we have to proceed and send sms to these numbers
+        # Create a twilio client in order to send sms
+        client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+        # Loop over all the phone numbers in the list
+        audien_details[:phone_numbers].each do |number|
+          # Extract the phone number and apply the filtering on it so that special characters can b removed   
+          number = filter_phone_number(number)
+          # Try to find the whether this phone no. is associated with an existing user
+          user_details_for_phone = User.find_by_phone_number(number) 
+          # If the phone belongs to a registered user then we have to send notification to his/her logged in device
+          # Check whether the phone number belongs to a registered user or not
+          if user_details_for_phone.present?                                          
+            # Double check that the registered user's phone number is present
+            if !user_details_for_phone.blank?
+              # Find out the registered users device ID
+              device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
+              # If a valid device ID is present then we will send notification to the associated device
+              if !device_details.blank?
+                # Send notifcation fo ASKHELP type
+                if question !=0
+                notify_string = "#{push_contant_str},"  + user.full_name + ","+ question.question_id.to_s + "," + Time.now().to_s
+                elsif question ==0
+                notify_string = "#{push_contant_str},"  + user.full_name + "," + Time.now().to_s  
+                end  
+                puts "notify_string123==#{notify_string}"
+                device_details.each do |d|
+                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
+                end
+              end
+            end
+            
+            # Now check whether the email ID of the registered user is present or not
+            if !user_details_for_phone.blank? && user_details_for_phone.email != nil
+              # Chandan commented the line below as it is no required
+              # phone_number = filter_phone_number(user_details_for_phone.phone_number)
+            begin 
+              client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+                        sms = client.account.sms.messages.create(
+                        from: TWILIO_CONFIG['from'],
+                        #to: phone_number,
+                        to: number,
+                        body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in in Reech to give help."
+                      )
+              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
+              rescue Exception => e
+                logger.error e.backtrace.join("\n")
+              end
+            end                                          
+            make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
+         else
+          # This case is for non-registered users
+          # Find out the referral code which has been generated for this question by the reecher who asked this question
+            if question !=0
+             get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,linked_quest_type
+             refral_code = get_referal_code_and_token[0][:referral_code]
+              elsif question == 0             
+             get_referal_code_and_token = linked_question_with_type user.reecher_id , 0, '' , number , linked_quest_type
+             refral_code = get_referal_code_and_token[0][:referral_code]
+            end 
+          
+          
+          # phone_number = filter_phone_number(user_details_for_phone.phone_number) 
+          # phone_number = "+919873992110"
+           begin   
+            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
+                      sms = client.account.sms.messages.create(
+                      from: TWILIO_CONFIG['from'],
+                      to: number,
+                      body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
+                     )
+             logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
+             rescue Exception => e
+              logger.error e.backtrace.join("\.n")
+            end
+          end 
+        end 
+      end 
+    end 
+  end
  
+ 
+  def send_posted_question_notification_to_chosen_emails audien_details ,user,question,push_title_msg,push_contant_str,linked_quest_type
+    if !audien_details.blank? 
+         if  audien_details.has_key?("emails")             
+                        if !audien_details["emails"].empty?
+                             audien_reecher_ids = []
+                               audien_details["emails"].each do |email|
+                                user_details_for_email = User.find_by_email(email)
+                                # If audien is a reecher store his reedher_id in question record
+                                # Else send an Invitation mail to the audien
+                                    if user_details_for_email.present?
+                                          audien_reecher_ids << user_details_for_email.reecher_id
+                                          #send notification to existing user
+                                            if !user_details_for_email.blank?
+                                               device_details = Device.where(:reecher_id=>user_details_for_email.reecher_id)
+                                               if !device_details.blank?
+                                                  if question !=0
+                                                  notify_string = "#{push_contant_str}," +  user.full_name + ","+ question.question_id + "," + Time.now().to_s 
+                                                  elsif question ==0
+                                                  notify_string = "#{push_contant_str}," +  user.full_name + "," + Time.now().to_s
+                                                  end  
+                                                   puts "notify_string123456==#{notify_string}"
+                                                device_details.each do |d|
+                                                 send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
+                                                end
+                          
+                                              end
+                                            end
+                                           if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
+                                             phone_number = filter_phone_number(user_details_for_email.phone_number)
+                                               begin
+                                               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
+                                                sms = client.account.sms.messages.create(
+                                                    from: TWILIO_CONFIG['from'],
+                                                    to: phone_number,
+                                                    body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                                                )
+                                                logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
+                                               rescue Exception => e
+                                               logger.error e.backtrace.join("\n")
+                                               end 
+                                           end   
+                                        make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                           
+                                    else
+                                     
+                                       begin
+                                          if question !=0
+                                             get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,linked_quest_type
+                                             UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id,linked_quest_type).deliver
+                                          elsif question == 0
+                                             get_referal_code_and_token = linked_question_with_type user.reecher_id , 0 , '' , email , linked_quest_type
+                                             UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],0,linked_quest_type).deliver
+                                              
+                                          end
+                                       rescue Exception => e
+                                         logger.error e.backtrace.join("\n")
+                                       end
+                                      
+                                    end 
+                              end 
+                          question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
+                        end 
+                   end
+         
+         end
+  end
+  
 
 end

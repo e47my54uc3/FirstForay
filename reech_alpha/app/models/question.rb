@@ -55,63 +55,26 @@ class Question < ActiveRecord::Base
 			end
 			@Questions = []
 			questions = Question.where(:posted_by_uid => friends_reecher_ids).order("created_at DESC")
-			questions.each do |q|
-			 # if question owner have add current login user for this question then his will show otherwise it will show Friend  
-			#	puts "current_user--object#{current_user.inspect}"
-				#puts "question--object#{q.inspect}"
-			#	puts "question--posted_by_uid#{q.posted_by_uid}"
-				#puts "question--question_id#{q.question_id}"
-			#	puts "current_user==#{current_user.inspect}"
-				#question_owner_name = Question::show_question_owner_name(current_user.reecher_id, q.question_id, q.posted_by_uid)
-				@question_owner_name = PostQuestionToFriend.where("user_id = ? AND friend_reecher_id= ? AND question_id = ?", q.posted_by_uid, current_user.reecher_id, q.question_id)
-				checked_is_question_linked = LinkedQuestion.where("question_id = ?",q.question_id)				
-				#puts "@question_owner_name#{@question_owner_name.inspect}"
-				#purchased_sl = PurchasedSolution.where(:user_id => current_user.id, :solution_id => sl.id)
-				
-				puts "@question_owner_name=#{@question_owner_name.inspect}"
-				puts "checked_is_question_linked=#{checked_is_question_linked.inspect}"
-				puts "@question_owner_name_size=#{@question_owner_name.size}"
-        puts "checked_is_question_linked_size=#{checked_is_question_linked.size}"
-         @all_sol= Solution.where(:question_id=>q.question_id) 
-			 #	reecher_associated_to_question=@question_owner_name.collect{|pq| pq.friend_reecher_id} 
-				if @question_owner_name.blank? 
-         q[:question_referee] = "Friend"   
-         q[:no_profile_pic] = true  
-				elsif @question_owner_name.size > 0
-				 q[:question_referee] = q.posted_by
-				 q[:no_profile_pic] = false 
-				elsif (checked_is_question_linked.size == 0 && @question_owner_name.size == 0)
-				 q[:question_referee] = q.posted_by
+			questions.each do |q|			
+      question_asker = q.posted_by_uid
+      question_asker_name = q.posted_by
+      question_is_public = q.is_public
+      @pqtfs = PostQuestionToFriend.where("question_id = ?", q.question_id)      
+      reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id} if !@pqtfs.blank?
+      if  (( current_user.reecher_id ==  question_asker) || question_is_public)
+         q[:question_referee] = q.posted_by   
          q[:no_profile_pic] = false 
-				elsif current_user.reecher_id.to_s == q.posted_by_uid.to_s
-				 q[:question_referee] = q.posted_by		
-				 q[:no_profile_pic] = false 
-				 
-				else
-			  
-				 unless @all_sol.blank?
-				 all_sol_id   = @all_sol.collect{|sol| sol.id}
-				 all_user = PurchasedSolution.where(:solution_id=>all_sol_id)
-				 get_all_user = all_user.collect{ |u| u.user_id} unless all_user.blank?
-				 all_reecher_id = User.where(:id=>get_all_user) unless all_user.blank?
-				 all_reecher = all_reecher_id.collect{|ur| ur.reecher_id} unless all_reecher_id.blank?
-							if (!all_reecher.blank?) && (all_reecher.include? q.posted_by_uid)
-            		   q[:question_referee] =  q.posted_by
-                   q[:no_profile_pic] = false 
-    				   else
-    				    q[:question_referee] = "Friend"  
-                q[:no_profile_pic] = true 
-    				   end
-				 else  
-				    q[:question_referee] = "Friend"  
-            q[:no_profile_pic] = true
-				 end
-				 			  			 
-				end
-				@Questions << q
-				
-				
-			end	
+      elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? current_user.reecher_id.to_s)) 
+         q[:question_referee] = q.posted_by   
+         q[:no_profile_pic] = false 
+      else          
+         q[:question_referee] = "Friend"  
+         q[:no_profile_pic] = true 
+      end    
+      @Questions << q
+      
+  end
+
 			@Questions
 	end
 

@@ -119,8 +119,11 @@ module Api
 			  user = User.find_by_reecher_id(params[:user_id])
 				solution = Solution.find(params[:solution_id])
 				question = Question.where(:question_id =>solution.question_id)
-				puts "question==#{question.inspect}"
 				#sfdsdfs
+				question_id = question[0][:question_id]
+				quest_asker = question[0][:posted_by_uid]
+        quest_is_public = question[0][:is_public]
+				
 				purchased_sl = PurchasedSolution.where(:user_id => user.id, :solution_id => solution.id)
 				if purchased_sl.present?
 					msg = {:status => 400, :message => "You have Already Purchased this Solution."}
@@ -130,6 +133,11 @@ module Api
 						purchased_solution.user_id = user.id
 						purchased_solution.solution_id = solution.id
 						purchased_solution.save
+					
+						if ((quest_asker.to_s == user.reecher_id.to_s) && !quest_is_public) 						  
+						 PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>solution.solver_id, :question_id=>question[0][:question_id])
+						end
+						
 						
 						#Make friend between login user and solution provider
 						check_friend = Friendship::are_friends(user.reecher_id,solution.solver_id)						
@@ -161,7 +169,7 @@ module Api
 						#Add points to solution provider
 						solution_provider = User.find_by_reecher_id(solution.solver_id)
 						#Revert back the points to user who post the question
-					   	
+						
 					   	if linked_by.blank?		
 						    quest_asker = question[0][:posted_by_uid]
 						    solution_provider.add_points(solution.ask_charisma)						   
@@ -360,51 +368,28 @@ module Api
         @solutions = []        
         @lk = LinkedQuestion.find_by_question_id(params[:question_id])    
         @pqtfs = PostQuestionToFriend.where(:question_id=>params[:question_id])  
-        reecher_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id} 
-        if @lk.blank?
-            if (reecher_associated_to_question.include? logined_user.reecher_id ) 
-             qust_details[:question_referee] = question_owner.full_name
-             qust_details[:no_profile_pic] = false  
-            elsif logined_user.reecher_id == question_owner.reecher_id
-             qust_details[:question_referee] = logined_user.full_name         
-             qust_details[:no_profile_pic] = false  
-            elsif (@pqtfs.blank?)
-            qust_details[:question_referee] = question_owner.full_name
-            qust_details[:no_profile_pic] = false   
-            else 
-             qust_details[:question_referee] = "Friend"
-             qust_details[:no_profile_pic] = true  
-            end
-          
-        else
-          linker_reecher_id = @lk.linked_by_uid
-          linked_by_reecher_id = @lk.user_id  
-          linker_user_details = User.find_by_reecher_id(linker_reecher_id)  
-          # @pqtfs = PostQuestionToFriend.where(:user_id=>logined_user.reecher_id,:question_id=>params[:question_id],:friend_reecher_id=>linked_by_reecher_id)
-          # reecher_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id}  
-          if logined_user.reecher_id == question_owner.reecher_id 
-           qust_details[:question_referee] = logined_user.full_name
-           qust_details[:no_profile_pic] = false
-           elsif reecher_associated_to_question.include? logined_user.reecher_id           
-           qust_details[:question_referee] = question_owner.full_name
-           qust_details[:no_profile_pic] = false
-           elsif logined_user.reecher_id == linked_by_reecher_id 
-           linker_user_details.user_profile.picture_file_name != nil ? qust_details[:owner_image] = linker_user_details.user_profile.thumb_picture_url : qust_details[:owner_image] = nil    
-           qust_details[:question_referee] =linker_user_details.full_name
-           qust_details[:no_profile_pic] = false
-           else
-           qust_details[:question_referee] = "Friend"
-           qust_details[:no_profile_pic] = true            
-          end
-          
-       end
+        reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id}  if !@pqtfs.blank?
+        
+        question_asker = qust_details.posted_by_uid
+        question_asker_name = qust_details.posted_by
+        question_is_public = qust_details.is_public
+        if (( logined_user.reecher_id ==  question_asker) || question_is_public)
+           qust_details[:question_referee] = qust_details.posted_by   
+           qust_details[:no_profile_pic] = false 
+        elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? logined_user.reecher_id.to_s)) 
+           qust_details[:question_referee] = qust_details.posted_by   
+           qust_details[:no_profile_pic] = false 
+        else          
+           qust_detailsq[:question_referee] = "Friend"  
+           qust_details[:no_profile_pic] = true 
+        end    
             
        # if @lk.blank?               
          #if @pqtfs.blank?
-           #reecher_associated_to_question=@pqtfs.collect{|pq| pq.reecher_id}                 
+           #reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.reecher_id}                 
          #end
        #end
-       puts "Solutions 1 === #{solutions.inspect}"
+     
         
         if solutions.size > 0
           puts "Solutions 2 === #{solutions.inspect}"
@@ -419,7 +404,7 @@ module Api
         
             puts "11zero   = check_friend == #{check_friend.inspect}"
             puts "11ONE   = logined_user == #{logined_user.full_name},   logined_user.reecher_id = #{logined_user.reecher_id}"
-            puts "11TWO   = reecher_associated_to_question == #{reecher_associated_to_question.inspect}"
+            puts "11TWO   = reecher_user_associated_to_question == #{reecher_user_associated_to_question.inspect}"
             puts "11THREE = question_owner.reecher_id      == #{question_owner.reecher_id}"
             puts "11FOUR  = user.reecher_id                == #{user.reecher_id}"
             puts "11FIVE  = sl.solver                      == #{sl.solver}"
@@ -437,11 +422,11 @@ module Api
                   if !@pqtfs.blank?
                    puts " I am on post question to friend block in without linked question "
                       
-                      #  reecher_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id} 
-                        if check_friend && ((reecher_associated_to_question.include? logined_user.reecher_id)||(reecher_associated_to_question.include? user.reecher_id))
+                      #  reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id} 
+                        if check_friend && ((reecher_user_associated_to_question.include? logined_user.reecher_id)||(reecher_user_associated_to_question.include? user.reecher_id))
                         solution_attrs[:solution_provider_name] = sl.solver
                         solution_attrs[:no_profile_pic] = false  
-                        elsif ((logined_user.reecher_id == question_owner.reecher_id) && (reecher_associated_to_question.include? user.reecher_id))
+                        elsif ((logined_user.reecher_id == question_owner.reecher_id) && (reecher_user_associated_to_question.include? user.reecher_id))
                         solution_attrs[:solution_provider_name] = sl.solver
                         solution_attrs[:no_profile_pic] = false 
                         elsif(user.reecher_id.to_s == logined_user.reecher_id.to_s) 
@@ -450,10 +435,10 @@ module Api
                         elsif (purchased_sl.present? && (purchased_sl[0]['user_id'].to_s == logined_user.id.to_s))
                         solution_attrs[:solution_provider_name] = sl.solver
                         solution_attrs[:no_profile_pic] = false     
-                        elsif !check_friend && ((reecher_associated_to_question.include? logined_user.reecher_id) && ((reecher_associated_to_question.include? user.reecher_id)))
+                        elsif !check_friend && ((reecher_user_associated_to_question.include? logined_user.reecher_id) && ((reecher_user_associated_to_question.include? user.reecher_id)))
                         solution_attrs[:solution_provider_name] =  "Friend of #{question_owner.first_name}"
                         solution_attrs[:no_profile_pic] = false   
-                        elsif !check_friend && (!(reecher_associated_to_question.include? logined_user.reecher_id) && (!(reecher_associated_to_question.include? user.reecher_id)))
+                        elsif !check_friend && (!(reecher_user_associated_to_question.include? logined_user.reecher_id) && (!(reecher_user_associated_to_question.include? user.reecher_id)))
                         solution_attrs[:solution_provider_name] =  "Friend of Friend"
                         solution_attrs[:no_profile_pic] = true               
                         else                        
@@ -467,13 +452,13 @@ module Api
                         if check_friend && purchased_sl.present?
                         solution_attrs[:solution_provider_name] = sl.solver
                         solution_attrs[:no_profile_pic] = false 
-                        elsif check_friend && (!(reecher_associated_to_question.include? logined_user.reecher_id)||(!reecher_associated_to_question.include? user.reecher_id))
+                        elsif check_friend && (!(reecher_user_associated_to_question.include? logined_user.reecher_id)||(!reecher_user_associated_to_question.include? user.reecher_id))
                         solution_attrs[:solution_provider_name] = sl.solver
                         solution_attrs[:no_profile_pic] = false  
                         elsif (check_friend && (!purchased_sl.present?))
                         solution_attrs[:solution_provider_name] = "Friend"
                         solution_attrs[:no_profile_pic] = truhece 
-                        elsif (check_friend && (!reecher_associated_to_question.include? logined_user.reecher_id))
+                        elsif (check_friend && (!reecher_user_associated_to_question.include? logined_user.reecher_id))
                          solution_attrs[:solution_provider_name] = sl.solver
                          solution_attrs[:no_profile_pic] = false 
                         elsif user.reecher_id == logined_user.reecher_id
@@ -511,23 +496,23 @@ module Api
                   elsif(purchased_sl.present?)
                     solution_attrs[:solution_provider_name] = sl.solver
                     solution_attrs[:no_profile_pic] = false 
-                  elsif(check_friend && (reecher_associated_to_question.include? logined_user.reecher_id)) 
+                  elsif(check_friend && (reecher_user_associated_to_question.include? logined_user.reecher_id)) 
                     solution_attrs[:solution_provider_name] = sl.solver
                     solution_attrs[:no_profile_pic] = false 
                   elsif((logined_user.reecher_id == linker_reecher_id)  && (user.reecher_id == linked_by_reecher_id ))
                     solution_attrs[:solution_provider_name] = sl.solver
                     solution_attrs[:no_profile_pic] = false 
-                  elsif (check_friend_with_linker_user &&  (!check_friend_with_linked_user) && (reecher_associated_to_question.include? logined_user.reecher_id || logined_user.reecher_id== question_owner.reecher_id))
+                  elsif (check_friend_with_linker_user &&  (!check_friend_with_linked_user) && (reecher_user_associated_to_question.include? logined_user.reecher_id || logined_user.reecher_id== question_owner.reecher_id))
                     solution_attrs[:solution_provider_name] = "Friend of #{linker_user_details.full_name}"
                     linker_user_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = linker_user_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                     solution_attrs[:no_profile_pic] = true
-                  elsif(!check_friend_with_linker_use && !check_friend_with_linked_user)   
+                  elsif(!check_friend_with_linker_user && !check_friend_with_linked_user)   
                     solution_attrs[:solution_provider_name] = "Friend of Friend"
                     solution_attrs[:no_profile_pic] = true 
                   elsif ((logined_user.reecher_id == question_owner.reecher_id ) && !check_friend_with_linker_user )   
                     solution_attrs[:solution_provider_name] = "Friend of Friend"
                     solution_attrs[:no_profile_pic] = true 
-                  elsif (check_friend_with_linker_user &&  (!check_friend_with_linked_user) && (!reecher_associated_to_question.include? logined_user.reecher_id || logined_user.reecher_id == question_owner.reecher_id)) 
+                  elsif (check_friend_with_linker_user &&  (!check_friend_with_linked_user) && (!reecher_user_associated_to_question.include? logined_user.reecher_id || logined_user.reecher_id == question_owner.reecher_id)) 
                     solution_attrs[:solution_provider_name] = "Friend of Friend"
                     solution_attrs[:no_profile_pic] = true
                   else

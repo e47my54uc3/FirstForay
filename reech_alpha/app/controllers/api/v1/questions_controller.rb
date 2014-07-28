@@ -2,6 +2,7 @@ module Api
   module V1
     class QuestionsController < ApiController
     #http_basic_authenticate_with name: "admin", password "secret"
+    require 'thread'
     before_filter :restrict_access , :except =>[:index,:send_apns_notification,:send_gcm_notification]
     #doorkeeper_for :all
     respond_to :json
@@ -16,7 +17,6 @@ module Api
         #@Questions = Question.includes(:votings).order("created_at DESC").get_stared_questions(params[:user_id])
         user = User.find_by_reecher_id(params[:user_id])
         question_ids = Voting.select("question_id").where("user_id = ?", user.id) unless user.blank?  
-        #puts "question_ids==#{question_ids.inspect}"
         question_ids = question_ids.map{|q| q.question_id}
         @Questions = Question.where("id in (?)", question_ids).order("created_at DESC")  unless user.blank?  
             
@@ -41,7 +41,7 @@ module Api
       
      
       #referred_friend_ids = PostQuestionToFriend::get_referred_friend_ids current_user.reecher_id
-      #puts "referred_friend_ids==#{referred_friend_ids}"
+      
       
       if @Questions.size > 0
         purchasedSolutionId =PurchasedSolution.pluck(:solution_id)        
@@ -132,9 +132,9 @@ module Api
              end
              
              if !params[:audien_details].nil?
-             send_posted_question_notification_to_reech_users params[:audien_details], @user, @question
-             send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question
-             send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question
+             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
              end
              @question[:category_name] = catgory.title
              msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
@@ -180,34 +180,22 @@ module Api
 
     def linked_questions
       user = User.find_by_reecher_id(params[:user_id])
-    
-      puts "ALL PARAMS=#{params.inspect}"
-    
       if user.blank?
         msg = { :status => 401, :message => "Failure!"}
         render :json => msg
       end
       linked_questions = LinkedQuestion.where("user_id = ? and linked_type =? ",user.reecher_id, "LINKED")
-     
-      puts "linked_questions====#{linked_questions.inspect}"
-      
       if !linked_questions.empty? &&  linked_questions.size >0
-        puts "I AM HERE"
           linked_questions_ary = []
            purchasedSolutionId =PurchasedSolution.pluck(:solution_id) # get all grab solution id
             linked_questions.each do |lq|
-              
-             puts "LINKED object =#{lq.inspect}"
              question = Question.find_by_question_id(lq[:question_id]) 
-             puts "LINKED asdasdsadsada =#{question.inspect}"
              solutions = Solution.find_all_by_question_id(lq[:question_id])
              solutions = solutions.collect!{|i| (i.id).to_s}   
              @get_linked_by = LinkedQuestion.where("user_id = ? and question_id = ? ", user.reecher_id , lq[:question_id])
-             puts "@get_linked_by==#{@get_linked_by.inspect}"
               #question_owner = User.find_by_reecher_id(question.posted_by_uid)
               if !@get_linked_by.blank?
                 question_owner = User.find_by_reecher_id(@get_linked_by[0]['linked_by_uid'])
-                puts "question_owner===#{question_owner}"
               else
                 msg = { :status => 401, :message => "Failure!"}
                 render :json => msg
@@ -233,8 +221,7 @@ module Api
             end
           
           msg = {:status => 200, :questions => linked_questions_ary}
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}" 
-          render :json => msg
+           render :json => msg
       else
      
       msg = { :status => 401, :message => "linked Question Not Available!"}
@@ -245,171 +232,17 @@ module Api
     end 
     
     def link_questions_to_expert
-      puts "STEP ONE"
-      user = User.find_by_reecher_id(params[:user_id])
-      
-      if !user.blank?
-        if !params[:referral_details][:email_ids].blank?
-           params[:referral_details][:email_ids].each do |email|
-        puts "STEP TWO"
-             #rescue Errono::ECONNRESET => e
-             user_details_for_email = User.find_by_email(email)
-                                # If audien is a reecher store his reedher_id in question record
-                                # Else send an Invitation mail to the audien
-                                    if user_details_for_email.present?                                        
-                                        logger.debug "This email #{email} is already present in DB for #{user_details_for_email.inspect}"
-                                         puts "STEP THREE"  
-                                         
-                                          #send notification to existing user
-                                            if !user_details_for_email.blank?
-                                              device_details = Device.where(:reecher_id=>user_details_for_email.reecher_id)
-                                               if !device_details.blank?
-                                                notify_string ="LINKED,"+user.full_name + ","+ params[:question_id].to_s + "," + Time.now().to_s
-                                                device_details.each do |d|
-                                                 send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
-                                                end
-                          
-                                              end
-                                            end
-                                           if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
-                                           
-                                             phone_number = filter_phone_number(user_details_for_email.phone_number)
-                                               begin
-                                               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
-                                                sms = client.account.sms.messages.create(
-                                                    from: TWILIO_CONFIG['from'],
-                                                    to: phone_number,
-                                                    body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
-                                                )
-                                                logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-                                               rescue Exception => e
-                                               logger.error e.backtrace.join("\n")
-                                               end 
-                                           end  
-                                           make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                         
-                                    else
-                                        puts "STEP FIVE"
-                                          
-                                         get_referal_code_and_token = linked_question_with_type user.reecher_id, params[:question_id] , '' , email , 'LINKED' 
-                                         puts "STEP SIX" 
-                                         
-                                       begin
-                                       
-                                        UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],params[:question_id]).deliver
-                                        
-                                        logger.debug "EMAIL ALREADY SENT to #{email}"
-                                          
-                                       rescue Exception => e
-                                         logger.error e.backtrace.join("\n")
-                                       end
-                                      
-                                    end 
-             
-           end
-        end
-        if !params[:referral_details][:phone_no].blank?          
-           params[:referral_details][:phone_no].each do |phone|             
-=begin             
-            phone_number = filter_phone_number phone 
-            puts "phone_number===#{phone_number}"
-            LinkedQuestion.create(:user_id =>'',:question_id=>params[:question_id],:linked_by_uid=>params[:user_id],:email_id=>'',:phone_no =>phone_number)
-            begin
-            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-            sms = client.account.sms.messages.create(
-                      from: TWILIO_CONFIG['from'],
-                      to: phone_number,
-                      body: "your friend #{user.first_name} #{user.last_name}  want to link this question i.e #{params[:question_id]} to you on Reech."
-                  )
-                  logger.debug ">>>>>>>>>Sending sms to #{phone} with text #{sms.body}"
-           rescue Exception => e
-               logger.error e.backtrace.join("\n")
-           end
-=end         
-                    number = filter_phone_number(phone)                    
-                    user_details_for_phone = User.find_by_phone_number(number) 
-                          if user_details_for_phone.present?                                          
-                                        #send notification to existing user
-                             
-                                if !user_details_for_phone.blank?
-                                  device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
-                                   if !device_details.blank?
-                                    notify_string ="LINKED,"+user.full_name + ","+ params[:question_id] + "," + Time.now().to_s
-                                    device_details.each do |d|
-                                     send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
-                                    end
-              
-                                  end
-                                end
-                               
-                               
-                                 if !user_details_for_phone.blank? && user_details_for_phone.email != nil
-                                   
-                                   phone_number = filter_phone_number(user_details_for_phone.phone_number)
-                                    begin 
-                                    client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-                                                     
-                                      sms = client.account.sms.messages.create(
-                                          from: TWILIO_CONFIG['from'],
-                                          to: phone_number,
-                                          body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
-                                      )
-                                      logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-                                      rescue Exception => e
-                                      logger.error e.backtrace.join("\n")
-                                      end
-                                 end                                          
-                               make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)          
-                                            
-                            else
-                                    get_referal_code_and_token = linked_question_with_type user.reecher_id,params[:question_id],'',number,'LINKED'  
-                                    refral_code = get_referal_code_and_token[0][:referral_code]
-                                    puts "PHONE--get_referal_code_and_token===#{get_referal_code_and_token.inspect}"
-                                   # UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code[:token],get_referal_code[:referral_code],question.question_id).deliver 
-                                       
-                               phone_number = filter_phone_number(number)
-                                begin                                           
-                                  client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
-                                                                                             
-                                    sms = client.account.sms.messages.create(
-                                        from: TWILIO_CONFIG['from'],
-                                        to: phone_number,
-                                        body: "Y
-                                        our friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
-                                    )
-                                    logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-                                rescue Exception => e
-                                  logger.error e.backtrace.join("\.n")
-                                end
-                                    
-                           end 
-                      
-                                       
-
-  
-          end
-        end
-        if !params[:referral_details][:reecher_ids].blank?
-          params[:referral_details][:reecher_ids].each do |reech_id|
-          LinkedQuestion.create(:user_id =>reech_id,:question_id=>params[:question_id],:linked_by_uid=>params[:user_id],:email_id=>'',:phone_no =>'',:linked_type=>'LINKED')
-          check_setting= notify_linked_to_question(reech_id)
-          if check_setting
-           user_details = User.where("users.reecher_id" =>reech_id) 
-             if !user_details.blank?
-               device_details = Device.where(:reecher_id=>user_details[0][:reecher_id])
-               puts "device_details==#{device_details.inspect}"
-                if !device_details.blank?
-                 notify_string ="LINKED,"+user.full_name + ","+ params[:question_id] +"," +Time.now().to_s
-                 device_details.each do |d|
-                      send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
-                 end
-                 # send_device_notification(device_details[:device_token], notify_string ,user_details[0][:platform])
-               end
-             end
-         end     
-          end
-        end
+      @user = User.find_by_reecher_id(params[:user_id])
+      @question = Question.find_by_question_id(params[:question_id]) 
+      if ((!user.blank?) && (!question.blank?))
+      # Outer if condition    
+          if !params[:audien_details].nil? 
+             Thread.new{link_questions_to_expert_for_users params[:audien_details] ,@user,@question.question_id}
+             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
+             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
+         end
       # end of outer  if loop
-     end
+      end
       msg = { :status => 200, :message => "success"}
       render :json =>msg 
     end
@@ -475,9 +308,10 @@ module Api
              params[:audien_details] = JSON.parse(params[:audien_details])            
             # Setting audiens for displaying posetd user details of a question
               if !params[:audien_details].nil?  
-              send_posted_question_notification_to_reech_users params[:audien_details], @user, @question
-              send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question
-              send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question
+             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+              
               end  # end of nil checking
 
             end # end of string class checking 
@@ -486,43 +320,35 @@ module Api
              else 
                msg = {:status => 401, :message => @question.errors}
              end
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
           render :json => msg
         else
           msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
           render :json => msg 
         end
 
     end
     
     
-  def send_posted_question_notification_to_reech_users audien_details ,user,question
+  def send_posted_question_notification_to_reech_users audien_details ,user,question,push_title_msg,push_contant_str,linked_quest_type
      
      if !audien_details.blank?
      if audien_details.has_key?("reecher_ids") 
-       puts "STEP1"
                  post_quest_to_frnd =[]
                     if !audien_details[:reecher_ids].empty? 
-                      puts "STEP2"
                       post_quest_to_frnd =[]
                        audien_details[:reecher_ids].each do |reech_id|
-                         puts "STEP3  REECHER ID=== #{reech_id} Question = #{question.question_id}"
                            user_details_with_reech_id = User.find_by_reecher_id(reech_id)   
-                           puts "STEP4  REECHER === #{user_details_with_reech_id.full_name} "
                            pqtf=PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_with_reech_id.reecher_id, :question_id=>question.question_id)
                            post_quest_to_frnd << pqtf.id
-                                              
                            check_setting= notify_audience_if_ask_for_help(user_details_with_reech_id.reecher_id) if !user_details_with_reech_id.blank?
-                           puts "reecher_id=#{user.reecher_id}"
                              if check_setting
                                  if !user.blank?
                                      device_details = Device.where(:reecher_id=>user_details_with_reech_id.reecher_id)
                                      if !device_details.blank?
-                                     notify_string = "ASKHELP," + user.full_name + "," + question.question_id.to_s + "," + Time.now().to_s
+                                     notify_string = push_contant_str + "," + user.full_name + "," + question.question_id.to_s + "," + Time.now().to_s
+                                     puts "send_posted_question_notification_to_reech_users notify_string = #{notify_string}"
                                        device_details.each do |d|
-                                         puts "VIJAY________________________"
-                                            send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_ASKHELP)
+                                            send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
                                        end
             
                                      end
@@ -544,144 +370,31 @@ module Api
      end
    end
   
-  
-  def send_posted_question_notification_to_chosen_emails audien_details ,user,question
-    if !audien_details.blank? 
-         if  audien_details.has_key?("emails")             
-                        if !audien_details["emails"].empty?
-                             audien_reecher_ids = []
-                               audien_details["emails"].each do |email|
-                                user_details_for_email = User.find_by_email(email)
-                                # If audien is a reecher store his reedher_id in question record
-                                # Else send an Invitation mail to the audien
-                                    if user_details_for_email.present?
-                                          audien_reecher_ids << user_details_for_email.reecher_id
-                                          #send notification to existing user
-                                            if !user_details_for_email.blank?
-                                              device_details = Device.where(:reecher_id=>user_details_for_email.reecher_id)
-                                               if !device_details.blank?
-                                                notify_string ="ASKHELP,"+user.full_name + ","+ question.question_id + "," + Time.now().to_s
-                                                device_details.each do |d|
-                                                 send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_ASKHELP)
-                                                end
-                          
-                                              end
-                                            end
-                                           if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
-                                             phone_number = filter_phone_number(user_details_for_email.phone_number)
-                                               begin
-                                               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
-                                                sms = client.account.sms.messages.create(
-                                                    from: TWILIO_CONFIG['from'],
-                                                    to: phone_number,
-                                                    body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
-                                                )
-                                                logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-                                               rescue Exception => e
-                                               logger.error e.backtrace.join("\n")
-                                               end 
-                                           end   
-                                        make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                           
-                                    else
-                                       begin
-                                        get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,'ASK'  
-                                        
-                                        UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id).deliver
-                                          
-                                       rescue Exception => e
-                                         logger.error e.backtrace.join("\n")
-                                       end
-                                      
-                                    end 
-                              end 
-                          question.audien_user_ids = audien_reecher_ids if audien_reecher_ids.size > 0
-                        end 
-                   end
-         
-         end
-  end
-  
-  # Method for sending sms, mail and push notification to the chosen audience for notifying about the posted question 
-  # Params
-  # audien_details - List of audience which has been selected for notifying
-  # user - User details of the reecher who has posted the question
-  # question - The posted question for which notification needs to be sent
-  def send_posted_question_notification_to_chosen_phones audien_details ,user,question
-    # Check whether the audience details contains the phone numbers list or not
-    if audien_details.has_key?("phone_numbers")  
-      # If the phone numbers list is present, check whether it is empty or not   
-      if !audien_details[:phone_numbers].empty? 
-        # If the list is not empty then we have to proceed and send sms to these numbers
-        # Create a twilio client in order to send sms
-        client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-        # Loop over all the phone numbers in the list
-        audien_details[:phone_numbers].each do |number|
-          # Extract the phone number and apply the filtering on it so that special characters can b removed   
-          number = filter_phone_number(number)
-          # Try to find the whether this phone no. is associated with an existing user
-          user_details_for_phone = User.find_by_phone_number(number) 
-          # If the phone belongs to a registered user then we have to send notification to his/her logged in device
-          # Check whether the phone number belongs to a registered user or not
-          if user_details_for_phone.present?                                          
-            # Double check that the registered user's phone number is present
-            if !user_details_for_phone.blank?
-              # Find out the registered users device ID
-              device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
-              # If a valid device ID is present then we will send notification to the associated device
-              if !device_details.blank?
-                # Send notifcation fo ASKHELP type
-                notify_string ="ASKHELP,"+user.full_name + ","+ question.question_id.to_s + "," + Time.now().to_s
-                device_details.each do |d|
-                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_ASKHELP)
-                end
-              end
-            end
-            
-            # Now check whether the email ID of the registered user is present or not
-            if !user_details_for_phone.blank? && user_details_for_phone.email != nil
-              # Chandan commented the line below as it is no required
-              # phone_number = filter_phone_number(user_details_for_phone.phone_number)
-            begin 
-              client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
-                        sms = client.account.sms.messages.create(
-                        from: TWILIO_CONFIG['from'],
-                        #to: phone_number,
-                        to: number,
-                        body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in in Reech to give help."
-                      )
-              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-              rescue Exception => e
-                logger.error e.backtrace.join("\n")
-              end
-            end                                          
-            make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
-        else
-          # This case is for non-registered users
-          # Find out the referral code which has been generated for this question by the reecher who asked this question
-          get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,'ASK'  
-          refral_code = get_referal_code_and_token[0][:referral_code]
-          puts "PHONE--get_referal_code_and_token===#{get_referal_code_and_token.inspect}"
-          # UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code[:token],get_referal_code[:referral_code],question.question_id).deliver 
-          # phone_number = filter_phone_number(user_details_for_phone.phone_number) 
-          # phone_number = "+919873992110"
-          begin                                           
-            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
-                      sms = client.account.sms.messages.create(
-                      from: TWILIO_CONFIG['from'],
-                      #to: phone_number,
-                      to: number,
-                      body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
-                     )
-            logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
-            rescue Exception => e
-              logger.error e.backtrace.join("\.n")
-            end
-          end 
-        end 
-      end 
-    end 
-  end
  
+  def link_questions_to_expert_for_users audien_details ,user,question_id
+    
+    if !params[:audien_details][:reecher_ids].blank?
+              params[:audien_details][:reecher_ids].each do |reech_id|
+              LinkedQuestion.create(:user_id =>reech_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>'',:phone_no =>'',:linked_type=>'LINKED')
+              check_setting= notify_linked_to_question(reech_id)
+              if check_setting
+               user_details = User.where("users.reecher_id" =>reech_id) 
+                 if !user_details.blank?
+                   device_details = Device.where(:reecher_id=>user_details[0][:reecher_id])
+                    if !device_details.blank?
+                     notify_string ="LINKED,"+user.full_name + ","+ question_id.to_s + "," +Time.now().to_s
+                     device_details.each do |d|
+                          send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
+                     end
+                     
+                   end
+                 end
+               end     
+              end
+            end
+  end
+  
+     
      
   #  End for class, modules
     end

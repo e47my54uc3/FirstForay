@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140620072945) do
+ActiveRecord::Schema.define(:version => 20140718121852) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -119,8 +119,10 @@ ActiveRecord::Schema.define(:version => 20140620072945) do
     t.string   "user_id"
     t.string   "question_id"
     t.string   "linked_by_uid"
-    t.datetime "created_at",    :null => false
-    t.datetime "updated_at",    :null => false
+    t.string   "linked_type",   :limit => 7
+    t.boolean  "status",                     :default => true
+    t.datetime "created_at",                                   :null => false
+    t.datetime "updated_at",                                   :null => false
     t.string   "email_id"
     t.string   "phone_no"
   end
@@ -233,6 +235,14 @@ ActiveRecord::Schema.define(:version => 20140620072945) do
 
   add_index "oauth_applications", ["uid"], :name => "index_oauth_applications_on_uid", :unique => true
 
+  create_table "post_question_to_friends", :force => true do |t|
+    t.string   "user_id"
+    t.text     "friend_reecher_id"
+    t.datetime "created_at",        :null => false
+    t.datetime "updated_at",        :null => false
+    t.string   "question_id"
+  end
+
   create_table "preview_solutions", :force => true do |t|
     t.integer  "user_id"
     t.integer  "solution_id"
@@ -264,6 +274,7 @@ ActiveRecord::Schema.define(:version => 20140620072945) do
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
     t.text     "audien_user_ids"
+    t.integer  "catgory_id"
     t.integer  "category_id"
   end
 
@@ -330,23 +341,26 @@ ActiveRecord::Schema.define(:version => 20140620072945) do
     t.datetime "updated_at",                                :null => false
     t.string   "reecher_id"
     t.boolean  "notify_when_my_stared_question_get_answer"
+    t.boolean  "notify_audience_if_ask_for_help"
+    t.boolean  "notify_when_someone_grab_my_answer"
   end
 
   create_table "users", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
-    t.string   "email",               :default => ""
-    t.datetime "created_at",                                 :null => false
-    t.datetime "updated_at",                                 :null => false
-    t.string   "profile_name",        :default => "reecher"
-    t.string   "profile_id",                                 :null => false
-    t.string   "reecher_id",                                 :null => false
+    t.string   "email",                             :default => ""
+    t.string   "phone_number",        :limit => 11
+    t.datetime "created_at",                                               :null => false
+    t.datetime "updated_at",                                               :null => false
+    t.string   "profile_name",                      :default => "reecher"
+    t.string   "profile_id",                                               :null => false
+    t.string   "reecher_id",                                               :null => false
     t.string   "crypted_password"
     t.string   "password_salt"
     t.string   "persistence_token"
     t.string   "single_access_token"
-    t.integer  "login_count",         :default => 0
-    t.integer  "failed_login_count",  :default => 0
+    t.integer  "login_count",                       :default => 0
+    t.integer  "failed_login_count",                :default => 0
     t.datetime "last_request_at"
     t.datetime "current_login_at"
     t.datetime "last_login_at"
@@ -354,7 +368,7 @@ ActiveRecord::Schema.define(:version => 20140620072945) do
     t.string   "last_login_ip"
     t.text     "omniauth_data"
     t.integer  "sash_id"
-    t.integer  "level",               :default => 0
+    t.integer  "level",                             :default => 0
     t.string   "fb_token"
     t.string   "fb_uid"
   end

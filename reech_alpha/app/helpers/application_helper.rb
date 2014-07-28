@@ -168,8 +168,6 @@ module ApplicationHelper
 
   
   def linked_question_with_type linker_id,question_id, email,phone,linked_type_str
-          puts " I am in lnked question with type block"
-          puts "linked_type_str==#{linked_type_str}"   
              @linkquest = LinkedQuestion.new()
              @linkquest.user_id =''
              @linkquest.question_id = question_id

@@ -137,7 +137,7 @@ module Api
 					
 						if ((quest_asker.to_s == user.reecher_id.to_s) && !quest_is_public) 						  
 						 PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>solution.solver_id, :question_id=>question[0][:question_id])
-						#end
+						end
 						
 						#Make friend between login user and solution provider
 						check_friend = Friendship::are_friends(user.reecher_id,solution.solver_id)						

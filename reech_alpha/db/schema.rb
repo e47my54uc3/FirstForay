@@ -11,7 +11,9 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140718121852) do
+
+ActiveRecord::Schema.define(:version => 20140728130848) do
+
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -261,14 +263,15 @@ ActiveRecord::Schema.define(:version => 20140718121852) do
     t.string   "post"
     t.string   "posted_by"
     t.string   "posted_by_uid"
-    t.datetime "created_at",                         :null => false
-    t.datetime "updated_at",                         :null => false
+    t.datetime "created_at",                             :null => false
+    t.datetime "updated_at",                             :null => false
     t.integer  "ups"
     t.integer  "downs"
-    t.string   "question_id",                        :null => false
+    t.string   "question_id",                            :null => false
     t.integer  "sash_id"
     t.integer  "level",               :default => 0
     t.integer  "Charisma"
+    t.boolean  "is_public",           :default => false
     t.string   "avatar_file_name"
     t.string   "avatar_content_type"
     t.integer  "avatar_file_size"

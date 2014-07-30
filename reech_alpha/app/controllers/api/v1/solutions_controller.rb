@@ -465,7 +465,7 @@ module Api
                  
             # When logged in person is in choosen audience and solution provider is NOT a linked user   
             elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && @lk.blank? )
-            puts "When logged in person is in choosen audience and solution provider is NOT a linked user"   
+             puts "When logged in person is in choosen audience and solution provider is NOT a linked user"   
                if ((reecher_user_associated_to_question.include? sl.solver_id || question_is_public == true ) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = sl.solver
                  solution_attrs[:no_profile_pic] = false

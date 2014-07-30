@@ -242,6 +242,9 @@ module Api
       @user = User.joins(:user_profile)
                    .select("users.*,user_profiles.location,user_profiles.bio,user_profiles.picture_file_name,user_profiles.profile_pic_path,user_profiles.reecher_interests,user_profiles.reecher_fav_music,user_profiles.reecher_fav_movies,user_profiles.reecher_fav_books,user_profiles.reecher_fav_sports,user_profiles.reecher_fav_destinations,user_profiles.snippet")
                    .where("users.reecher_id =?" ,params[:user_id])
+      
+      
+                   
       profile_obj = UserProfile.find_by_reecher_id(@user[0][:reecher_id].to_s)
       picture_file =  @user[0][:picture_file_name].to_s
       profile_pic  =  @user[0][:profile_pic_path].to_s
@@ -264,6 +267,7 @@ module Api
       tot_quest = get_user_total_question(params[:user_id])
       tot_sol = get_user_total_solution(params[:user_id])
       tot_conn = get_user_total_connection(params[:user_id])
+      
       user_hash[:image_url] = image_url
       user_hash[:curio_points] = tot_curio
       user_hash[:total_questions_asked] = tot_quest

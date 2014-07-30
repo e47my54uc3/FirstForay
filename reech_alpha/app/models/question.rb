@@ -58,7 +58,7 @@ class Question < ActiveRecord::Base
 			questions = Question.where(:posted_by_uid => friends_reecher_ids).order("created_at DESC")
 			questions.each do |q|			
       question_asker = q.posted_by_uid
-      puts "question_askerquestion_asker=#{question_asker}"
+      #puts "question_askerquestion_asker=#{question_asker}"
       question_asker_name = q.posted_by
       question_is_public = q.is_public
       @pqtfs = PostQuestionToFriend.where("question_id = ?", q.question_id)   

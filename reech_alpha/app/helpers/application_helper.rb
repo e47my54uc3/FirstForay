@@ -160,7 +160,6 @@ module ApplicationHelper
     else
       phone_num =  phone_number.gsub(/[^0-9]/, '')      
     end
-    
    phone_num
     
   end  

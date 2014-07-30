@@ -151,7 +151,6 @@ module ApplicationHelper
     end
   end  
   
-
   def filter_phone_number phone_number  
     puts "filter_phone_number has received phone_number===#{phone_number}" 
     phone_number.strip

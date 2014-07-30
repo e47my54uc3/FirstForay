@@ -74,7 +74,7 @@ module Api
              avatar_geo=((q.avatar_geometry).to_s).split('x') 	
 	           q_hash[:image_width]=avatar_geo[0]	
 	          q_hash[:image_height] = avatar_geo[1] 	
-	      end
+	       end
 
           q_hash[:owner_location] = question_owner_profile.location
           question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
@@ -123,23 +123,22 @@ module Api
               
             end
             
-           if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
+             if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
               @question.is_public = true
-           end 
+             end 
             
              if @question.save
              catgory = Category.find(@question.category_id)             
-             if !post_quest_to_frnd.blank? 
-               post_quest_to_frnd.each do|pqf|                 
-               @pqtf= PostQuestionToFriend.find(pqf)                 
-               @pqtf.update_attributes(:question_id=>@question.question_id) 
-               end
-             end
-             
              if !params[:audien_details].nil?
              Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
              Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
              Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             end
+             if !post_quest_to_frnd.blank? 
+             post_quest_to_frnd.each do|pqf|                 
+              @pqtf= PostQuestionToFriend.find(pqf)                 
+              @pqtf.update_attributes(:question_id=>@question.question_id) 
+              end
              end
              @question[:category_name] = catgory.title
              msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
@@ -300,28 +299,29 @@ module Api
            @question.avatar = params[:file]  
           end 
            post_quest_to_frnd=[]
+           params[:audien_details] = JSON.parse(params[:audien_details]) 
+           if (params[:audien_details].blank? || (!(params[:audien_details].blank?) && params[:audien_details][:reecher_ids].blank?)) 
+              @question.is_public = true
+            end 
              if @question.save
              catgory = Category.find(@question.category_id)
              @question[:category_name] = catgory.title
-             if !post_quest_to_frnd.blank?  
+             if params[:audien_details].class.to_s == 'String'            
+                        
+            # Setting audiens for displaying posetd user details of a question
+             if !params[:audien_details].blank?  
+             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             end  # end of nil checking
+             
+            if !post_quest_to_frnd.blank?  
                post_quest_to_frnd.each do|pqf|
                @pqtf= PostQuestionToFriend.find(pqf)                 
                @pqtf.update_attributes(:question_id=>@question.question_id) 
                end
-             end
-            if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
-              @question.is_public = true
              end 
-            if params[:audien_details].class.to_s == 'String'            
-             params[:audien_details] = JSON.parse(params[:audien_details])            
-            # Setting audiens for displaying posetd user details of a question
-              if !params[:audien_details].nil?  
-             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
               
-              end  # end of nil checking
-
             end # end of string class checking 
                            
                msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 

@@ -74,10 +74,11 @@ module Api
                 #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                 puts "device_details==#{device_details.inspect}"
+                # Start
+                # End logic for string
                 response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
-                      
                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s, @solution.solver+PUSH_TITLE_PRSLN)
                     end  
                 end 
@@ -90,8 +91,6 @@ module Api
            if !@voting.blank?
             @voting.each do |v|
              check_setting= notify_when_my_stared_question_get_answer(v.user_id)
-             puts "check_setting====#{check_setting}"
-             puts "check_setting---user====#{v.user_id}"
                if check_setting
                 starred_user = User.find_by_id(v.user_id)
                 puts "starred_user===#{starred_user.inspect}"
@@ -376,9 +375,18 @@ module Api
         question_asker_name = qust_details.posted_by
         question_is_public = qust_details.is_public
         
+        question_linker_reecher_id = @lk.linked_by_uid  unless @lk.blank? 
+        linked_user_to_question = @lk.user_id  unless @lk.blank? 
+        question_linker_details= User.find_by_reecher_id(question_linker_reecher_id)
+        
         if ((logined_user.reecher_id ==  question_asker) || question_is_public)
            qust_details[:question_referee] = qust_details.posted_by   
            qust_details[:no_profile_pic] = false 
+        elsif (!@lk.blank? && (logined_user.reecher_id == linked_user_to_question))
+           qust_details[:question_referee] = question_linker_details.first_name   
+           qust_details[:no_profile_pic] = false 
+           question_linker_details_profile = question_linker_details.user_profile
+           question_linker_details_profile.picture_file_name != nil ? qust_details[:owner_image] = question_linker_details_profile.thumb_picture_url : qust_details[:owner_image] = nil
         elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? logined_user.reecher_id.to_s)) 
            qust_details[:question_referee] = qust_details.posted_by   
            qust_details[:no_profile_pic] = false 
@@ -392,12 +400,10 @@ module Api
             solution_attrs = sl.attributes
             user = User.find_by_reecher_id(sl.solver_id)
              user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
-            sl.picture_file_name != nil ? solution_attrs[:image_url] = sl.picture_url : solution_attrs[:image_url] = nil
+             sl.picture_file_name != nil ? solution_attrs[:image_url] = sl.picture_url : solution_attrs[:image_url] = nil
             ############
             check_friend_with_login_and_solver = Friendship::are_friends(logined_user.reecher_id,sl.solver_id)
-            question_linker_reecher_id = @lk.linked_by_uid  unless @lk.blank? 
-            linked_user_to_question = @lk.user_id  unless @lk.blank? 
-            question_linker_details= User.find_by_reecher_id(question_linker_reecher_id)
+            
             purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
             
             if purchased_sl.present?
@@ -421,7 +427,7 @@ module Api
             puts "reecher_user_associated_to_question ==#{reecher_user_associated_to_question.inspect}" if !reecher_user_associated_to_question.blank?
             
             
-                # When logged in person is question asker and solution provide is Not linked user               
+                              
              if purchased_sl.present?
                     solution_attrs[:solution_provider_name] = sl.solver
                     solution_attrs[:no_profile_pic] = false
@@ -431,8 +437,9 @@ module Api
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = true
              elsif(question_asker.to_s == (logined_user.reecher_id).to_s && @lk.blank?)
-               puts "When logged in person is question asker and solution provide is Not linked user"
-                 if ((!reecher_user_associated_to_question.blank?) && (reecher_user_associated_to_question.include? sl.solver_id) )
+                # When logged in person is question asker and solution provide is Not linked user
+                 if ((question_is_public == true) || (reecher_user_associated_to_question.include? sl.solver_id) )
+                   puts "When logged in person is question asker and solution provide is Not linked user"
                    solution_attrs[:solution_provider_name] = sl.solver
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = true
@@ -443,54 +450,57 @@ module Api
                  end
                
                # When logged in person is question asker and solution provide is linked user
-            elsif (question_asker==logined_user.reecher_id && !@lk.blank? )
+             elsif (question_asker==logined_user.reecher_id && !@lk.blank? )
               puts "When logged in person is question asker and solution provide is linked user"
-                 if (reecher_user_associated_to_question.include? question_linker_reecher_id) 
+                 if (reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) 
                    solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
-                 else  
+                   question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+                 else
                    solution_attrs[:solution_provider_name] = "Friend of Friend"
                    solution_attrs[:no_profile_pic] = true
                    solution_attrs[:profile_pic_clickable] = false
                  end
+                 
             # When logged in person is in choosen audience and solution provider is NOT a linked user   
-            elsif (((!reecher_user_associated_to_question.blank?) && (reecher_user_associated_to_question.include? logined_user.reecher_id)) && @lk.blank? )
+            elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && @lk.blank? )
             puts "When logged in person is in choosen audience and solution provider is NOT a linked user"   
-               if ((reecher_user_associated_to_question.include? sl.solver_id) && check_friend_with_login_and_solver )
+               if ((reecher_user_associated_to_question.include? sl.solver_id || question_is_public == true ) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = sl.solver
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
-               elsif ((reecher_user_associated_to_question.include? sl.solver_id) && !check_friend_with_login_and_solver )
+               elsif ((reecher_user_associated_to_question.include? sl.solver_id || question_is_public == true ) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of #{question_owner.first_name}"
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = false
-               elsif (!(reecher_user_associated_to_question.include? sl.solver_id) && check_friend_with_login_and_solver )
+               elsif ((!reecher_user_associated_to_question.include? sl.solver_id && question_is_public == false) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend"
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
-               elsif (!(reecher_user_associated_to_question.include? sl.solver_id) && !check_friend_with_login_and_solver )
+               elsif ((!reecher_user_associated_to_question.include? sl.solver_id && question_is_public == false) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of Friend"
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
                end
 
            # When logged in person is in choosen audience and solution provider is a linked user    
-           elsif (((!reecher_user_associated_to_question.blank?) && (reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
+           elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
             puts "When logged in person is in choosen audience and solution provider is a linked user"   
-              if ((reecher_user_associated_to_question.include? question_linker_reecher_id) && check_friend_with_login_and_solver )
+              if ((reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = sl.solver
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
-               elsif ((reecher_user_associated_to_question.include? question_linker_reecher_id) && !check_friend_with_login_and_solver )
+               elsif ((reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = false
-               elsif (!(reecher_user_associated_to_question.include? question_linker_reecher_id) && check_friend_with_login_and_solver )
+                  question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+               elsif ((!reecher_user_associated_to_question.include? question_linker_reecher_id && question_is_public == false) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend"
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
-               elsif (!(reecher_user_associated_to_question.include? question_linker_reecher_id) && !check_friend_with_login_and_solver )
+               elsif ((!reecher_user_associated_to_question.include? question_linker_reecher_id && question_is_public == false) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of Friend"
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false

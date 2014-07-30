@@ -239,7 +239,7 @@ module ApplicationHelper
                       )
               logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
               rescue Exception => e
-                logger.error e.backtrace.join("\n")
+                logger.error e.to_s
               end
             end                                          
             make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
@@ -266,7 +266,7 @@ module ApplicationHelper
                      )
              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
              rescue Exception => e
-              logger.error e.backtrace.join("\.n")
+              logger.error e.to_s
             end
           end 
         end 
@@ -329,7 +329,7 @@ module ApplicationHelper
                                               
                                           end
                                        rescue Exception => e
-                                         logger.error e.backtrace.join("\n")
+                                         logger.error e.to_s
                                        end
                                       
                                     end 

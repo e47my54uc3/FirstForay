@@ -11,9 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-
 ActiveRecord::Schema.define(:version => 20140728130848) do
-
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"

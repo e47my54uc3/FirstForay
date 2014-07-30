@@ -240,10 +240,10 @@ module ApplicationHelper
               logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
               rescue Exception => e
                 logger.error e.to_s
-              end
+             end
             end                                          
             make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
-         else
+        else
           # This case is for non-registered users
           # Find out the referral code which has been generated for this question by the reecher who asked this question
             if question !=0
@@ -313,7 +313,7 @@ module ApplicationHelper
                                                 )
                                                 logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
                                                rescue Exception => e
-                                               logger.error e.backtrace.join("\n")
+                                               logger.error e.to_s
                                                end 
                                            end   
                                         make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                           

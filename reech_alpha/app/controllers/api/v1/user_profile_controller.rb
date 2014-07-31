@@ -108,7 +108,7 @@ module Api
               rescue Exception => e
               logger.error e.backtrace.join("\n")
               end
-                logger.debug ">>>>>>>>>Sending sms to #{@user.phone_number} with text #{sms.body}"
+                logger.debug ">>>>>>>>>Sending sms to #{@user.phone_number} with text "
                 msg = {:status => 200, :message => "Password sent to your phone number"}
                 logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
                 render :json => msg

@@ -178,11 +178,12 @@ module Api
       if !@user.blank?
        # Outer if condition
         if !params[:audien_details][:emails].blank?
+          puts "  I am in audeince Email block"
           Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, 0,PUSH_TITLE_INVITE,"INVITE","INVITE"}
              
         end
-        if !params[:audien_details][:phone_numbers].blank?
-          
+        if !params[:audien_details][:phone_numbers].blank?       
+          puts "  I am in audeince Phone block"   
           Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, 0,PUSH_TITLE_INVITE,"INVITE","INVITE"}
         end
       # End of outer condition  

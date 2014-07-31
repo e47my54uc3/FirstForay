@@ -353,7 +353,7 @@ module Api
                                  if !user.blank?
                                      device_details = Device.where(:reecher_id=>user_details_with_reech_id.reecher_id)
                                      if !device_details.blank?
-                                     notify_string = push_contant_str + "," + user.full_name + "," + question.question_id.to_s + "," + Time.now().to_s
+                                     notify_string = push_contant_str + "," + "<"+user.full_name + ">" + "," + question.question_id.to_s + "," + Time.now().to_s
                                      puts "send_posted_question_notification_to_reech_users notify_string = #{notify_string}"
                                        device_details.each do |d|
                                             send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)

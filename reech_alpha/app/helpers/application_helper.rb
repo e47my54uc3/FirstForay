@@ -15,6 +15,7 @@ module ApplicationHelper
       puts "I am in iOS mobile notification"
       n1= APNS::Notification.new(device_token, :alert => title, :badge => 1, :sound => 'default',:other=>{:message=>message,:title=>title,:badge => 1})
       APNS.send_notifications([n1])
+      puts "iOS response ==#{response.inspect}"
     elsif platform =='Android'
       puts "I am in Android mobile notification"
       require 'gcm'
@@ -165,9 +166,9 @@ module ApplicationHelper
   end  
 
   
-  def linked_question_with_type linker_id,question_id, email,phone,linked_type_str
+  def linked_question_with_type linker_id,user_id="",question_id, email,phone,linked_type_str
              @linkquest = LinkedQuestion.new()
-             @linkquest.user_id =''
+             @linkquest.user_id =user_id
              @linkquest.question_id = question_id
              @linkquest.linked_by_uid = linker_id
              @linkquest.email_id = email
@@ -214,11 +215,11 @@ module ApplicationHelper
               if !device_details.blank?
                 # Send notifcation fo ASKHELP type
                 if question !=0
-                notify_string = "#{push_contant_str},"  + user.full_name + ","+ question.question_id.to_s + "," + Time.now().to_s
+                notify_string = "#{push_contant_str},"  + "<"+ user.full_name + ">" + ","+ question.question_id.to_s + "," + Time.now().to_s
                 elsif question ==0
-                notify_string = "#{push_contant_str},"  + user.full_name + "," + Time.now().to_s  
+                notify_string = "#{push_contant_str},"  + "<"+ user.full_name + ">" + "," + Time.now().to_s  
                 end  
-                puts "notify_string123==#{notify_string}"
+                
                 device_details.each do |d|
                   send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
                 end
@@ -239,10 +240,12 @@ module ApplicationHelper
                       )
               logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
               rescue Exception => e
-                logger.error e.to_s
-             end
+	      logger.error e.to_s
+              end
             end                                          
-            make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
+
+            LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)                                        
+           make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
         else
           # This case is for non-registered users
           # Find out the referral code which has been generated for this question by the reecher who asked this question
@@ -291,18 +294,19 @@ module ApplicationHelper
                                                device_details = Device.where(:reecher_id=>user_details_for_email.reecher_id)
                                                if !device_details.blank?
                                                   if question !=0
-                                                  notify_string = "#{push_contant_str}," +  user.full_name + ","+ question.question_id + "," + Time.now().to_s 
+                                                  notify_string = "#{push_contant_str}," + "<" + user.full_name + ">" + ","+ question.question_id + "," + Time.now().to_s 
                                                   elsif question ==0
-                                                  notify_string = "#{push_contant_str}," +  user.full_name + "," + Time.now().to_s
+                                                  notify_string = "#{push_contant_str}," + "<"+  user.full_name + ">" + "," + Time.now().to_s
                                                   end  
-                                                   puts "notify_string123456==#{notify_string}"
-                                                device_details.each do |d|
-                                                 send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
+                                                  
+                                                  device_details.each do |d|
+                                                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
                                                 end
                           
                                               end
                                             end
-                                           if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
+                                            
+                                            if !user_details_for_email.blank? && user_details_for_email.phone_number != nil
                                              phone_number = filter_phone_number(user_details_for_email.phone_number)
                                                begin
                                                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
@@ -315,8 +319,12 @@ module ApplicationHelper
                                                rescue Exception => e
                                                logger.error e.to_s
                                                end 
-                                           end   
-                                        make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)                                           
+                                            end   
+                                         puts " Before linked question"       
+                                        LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)   
+                                        puts " after linked question"
+                                        make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)
+                                        puts " after friend linked question"                                           
                                     else
                                      
                                        begin

@@ -5,6 +5,8 @@ PUSH_TITLE_LNKSN    = " provided a solution to starred question."
 PUSH_TITLE_STARSOLS = " provided a solution to starred question."
 PUSH_TITLE_ASKHELP  = " has asked for your help."
 PUSH_TITLE_GRABSOLS = " grabbed your solution."
+PUSH_TITLE_GRABSOLS2 = " is now in your Reech."
 PUSH_TITLE_INVITE   = " is now a part of your REECH"
 PUSH_TITLE_GRABSOLSLINK = " grabbed your solution."
+FRIEND_OF_FRIEND= "Friend of Friend"
  

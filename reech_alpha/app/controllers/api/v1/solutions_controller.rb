@@ -58,28 +58,52 @@ module Api
 						end
 					end	
 			 end	
-       
-        
-      
         
 			if @solution.save
 				    # send push notification to user who posted this question
             qust_details = Question.find_by_question_id(params[:question_id])
+            @lk = LinkedQuestion.find_by_question_id(qust_details.question_id)
+            @pqtfs = PostQuestionToFriend.where(:question_id=>qust_details.question_id)  
+            reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id}  if !@pqtfs.blank?
+            logged_in_user = @solver.reecher_id 
+            question_asker = qust_details.posted_by_uid unless qust_details.blank? 
+            question_asker_name = qust_details.posted_by unless qust_details.blank? 
+            question_is_public = qust_details.is_public unless qust_details.blank? 
+            question_linker_reecher_id = @lk.linked_by_uid  unless @lk.blank? 
+            linked_user_to_question = @lk.user_id  unless @lk.blank? 
+            question_linker_details= User.find_by_reecher_id(question_linker_reecher_id) unless @lk.blank?
+            
+            
+            
             #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
              #delete_linked_question(@solver.reecher_id,qust_details.question_id)
+             
             if !qust_details.nil?
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
                puts "check_setting==#{check_setting}"
                if check_setting
                 #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
-                puts "device_details==#{device_details.inspect}"
                 # Start
+                if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
+                push_title = "#{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
+                response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
+                elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
+                push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
+                elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
+                push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
+                else  
+                response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
+                push_title = "Friend" + PUSH_TITLE_PRSLN 
+                end
+                
                 # End logic for string
-                response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
+                #response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s, @solution.solver+PUSH_TITLE_PRSLN)
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s, push_title)
                     end  
                 end 
                end
@@ -93,14 +117,18 @@ module Api
              check_setting= notify_when_my_stared_question_get_answer(v.user_id)
                if check_setting
                 starred_user = User.find_by_id(v.user_id)
-                puts "starred_user===#{starred_user.inspect}"
                 device_details = Device.select("device_token,platform").where("reecher_id=?",starred_user.reecher_id)
-                puts "device_details===#{device_details.inspect}"
-                response_string = "STARSOLS,"+ @solution.solver + ","+params[:question_id]+"," +Time.now().to_s
-                  if !device_details.blank?   
+                checkFiendWithStarredUser = Friendship::are_friends(starred_user.reecher_id,@solution.solver_id) 
+                if checkFiendWithStarredUser
+                  response_string = "STARSOLS,"+ "Your Friend <"+@solution.solver + ">,"+params[:question_id]+"," +Time.now().to_s
+                  push_title = @solution.solver+PUSH_TITLE_STARSOLS
+                else  
+                  response_string = "STARSOLS,"+ "Your Friend" + ","+params[:question_id]+"," +Time.now().to_s
+                  push_title = "Friend"+ PUSH_TITLE_STARSOLS
+                end
+                 if !device_details.blank?   
                      device_details.each do |d|
-                       puts "SEND NOTIFCAITION TO ===#{d[:device_token].to_s}"
-                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,@solution.solver+PUSH_TITLE_STARSOLS)
+                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,push_title)
                      end
                   end
                end
@@ -139,29 +167,55 @@ module Api
 						end
 						
 						#Make friend between login user and solution provider
-						check_friend = Friendship::are_friends(user.reecher_id,solution.solver_id)						
-						if !check_friend						  
-						  make_friendship_standard(user.reecher_id,solution.solver_id)						 
-						end
+						check_friend = Friendship::are_friends(user.reecher_id,solution.solver_id)		
 						
+				   # linked_by = LinkedQuestion.find_by_question_id(solution.question_id)
+  					linked_by = LinkedQuestion.where("question_id=? AND linked_type=?", solution.question_id,"LINKED") 
+            linked_by=linked_by[0]  
+            solver_details = User.find_by_reecher_id(solution.solver_id)
+				
+  							if (!linked_by.blank?) && ((solver_details.reecher_id).to_s == (linked_by.user_id).to_s) 
+                 linker_user = User.find_by_reecher_id(linked_by.linked_by_uid)  
+                 #msgText = user.full_name + " just grabbed an answer you gave to your friend " + linker_user.first_name + "'s question." + user.first_name + " is now a part of your REECH."
+                 msgText = "<"+user.full_name+">" + " grabbed your solution which you were linked. " +  "<"+ user.first_name + ">" + " is now in your REECH."
+                 notify_string ="GRABLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
+                else
+                 if check_friend      
+                 notify_string ="GRABSOLS," + "<" +user.full_name+">" + "," + (solution.id).to_s + "," + Time.now().to_s
+                 else
+                 msgText = "<"+user.full_name+">" + " grabbed your solution. " +  "<"+ user.first_name + ">" + " is now in your REECH."
+                 notify_string ="GRABLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
+                 end   
+                 
+                end 
+                
+         	 
+         	 
+         	  if !check_friend
+         	  make_friendship_standard(user.reecher_id,solution.solver_id)			  					 
+						end
+			
 						#End of friendship  code
 						
-            linked_by = LinkedQuestion.find_by_question_id(solution.question_id)
+           
 						
 						# Send notification to the solver
 						check_setting= notify_when_someone_grab_my_answer(solution.solver_id)
 						if check_setting
 						  solver_details = User.find_by_reecher_id(solution.solver_id)
-                     if !solver_details.blank? && linked_by.blank?  
-                         device_details = Device.where(:reecher_id=>solver_details.reecher_id)
-                         if !device_details.blank?
-                         notify_string ="GRABSOLS," + user.full_name + "," + (solution.id).to_s + "," + Time.now().to_s
-                           device_details.each do |d|
-                                send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_GRABSOLS)
-                           end
+						  if !solver_details.blank? 
+                 device_details = Device.where(:reecher_id=>solver_details.reecher_id)
+                 if !device_details.blank?
+                   #notify_string ="GRABSOLS," + user.full_name + "," + (solution.id).to_s + "," + Time.now().to_s
+                   device_details.each do |d|
+                    # puts "SEND NOTIFICATION TO SOLUTION PROVIDER ==#{notify_string}"
+                        send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_GRABSOLS)
+                   end
 
-                         end
-                     end  
+                 end
+              end  
+            
+                     
             end
 						preview_solution = PreviewSolution.find_by_user_id_and_solution_id(user.id, solution.id)
 						preview_solution.destroy
@@ -175,8 +229,7 @@ module Api
 						    if quest_asker == params[:user_id]
 							   user.subtract_points(solution.ask_charisma)
 							   all_solution_for_this_question = Solution.where(:question_id=>solution.question_id)
-							   all_solution_for_this_question = all_solution_for_this_question.collect{|s| s.id}
-							   
+							   all_solution_for_this_question = all_solution_for_this_question.collect{|s| s.id}							   
 							   ssss =check_one_time_bonus_distribution(solution.question_id ,all_solution_for_this_question,user.id)
 							   if ssss
 							     user.add_points(10)        
@@ -186,18 +239,9 @@ module Api
 						    end	
 						    
 					    else
-					    	linked_by_user = User.find_by_reecher_id(linked_by.linked_by_uid)		
-					    	device_details = Device.where(:reecher_id=>solver_details.reecher_id)
-                if !device_details.blank?
-                   msgText = user.full_name + " just grabbed an answer you gave to your friend " + linked_by_user.first_name + "'s question." + user.first_name + " is now a part of your REECH."
-                   notify_string ="GRABSOLSLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
-                   device_details.each do |d|
-                   send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_GRABSOLSLINK)
-                   end
-                end
 					    	one_by_five = (((solution.ask_charisma).to_i ) * 1/5).floor
 					    	fourth_by_five = (((solution.ask_charisma).to_i ) * 4/5).floor
-					    	linked_by_user.add_points(one_by_five)
+					    	linker_user.add_points(one_by_five)
 					    	solution_provider.add_points(fourth_by_five)					    	
                 all_solution_for_this_question = Solution.where(:question_id=>solution.question_id)
                 all_solution_for_this_question = all_solution_for_this_question.collect{|s| s.id}
@@ -323,7 +367,7 @@ module Api
 				check_setting= notify_solution_got_highfive(solution.solver_id)
                if check_setting
                 device_details=Device.select("device_token,platform").where("reecher_id=?",solution.solver_id.to_s)
-                response_string ="HGHFV,"+ user.full_name + "," + params[:solution_id] +","+Time.now().to_s
+                response_string ="HGHFV,"+ "<" +user.full_name + ">"+ "," + params[:solution_id] +","+Time.now().to_s
                 if !device_details.empty? 
                     device_details.each do |d|
                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_HGHFV)
@@ -367,7 +411,8 @@ module Api
           end
           
         @solutions = []        
-        @lk = LinkedQuestion.find_by_question_id(params[:question_id])    
+        @lk = LinkedQuestion.where("question_id=? AND linked_type=?", params[:question_id],"LINKED") 
+        @lk=@lk[0]  
         @pqtfs = PostQuestionToFriend.where(:question_id=>params[:question_id])  
         reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id}  if !@pqtfs.blank?
         
@@ -429,17 +474,21 @@ module Api
             
                               
              if purchased_sl.present?
+                puts "When logged in users is the purchaser of the solution"
+               
                     solution_attrs[:solution_provider_name] = sl.solver
                     solution_attrs[:no_profile_pic] = false
                     solution_attrs[:profile_pic_clickable] = true
              elsif(sl.solver_id == logined_user.reecher_id)
+                  puts "When logged in users is the solver of the solution"
+
                    solution_attrs[:solution_provider_name] = sl.solver
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = true
              elsif(question_asker.to_s == (logined_user.reecher_id).to_s && @lk.blank?)
                 # When logged in person is question asker and solution provide is Not linked user
                  if ((question_is_public == true) || (reecher_user_associated_to_question.include? sl.solver_id) )
-                   puts "When logged in person is question asker and solution provide is Not linked user"
+                   puts "When logged in person is question asker and solution provider is Not linked user"
                    solution_attrs[:solution_provider_name] = sl.solver
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = true
@@ -452,11 +501,11 @@ module Api
                # When logged in person is question asker and solution provide is linked user
              elsif (question_asker==logined_user.reecher_id && !@lk.blank? )
               puts "When logged in person is question asker and solution provide is linked user"
-                 if (reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) 
+                 if ( ((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) || (question_is_public == true)) 
                    solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
-                   question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+                   question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                  else
                    solution_attrs[:solution_provider_name] = "Friend of Friend"
                    solution_attrs[:no_profile_pic] = true
@@ -483,6 +532,10 @@ module Api
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
                end
+               
+               
+               
+               
 
            # When logged in person is in choosen audience and solution provider is a linked user    
            elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
@@ -495,7 +548,7 @@ module Api
                  solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = false
-                  question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = user.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+                  question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                elsif ((!reecher_user_associated_to_question.include? question_linker_reecher_id && question_is_public == false) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend"
                  solution_attrs[:no_profile_pic] = true

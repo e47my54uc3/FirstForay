@@ -2,3 +2,8 @@ development:
   from: '+19163786578'
   sid: 'AC07c21f51e35019a183a0243b52d369d2'
   token: '5bf3a87ac58e58748f23f44ffec4b7e8'
+
+production:
+  from: '+19163786578'
+  sid: 'AC07c21f51e35019a183a0243b52d369d2'
+  token: '5bf3a87ac58e58748f23f44ffec4b7e8'

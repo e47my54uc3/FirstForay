@@ -63,7 +63,7 @@ module Api
                     sms = client.account.sms.messages.create(
                         from: TWILIO_CONFIG['from'],
                         to: number,
-                        body: "your friend #{@user.first_name} #{@user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                        body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                     )
                     logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
           

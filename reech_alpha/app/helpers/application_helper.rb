@@ -235,7 +235,7 @@ module ApplicationHelper
                         from: TWILIO_CONFIG['from'],
                         #to: phone_number,
                         to: number,
-                        body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in in Reech to give help."
+                        body: "Your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in & help them out."
                       )
               logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
               rescue Exception => e
@@ -262,7 +262,7 @@ module ApplicationHelper
                       sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
-                      body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech with referal code=#{refral_code} to give help."
+                      body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                      )
              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
              rescue Exception => e
@@ -309,7 +309,7 @@ module ApplicationHelper
                                                 sms = client.account.sms.messages.create(
                                                     from: TWILIO_CONFIG['from'],
                                                     to: phone_number,
-                                                    body: "your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Signup Reech to give help."
+                                                    body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                                                 )
                                                 logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
                                                rescue Exception => e

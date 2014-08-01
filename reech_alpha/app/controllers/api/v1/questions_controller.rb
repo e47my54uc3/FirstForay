@@ -383,14 +383,14 @@ module Api
     
     if !params[:audien_details][:reecher_ids].blank?
               params[:audien_details][:reecher_ids].each do |reech_id|
-              LinkedQuestion.create(:user_id =>reech_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>'',:phone_no =>'',:linked_type=>'LINKED')
+              LinkedQuestion.create(:user_id =>reech_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>user.email,:phone_no =>user.phone_number,:linked_type=>'LINKED')
               check_setting= notify_linked_to_question(reech_id)
               if check_setting
                user_details = User.where("users.reecher_id" =>reech_id) 
                  if !user_details.blank?
                    device_details = Device.where(:reecher_id=>user_details[0][:reecher_id])
                     if !device_details.blank?
-                     notify_string ="LINKED,"+user.full_name + ","+ question_id.to_s + "," +Time.now().to_s
+                     notify_string ="LINKED,"+ "<" +user.full_name + ">" + ","+ question_id.to_s + "," +Time.now().to_s
                      device_details.each do |d|
                           send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
                      end

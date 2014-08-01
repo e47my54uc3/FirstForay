@@ -101,7 +101,7 @@ module Api
                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 sms = client.account.sms.messages.create(
                           from: TWILIO_CONFIG['from'],
-                          to: @user.phone_number,
+                          to: "+"+@user.phone_number,
                           body: "Username= #{@user.phone_number} and Temporay password=#{pass_token}"  
                           #body: "Dear #{@user.full_name},We are providing you a temporary password for login into application and later on you can reset it. Your Username= #{@user.phone_number} and Temporay password=#{pass_token}"
                       )
@@ -174,12 +174,19 @@ module Api
 							end	
 
 							if !params[:contact_details][:phone_number].nil?
+							  
+							  
 								client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+								begin
 								sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
-        							to: params[:contact_details][:phone_number],
+        							to: "+"+params[:contact_details][:phone_number],
         							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
+      				  rescue Exception => e
+                logger.error e.backtrace.join("\n")
+               end	
+      						
                 msg = {:status => 200, :message => "SMS sent to the contact."}
 							end	
 							

@@ -129,6 +129,9 @@ module ApplicationHelper
   
   def make_friendship_standard(friends, user)
     # Proceed only if both the IDs are not same 
+    
+    puts "friends====#{friends}"
+    puts "user-recher_id====#{user}"
     if friends != user
 	    are_friends1 = Friendship::are_friends(friends,user)
 	    are_friends2 = Friendship::are_friends(user,friends)
@@ -156,7 +159,7 @@ module ApplicationHelper
     puts "filter_phone_number has received phone_number===#{phone_number}" 
     phone_number.strip
     check_plus_sign = phone_number.chr
-    phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
+    phone_num =  phone_number.gsub(/[^0-9]/, '')
 =begin    
     if check_plus_sign == "+"      
       phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
@@ -206,15 +209,19 @@ module ApplicationHelper
         audien_details[:phone_numbers].each do |number|
           # Extract the phone number and apply the filtering on it so that special characters can b removed   
           number = filter_phone_number(number)
+          
           # Try to find the whether this phone no. is associated with an existing user
           user_details_for_phone = User.find_by_phone_number(number) 
+          puts "user_details_for_phone==#{user_details_for_phone.inspect}"
           # If the phone belongs to a registered user then we have to send notification to his/her logged in device
           # Check whether the phone number belongs to a registered user or not
-          if user_details_for_phone.present?                                          
+          if user_details_for_phone.present?  
+                                                    
             # Double check that the registered user's phone number is present
             if !user_details_for_phone.blank?
               # Find out the registered users device ID
               device_details = Device.where(:reecher_id=>user_details_for_phone.reecher_id)
+              puts "device_details==#{device_details.inspect}"
               # If a valid device ID is present then we will send notification to the associated device
               if !device_details.blank?
                 # Send notifcation fo ASKHELP type
@@ -235,22 +242,26 @@ module ApplicationHelper
               # Chandan commented the line below as it is no required
               # phone_number = filter_phone_number(user_details_for_phone.phone_number)
             begin 
-              puts ""
               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                         sms = client.account.sms.messages.create(
                         from: TWILIO_CONFIG['from'],
                         #to: phone_number,
-                        to: number,
+                        to: "+"+number,
                         body: "Your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in & help them out."
                       )
-              logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
+              logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"        
               rescue Exception => e
-	      logger.error e.to_s
+	              logger.error e.to_s
               end
-            end                                          
-
-            LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)                                        
-           make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)               
+            end   
+            make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id) 
+            
+            if question !=0
+              LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
+            elsif question == 0   
+              LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>0,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
+            end    
+                          
         else
           # This case is for non-registered users
           # Find out the referral code which has been generated for this question by the reecher who asked this question
@@ -271,7 +282,7 @@ module ApplicationHelper
             client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
                       sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
-                      to: number,
+                      to: "+"+number,
                       body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                      )
              logger.debug ">>>>>>>>>Sending sms to #{number} with text"      
@@ -320,7 +331,7 @@ module ApplicationHelper
                                                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])                                                               
                                                 sms = client.account.sms.messages.create(
                                                     from: TWILIO_CONFIG['from'],
-                                                    to: phone_number,
+                                                    to: "+"+phone_number,
                                                     body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                                                 )
                                                 logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"
@@ -328,7 +339,7 @@ module ApplicationHelper
                                                logger.error e.to_s
                                                end 
                                             end   
-                                         puts " Before linked question"       
+                                        puts " Before linked question"       
                                         LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)   
                                         puts " after linked question"
                                         make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id)

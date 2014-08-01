@@ -51,7 +51,7 @@ module Api
 						params[:expert_details][:phone_numbers].each do |number|
 							sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
-        							to: number,
+        							to: "+"+number,
         							body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
       						)
       						logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
@@ -515,11 +515,11 @@ module Api
             # When logged in person is in choosen audience and solution provider is NOT a linked user   
             elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && @lk.blank? )
              puts "When logged in person is in choosen audience and solution provider is NOT a linked user"   
-               if ((reecher_user_associated_to_question.include? sl.solver_id || question_is_public == true ) && check_friend_with_login_and_solver )
+               if ((((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? sl.solver_id)) || question_is_public == true ) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = sl.solver
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
-               elsif ((reecher_user_associated_to_question.include? sl.solver_id || question_is_public == true ) && !check_friend_with_login_and_solver )
+               elsif ((((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? sl.solver_id)) || question_is_public == true ) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of #{question_owner.first_name}"
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = false
@@ -540,11 +540,11 @@ module Api
            # When logged in person is in choosen audience and solution provider is a linked user    
            elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
             puts "When logged in person is in choosen audience and solution provider is a linked user"   
-              if ((reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) && check_friend_with_login_and_solver )
+              if ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = sl.solver
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
-               elsif ((reecher_user_associated_to_question.include? question_linker_reecher_id || question_is_public == true ) && !check_friend_with_login_and_solver )
+               elsif ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && !check_friend_with_login_and_solver )
                  solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = false
@@ -678,7 +678,7 @@ module Api
               begin
               sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
-                      to: number,
+                     to: "+"+number,
                       body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"

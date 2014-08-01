@@ -148,7 +148,7 @@ module ApplicationHelper
 		    friend2.save
 	    end
     else
-	puts "Error : Cant make friendship between same users." 
+	  puts "Error : Cant make friendship between same users." 
     end
   end  
   
@@ -156,12 +156,16 @@ module ApplicationHelper
     puts "filter_phone_number has received phone_number===#{phone_number}" 
     phone_number.strip
     check_plus_sign = phone_number.chr
+    phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
+=begin    
     if check_plus_sign == "+"      
       phone_num = "+" + phone_number.gsub(/[^0-9]/, '')
     else
-      phone_num =  phone_number.gsub(/[^0-9]/, '')      
+      phone_num =  "+"+ phone_number.gsub(/[^0-9]/, '')      
     end
-   phone_num
+    phone_num
+=end
+
     
   end  
 
@@ -231,6 +235,7 @@ module ApplicationHelper
               # Chandan commented the line below as it is no required
               # phone_number = filter_phone_number(user_details_for_phone.phone_number)
             begin 
+              puts ""
               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                         sms = client.account.sms.messages.create(
                         from: TWILIO_CONFIG['from'],
@@ -260,14 +265,17 @@ module ApplicationHelper
           
           # phone_number = filter_phone_number(user_details_for_phone.phone_number) 
           # phone_number = "+919873992110"
+          
            begin   
+           puts " Before sending sms MY NUMBER = #{number}"
             client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
                       sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
                       body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                      )
-             logger.debug ">>>>>>>>>Sending sms to #{phone_number} with text #{sms.body}"        
+             logger.debug ">>>>>>>>>Sending sms to #{number} with text"      
+             puts " After sending sms MY NUMBER = #{number}"  
              rescue Exception => e
               logger.error e.to_s
             end

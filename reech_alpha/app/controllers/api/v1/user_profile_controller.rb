@@ -159,7 +159,7 @@ module Api
 
 				def profile_dash_board
 					@user = User.find_by_reecher_id(params[:user_id])
-					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.size} : msg = {:status => 400, :message => "User doesn't exist"}
+					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.where('status = "accepted"').size} : msg = {:status => 400, :message => "User doesn't exist"}
 					render :json => msg
 				end	
 

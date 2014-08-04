@@ -188,7 +188,7 @@ module Api
         msg = { :status => 401, :message => "Failure!"}
         render :json => msg
       end
-      linked_questions = LinkedQuestion.where("user_id = ? and linked_type =? ",user.reecher_id, "LINKED")
+      linked_questions = LinkedQuestion.where("user_id = ? and linked_type =? ",user.reecher_id, "LINKED").order("id DESC")
       if !linked_questions.empty? &&  linked_questions.size >0
           linked_questions_ary = []
            purchasedSolutionId =PurchasedSolution.pluck(:solution_id) # get all grab solution id

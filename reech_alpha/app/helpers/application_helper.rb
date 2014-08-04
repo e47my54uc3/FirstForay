@@ -242,14 +242,16 @@ module ApplicationHelper
               # Chandan commented the line below as it is no required
               # phone_number = filter_phone_number(user_details_for_phone.phone_number)
             begin 
+              puts "  1233 Before sending sms MY NUMBER = #{number}"
               client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                         sms = client.account.sms.messages.create(
                         from: TWILIO_CONFIG['from'],
                         #to: phone_number,
-                        to: "+"+number,
+                        to: "+" +number,
                         body: "Your friend #{user.first_name} #{user.last_name} needs your help answering a question on Reech. Sign-in & help them out."
                       )
               logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"        
+              puts " 1233 After sending sms MY NUMBER = #{number}"  
               rescue Exception => e
 	              logger.error e.to_s
               end

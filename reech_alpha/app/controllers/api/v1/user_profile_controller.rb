@@ -73,7 +73,7 @@ module Api
 								@user.password_confirmation = @pass
 								@user.save(:validate => false)
 								api_key.destroy
-								current_user_session.destroy if !current_user_session.n:reecheridil?
+		#						current_user_session.destroy if !current_user_session.n:reecheridil?
 								msg = {:status => 200, :message => "Your password has been changed please login again"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 								render :json => msg

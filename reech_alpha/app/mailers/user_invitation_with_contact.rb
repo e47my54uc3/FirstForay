@@ -1,6 +1,6 @@
 class UserInvitationWithContact < ActionMailer::Base
   
-  default :from => "vijayprasad83@gmail.com", :mime_type =>"multipart/mixed"
+  default :from => "hello@reechout.co", :mime_type =>"multipart/mixed"
   #default from: "from@example.com"
   def invite_friend(email, user,token)
     @user  = user

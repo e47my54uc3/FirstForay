@@ -1,6 +1,6 @@
 class UserMailer < ActionMailer::Base
   include ApplicationHelper
-  default :from => "vijayprasad83@gmail.com", :mime_type =>"multipart/mixed"
+  default :from => "hello@reechout.co", :mime_type =>"multipart/mixed"
 =begin
   def password_reset_instructions(user)
   	@user = user

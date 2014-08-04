@@ -87,34 +87,41 @@ module Api
 				end
 
 				def forget_password
-					@user = User.find_by_phone_number(params[:phone_number])
+				  phone_number = filter_phone_number(params[:phone_number])
+				  
+					@user = User.find_by_phone_number(phone_number)
 					puts "@user ==#{@user.inspect}"
 					rand_str = (('A'..'Z').to_a + (0..9).to_a)
           pass_token = (0...8).map { |n| rand_str.sample }.join
           puts "pass_token== #{pass_token}"
           #@user.update_attributes(:password=> pass_token) unless @user.blank?
-          @user.password = 'test123' unless @user.blank?
+          @user.password = pass_token unless @user.blank?
           @user.save(:validate=> false)  unless @user.blank?
 
+            
+          
+            
 					if !@user.blank?           
+              
               begin
+              UserMailer.send_new_password_as_forgot_password(@user,pass_token).deliver    
                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 sms = client.account.sms.messages.create(
                           from: TWILIO_CONFIG['from'],
                           to: "+"+@user.phone_number,
-                          body: "Username= #{@user.phone_number} and Temporay password=#{pass_token}"  
+                          body: "Username= #{@user.phone_number} and Temporary password= #{pass_token}"  
                           #body: "Dear #{@user.full_name},We are providing you a temporary password for login into application and later on you can reset it. Your Username= #{@user.phone_number} and Temporay password=#{pass_token}"
                       )
+                   
               rescue Exception => e
               logger.error e.backtrace.join("\n")
               end
-                logger.debug ">>>>>>>>>Sending sms to #{@user.phone_number} with text "
-                msg = {:status => 200, :message => "Password sent to your phone number"}
-                logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-                render :json => msg
-         
-         else
-            msg = {:status => 400, :message => "Given phone number found"}
+              logger.debug ">>>>>>>>>Sending sms to #{@user.phone_number} with text "
+              msg = {:status => 200, :message => "Password sent to your phone number"}
+              logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+              render :json => msg
+        else
+            msg = {:status => 400, :message => "Given phone number not found"}
             logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
             render :json => msg
           end 

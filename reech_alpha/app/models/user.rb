@@ -20,7 +20,8 @@ class User < ActiveRecord::Base
 	#For Authlogic
 	acts_as_authentic do |c|
 		c.ignore_blank_passwords = true #ignoring passwords
-		 c.login_field = :phone_number
+		c.login_field = :phone_number
+		c.validate_login_field =false
 	end
 
 	attr_accessible :email, :first_name, :last_name, :password, :password_confirmation, :points
@@ -29,7 +30,7 @@ class User < ActiveRecord::Base
 	before_create :create_unique_profile_id
 	before_create :create_reecher_id
 	validates :email, uniqueness: true ,:allow_blank => true, :allow_nil => true
-	validates :phone_number, uniqueness: true ,:allow_blank => true, :allow_nil => true
+	validates :phone_number, uniqueness: true ,:allow_blank => true, :allow_nil => true 
 	#Authentications
 	validate do |user|
 		if user.new_record? #adds validation if it is a new record

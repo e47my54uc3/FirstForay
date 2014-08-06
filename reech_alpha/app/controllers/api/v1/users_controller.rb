@@ -11,14 +11,15 @@ module Api
 			def create
 				if !params.blank?
 					if params[:provider] == "standard"
-					  
-					  user = User.find_by_phone_number(params[:user_details][:phone_number])					  
+					  original_phone_number = params[:user_details][:phone_number]
+					  phone_number = filter_phone_number(params[:user_details][:phone_number])
+					  user = User.find_by_phone_number(phone_number)					  
 						if user.nil?
-								@user = User.new(params[:user_details])
+								@user = User.new(params[:user_details])								
+								@user.original_phone_number = original_phone_number
+								@user.phone_number = phone_number
 								@user.password_confirmation = params[:user_details][:password]
-							#	friend_con=JSON.parse(friend_con.join())     
-								    								
-      								if @user.save
+											if @user.save
       									if !params[:profile_image].blank? 
       										data = StringIO.new(Base64.decode64(params[:profile_image]))
       										@user.user_profile.picture = data
@@ -36,8 +37,6 @@ module Api
       									logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
       									render :json => msg  # note, no :location or :status option
       								end
-      							 	
-      								
 						else
 						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
 							 #msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
@@ -50,15 +49,15 @@ module Api
 						@graph = Koala::Facebook::API.new(params[:user_details][:access_token])
 						fb_user_profile_pic_path = @graph.get_picture(params[:user_details][:uid])
 						@profile = @graph.get_object("me")
+						puts "Facebook user profile=#{@profile.inspect}"
 						@fb_friends = @graph.get_connections("me", "friends")
             if fb_user.nil?  
-              
               #friend_con123=JSON.parse(friend_con.join())
-                   
-  							@user = User.new()
+        				@user = User.new()
   							@user.first_name = @profile["first_name"]
   							@user.last_name = @profile["last_name"]
   							@user.email = @profile["email"]
+  							@user.phone_number = @profile["phone"]  							
   							@user.fb_token = params[:user_details][:access_token]
   							@user.fb_uid = params[:user_details][:uid]
     							if @user.save(:validate => false)		
@@ -66,7 +65,7 @@ module Api
     							  @user.user_profile.save
     							  friend_con=make_auto_connection_with_referral_code @user.reecher_id, params[:referral_code] 
     							  #@user.user_profile.build
-    							 #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
+    							  #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
     								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
     								create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
                   	make_friendship(@fb_friends,@user,params[:device_token]) if @fb_friends.size > 0

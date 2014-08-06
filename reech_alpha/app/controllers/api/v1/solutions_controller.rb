@@ -51,7 +51,7 @@ module Api
 						params[:expert_details][:phone_numbers].each do |number|
 							sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
-        							to: "+"+number,
+        							to: number,
         							body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
       						)
       						logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
@@ -86,7 +86,7 @@ module Api
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                 # Start
                 if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
-                push_title = "#{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
+                push_title = "Your Friend #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                 response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
                 elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
                 response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
@@ -160,12 +160,10 @@ module Api
 						purchased_solution = PurchasedSolution.new
 						purchased_solution.user_id = user.id
 						purchased_solution.solution_id = solution.id
-						purchased_solution.save
-					
+						purchased_solution.save				
 						if ((quest_asker.to_s == user.reecher_id.to_s) && !quest_is_public) 						  
 						 PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>solution.solver_id, :question_id=>question[0][:question_id])
 						end
-						
 						#Make friend between login user and solution provider
 						check_friend = Friendship::are_friends(user.reecher_id,solution.solver_id)		
 						
@@ -183,7 +181,8 @@ module Api
                  if check_friend      
                  notify_string ="GRABSOLS," + "<" +user.full_name+">" + "," + (solution.id).to_s + "," + Time.now().to_s
                  else
-                 msgText = "<"+user.full_name+">" + " grabbed your solution. " +  "<"+ user.first_name + ">" + " is now in your REECH."
+                 #msgText = "<"+user.full_name+">" + " grabbed your solution. " +  "<"+ user.first_name + ">" + " is now in your REECH."
+                 msgText = "<"+user.full_name+">" + " grabbed your solution. " #+  "<"+ user.first_name + ">" + " is now in your REECH."
                  notify_string ="GRABLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
                  end   
                  
@@ -209,7 +208,7 @@ module Api
                    #notify_string ="GRABSOLS," + user.full_name + "," + (solution.id).to_s + "," + Time.now().to_s
                    device_details.each do |d|
                     # puts "SEND NOTIFICATION TO SOLUTION PROVIDER ==#{notify_string}"
-                        send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_GRABSOLS)
+                        send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.first_name+PUSH_TITLE_GRABSOLS)
                    end
 
                  end
@@ -284,48 +283,10 @@ module Api
 			     else
 			     hi5 =false	
 			    end	
-			    
-			    msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
+		    msg = {:status => 201, :message => "Success", :user_id=>solution_owner_profile.reecher_id}
 				msg = {:status => 200, :solution => @solution ,:has_hi5=>hi5} 
 				render :json => msg
 			end	
-			
-=begin
-			def view_all_solutions
-				solutions = Solution.find_all_by_question_id(params[:question_id])
-				#qust_details =Question.find_by_question_id(params[:question_id])
-				logined_user = User.find_by_reecher_id(params[:user_id])
-				@solutions = []
-				if solutions.size > 0
-					solutions.logger.error e.backtrace.join("\n")each do |sl|
-					  
-						solution_attrs = sl.attributes
-						
-						user = User.find_by_reecher_id(sl.solver_id)
-						
-						user.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] =  "http://#{request.host_with_port}" + user.user_profile.picture_url : solution_attrs[:solver_image] = nil
-						
-						sl.picture_file_name != nil ? solution_attrs[:image_url] =  "http://#{request.host_with_port}" + sl.picture_url : solution_attrs[:image_url] = "http://#{request.host_with_port}/"+"no-image.png"
-						
-						purchased_sl = PurchasedSolution.where(:user_id => logined_user.id, :solution_id => sl.id)
-					 
-						if purchased_sl.present?  
-							solution_attrs[:purchased] = true
-						else
-							solution_attrs[:purchased] = false	
-						end	
-						
-						@solutions << solution_attrs
-					
-					end	
-				end
-				msg = {:status => 200, :solutions => @solutions} 
-				logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@solutions}"
-
-				render :json => msg
-			end	
-
-=end
 			def preview_solution
 				@user = User.find_by_reecher_id(params[:user_id])
 				@solution = Solution.find(params[:solution_id])
@@ -532,12 +493,7 @@ module Api
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
                end
-               
-               
-               
-               
-
-           # When logged in person is in choosen audience and solution provider is a linked user    
+            # When logged in person is in choosen audience and solution provider is a linked user    
            elsif (((question_is_public == true) || (reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
             puts "When logged in person is in choosen audience and solution provider is a linked user"   
               if ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && check_friend_with_login_and_solver )
@@ -583,7 +539,6 @@ module Api
            # When logged in person is NOT in choosen audience and solution provider is a linked user    
            elsif (((!reecher_user_associated_to_question.blank?) && (!reecher_user_associated_to_question.include? logined_user.reecher_id)) && !@lk.blank?)
               puts "When logged in person is NOT in choosen audience and solution provider is a linked user"
-              
               if((reecher_user_associated_to_question.include? question_linker_reecher_id) && check_friend_with_login_and_solver )
                 puts "111111111111111111111"
                  solution_attrs[:solution_provider_name] = "Friend"
@@ -610,6 +565,10 @@ module Api
                  solution_attrs[:no_profile_pic] = true
                  solution_attrs[:profile_pic_clickable] = false
                end
+            else
+               solution_attrs[:solution_provider_name] = sl.solver
+               solution_attrs[:no_profile_pic] = false
+               solution_attrs[:profile_pic_clickable] = true   
             end   
           
             @solutions << solution_attrs
@@ -678,7 +637,7 @@ module Api
               begin
               sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
-                     to: "+"+number,
+                     to: number,
                       body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"

@@ -1,4 +1,4 @@
-PUSH_TITLE_PRSLN    = " provided a solution. Hi5 them if it worked!"
+PUSH_TITLE_PRSLN    = " provided a solution."
 PUSH_TITLE_LINKED   = " linked you to a question."
 PUSH_TITLE_HGHFV    = " high fived your solution."
 PUSH_TITLE_LNKSN    = " provided a solution to starred question."
@@ -9,4 +9,4 @@ PUSH_TITLE_GRABSOLS2 = " is now in your Reech."
 PUSH_TITLE_INVITE   = " is now a part of your REECH"
 PUSH_TITLE_GRABSOLSLINK = " grabbed your solution."
 FRIEND_OF_FRIEND= "Friend of Friend"
- 
+INDIAN_PHONE_NUMBER_ALLOWED=["9015721476","8800954273","9990007236","9873992110","9717746667","9810341239"]

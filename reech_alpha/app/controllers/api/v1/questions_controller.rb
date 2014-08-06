@@ -123,7 +123,7 @@ module Api
               
             end
             
-             if params[:audien_details].blank? || (!params[:audien_details].blank? && params[:audien_details][:reecher_ids].blank?) 
+             if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?) 
               @question.is_public = true
              end 
             
@@ -244,7 +244,21 @@ module Api
              Thread.new{link_questions_to_expert_for_users params[:audien_details] ,@user,@question.question_id}
              Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
              Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
-         end
+=begin
+             any_linked = false
+             
+             if !params[:audien_details][:reecher_ids].blank?
+                 params[:audien_details][:reecher_ids].each do |reech_id|
+                  user_details =User.find_by_reecher_id(reech_id)
+                  check_linked_question  = is_question_linked_to_user question_id ,user_details.reecher_id,user.reecher_id 
+                  if check_linked_question
+                     any_linked = true
+                     break
+                  end
+                end
+            end  
+=end           
+       end
       # end of outer  if loop
       end
       msg = { :status => 200, :message => "success"}
@@ -300,7 +314,7 @@ module Api
           end 
            post_quest_to_frnd=[]
            params[:audien_details] = JSON.parse(params[:audien_details]) 
-           if (params[:audien_details].blank? || (!(params[:audien_details].blank?) && params[:audien_details][:reecher_ids].blank?)) 
+            if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?)
               @question.is_public = true
             end 
              if @question.save
@@ -382,17 +396,25 @@ module Api
   def link_questions_to_expert_for_users audien_details ,user,question_id
     
     if !params[:audien_details][:reecher_ids].blank?
+              all_sent =true
               params[:audien_details][:reecher_ids].each do |reech_id|
-              LinkedQuestion.create(:user_id =>reech_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>user.email,:phone_no =>user.phone_number,:linked_type=>'LINKED')
+              user_details =User.find_by_reecher_id(reech_id)
+              check_linked_question  = is_question_linked_to_user question_id ,user_details.reecher_id,user.reecher_id 
+              puts "check_linked_question===#{check_linked_question}"
+              if !check_linked_question
+              puts "I am inser linked question block "
+              LinkedQuestion.create(:user_id =>user_details.reecher_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details.email,:phone_no =>user_details.phone_number,:linked_type=>'LINKED')
+             
+              end
               check_setting= notify_linked_to_question(reech_id)
-              if check_setting
-               user_details = User.where("users.reecher_id" =>reech_id) 
+              if check_setting && !check_linked_question
                  if !user_details.blank?
-                   device_details = Device.where(:reecher_id=>user_details[0][:reecher_id])
+                   device_details = Device.where(:reecher_id=>user_details.reecher_id)
                     if !device_details.blank?
                      notify_string ="LINKED,"+ "<" +user.full_name + ">" + ","+ question_id.to_s + "," +Time.now().to_s
                      device_details.each do |d|
                           send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
+                       
                      end
                      
                    end

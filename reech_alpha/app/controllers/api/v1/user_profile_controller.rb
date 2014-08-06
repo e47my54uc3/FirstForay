@@ -73,7 +73,7 @@ module Api
 								@user.password_confirmation = @pass
 								@user.save(:validate => false)
 								api_key.destroy
-		#						current_user_session.destroy if !current_user_session.n:reecheridil?
+		             #current_user_session.destroy if !current_user_session.n:reecheridil?
 								msg = {:status => 200, :message => "Your password has been changed please login again"}
 								logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
 								render :json => msg
@@ -88,7 +88,6 @@ module Api
 
 				def forget_password
 				  phone_number = filter_phone_number(params[:phone_number])
-				  
 					@user = User.find_by_phone_number(phone_number)
 					puts "@user ==#{@user.inspect}"
 					rand_str = (('A'..'Z').to_a + (0..9).to_a)
@@ -97,10 +96,6 @@ module Api
           #@user.update_attributes(:password=> pass_token) unless @user.blank?
           @user.password = pass_token unless @user.blank?
           @user.save(:validate=> false)  unless @user.blank?
-
-            
-          
-            
 					if !@user.blank?           
               
               begin
@@ -108,8 +103,8 @@ module Api
                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 sms = client.account.sms.messages.create(
                           from: TWILIO_CONFIG['from'],
-                          to: "+"+@user.phone_number,
-                          body: "Username= #{@user.phone_number} and Temporary password= #{pass_token}"  
+                          to: @user.phone_number,
+                          body: "Username= #{@user.original_phone_number} and Temporary password= #{pass_token}"  
                           #body: "Dear #{@user.full_name},We are providing you a temporary password for login into application and later on you can reset it. Your Username= #{@user.phone_number} and Temporay password=#{pass_token}"
                       )
                    
@@ -187,7 +182,7 @@ module Api
 								begin
 								sms = client.account.sms.messages.create(
         							from: TWILIO_CONFIG['from'],
-        							to: "+"+params[:contact_details][:phone_number],
+        							to: params[:contact_details][:phone_number],
         							body: "your friend #{@user.first_name} #{@user.last_name} needs to add you as a contact on Reech."
       						)
       				  rescue Exception => e

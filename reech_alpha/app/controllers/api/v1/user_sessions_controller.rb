@@ -19,8 +19,15 @@ module Api
 			# This method is used for create a session for standard user
 			def create
 				if params[:provider] == "standard"
-					@user_session = UserSession.new(params[:user_details])
-			
+				  
+				 
+				  
+				  phone_number = filter_phone_number(params[:user_details][:phone_number])
+				   
+					@user_session = UserSession.new
+				  @user_session.phone_number = phone_number
+				  @user_session.password = params[:user_details][:password]
+					puts "@user_session=#{@user_session.inspect}"	
 					if @user_session.save
 						respond_to do |format|
 							@user_id = User.find_by_phone_number(@user_session.phone_number)							

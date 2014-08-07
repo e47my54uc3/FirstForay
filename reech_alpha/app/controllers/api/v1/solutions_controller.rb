@@ -171,19 +171,17 @@ module Api
   					linked_by = LinkedQuestion.where("question_id=? AND linked_type=?", solution.question_id,"LINKED") 
             linked_by=linked_by[0]  
             solver_details = User.find_by_reecher_id(solution.solver_id)
-				
+				    
+				      msgText = "<"+user.full_name+">"
+				     
   							if (!linked_by.blank?) && ((solver_details.reecher_id).to_s == (linked_by.user_id).to_s) 
                  linker_user = User.find_by_reecher_id(linked_by.linked_by_uid)  
-                 #msgText = user.full_name + " just grabbed an answer you gave to your friend " + linker_user.first_name + "'s question." + user.first_name + " is now a part of your REECH."
-                 msgText = "<"+user.full_name+">" + " grabbed your solution which you were linked. " #+  "<"+ user.first_name + ">" + " is now in your REECH."
-                 notify_string ="GRABLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
+                 notify_string ="GRABLINK1," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
                 else
-                 if check_friend      
-                 notify_string ="GRABSOLS," + "<" +user.full_name+">" + "," + (solution.id).to_s + "," + Time.now().to_s
+                 if check_friend  
+                 notify_string ="GRABSOLS," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
                  else
-                 #msgText = "<"+user.full_name+">" + " grabbed your solution. " +  "<"+ user.first_name + ">" + " is now in your REECH."
-                 msgText = "<"+user.full_name+">" + " grabbed your solution. " #+  "<"+ user.first_name + ">" + " is now in your REECH."
-                 notify_string ="GRABLINK," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
+                 notify_string ="GRABLINK2," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
                  end   
                  
                 end 

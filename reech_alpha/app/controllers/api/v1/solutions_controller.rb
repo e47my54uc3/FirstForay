@@ -361,6 +361,7 @@ module Api
         qust_details.is_stared? ? qust_details[:stared] = true : qust_details[:stared] =false
         qust_details[:owner_location] = question_owner_profile.location
         qust_details[:avatar_file_name] != nil ? qust_details[:image_url] =  qust_details.avatar_original_url : qust_details[:image_url] = nil
+        qust_details[:posted_by] = question_owner.full_name
         question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = question_owner_profile.thumb_picture_url : qust_details[:owner_image] = nil
         logined_user = User.find_by_reecher_id(params[:user_id])
         @voting = Voting.where(:user_id=> logined_user.id, :question_id=> qust_details.id) 

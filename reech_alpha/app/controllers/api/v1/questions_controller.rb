@@ -10,33 +10,42 @@ module Api
     def index
       @Questions = [] 
       questions_hash = []
+      user = User.find_by_reecher_id(params[:user_id])
       if params[:type] == "feed"
-        @Questions = Question.filterforuser(params[:user_id])
+         friends_reecher_ids = []
+        friends_reecher_ids << user.reecher_id
+        user_friends = Friendship.where(:reecher_id => user.reecher_id, :status => 'accepted')
+        if user_friends.size > 0
+          user_friends.each do |uf|
+            friends_reecher_ids << uf.friend_reecher_id
+          end
+        end
+        @Questions = []
+        @Questions_obj = Question.where("posted_by_uid  IN (?) AND created_at>=?" , friends_reecher_ids.to_a ,current_user.created_at).order("created_at DESC")
+        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
+       
       elsif params[:type] == "stared"
-        #@Questions = Question.includes(:posted_solutions, :votings).order("created_at DESC").get_stared_questions(params[:user_id])
-        #@Questions = Question.includes(:votings).order("created_at DESC").get_stared_questions(params[:user_id])
-        user = User.find_by_reecher_id(params[:user_id])
         question_ids = Voting.select("question_id").where("user_id = ?", user.id) unless user.blank?  
         question_ids = question_ids.map{|q| q.question_id}
-        @Questions = Question.where("id in (?)", question_ids).order("created_at DESC")  unless user.blank?  
-            
-        elsif params[:type] == "self"
-        user = User.find_by_reecher_id(params[:user_id])
-        @Questions = user.questions.includes(:solutions, :votings).order("created_at DESC")
-        # question which whose solution is purchased.
+        @Questions_obj = Question.where("id in (?)", question_ids).order("created_at DESC")  unless user.blank? 
+        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
+        
+      elsif params[:type] == "self"
+        @Questions = user.questions.order("created_at DESC")
         my_purchases_solid = PurchasedSolution.select(:solution_id).where("user_id = ?", user.id) 
         quest_hash =[]
         my_purchases_solid.each do |sid|
         qust_purc_sol=Question.joins(:solutions)
                    .select("questions.*,solutions.id as sol_id,solutions.question_id as sol_question_id")
                    .where("solutions.id = ?", sid.solution_id)
-         quest_hash.push(qust_purc_sol[0][:id]) unless qust_purc_sol.blank?
+        quest_hash.push(qust_purc_sol[0][:id]) unless qust_purc_sol.blank?
         end
         my_quest= @Questions.map{|q| q.id}
         merge_question = quest_hash + my_quest
         my_all_question = merge_question.sort
-        @Questions = Question.where("id in (?)", my_all_question).order("created_at DESC")
-        
+        @Questions_obj = Question.where("id in (?)", my_all_question).order("created_at DESC")        
+        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
+          
       end 
       
      
@@ -47,11 +56,8 @@ module Api
         purchasedSolutionId =PurchasedSolution.pluck(:solution_id)        
         @Questions.each do |q|
           q_hash = q.attributes
-          
           question_owner = User.find_by_reecher_id(q.posted_by_uid)
-          
           question_owner_profile = question_owner.user_profile
-          
           solutions = Solution.find_all_by_question_id(q.question_id)
           #solutions = solutions.map!(&:id).to_s
           solutions = solutions.collect!{|i| (i.id).to_s}   

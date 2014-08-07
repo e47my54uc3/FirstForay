@@ -26,7 +26,6 @@ module Api
 					@user = User.find_by_reecher_id(params[:user_id])
 					@user.first_name = params[:first_name]
 					@user.last_name = params[:last_name]
-					
 					@profile = @user.user_profile
 					#@profile.update({:location => params[:location],:bio=>params[:about]})
 					@profile.location = params[:location]

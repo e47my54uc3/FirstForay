@@ -57,7 +57,7 @@ module Api
   							@user.first_name = @profile["first_name"]
   							@user.last_name = @profile["last_name"]
   							@user.email = @profile["email"]
-  							@user.phone_number = @profile["phone"]  							
+  							#@user.phone_number = @profile["phone"]  							
   							@user.fb_token = params[:user_details][:access_token]
   							@user.fb_uid = params[:user_details][:uid]
     							if @user.save(:validate => false)		

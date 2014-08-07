@@ -51,7 +51,7 @@ Reech::Application.configure do
   password:             'Superhelper1!',
   authentication:       'login',
   enable_starttls_auto: true  }
-  
+
   config.paperclip_defaults = {
   :storage => :s3,
   :s3_credentials => {

@@ -60,7 +60,8 @@ class QuestionsController < ApplicationController
 		else
 			respond_to do |format|			
 				flash[:notice] = "Sorry, you need at least 10 Charisma Creds to ask a Question! Earn some by providing Solutions!"				
-				format.html { redirect_to root_path }
+				format.html { red           qust_details[:question_referee] = question_asker_name   
+irect_to root_path }
 			end
 		end
   end

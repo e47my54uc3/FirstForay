@@ -25,53 +25,23 @@ class Question < ActiveRecord::Base
     self.question_id=gen_question_id
   end
 
-  def self.filterforuser(user_id)
-    current_user = User.find_by_reecher_id("#{user_id}")
-
-=begin
-@Qpostedbyuser = Question.where(:posted_by_uid => current_user.reecher_id).order('created_at DESC')
-#@Questions = @Qpostedbyuser.collect{|question| {:value=>question.id, :label=>question.post}}
-@Questions = []
-@Qpostedbyuser.each do |qby_user|
-@Questions << qby_user
-end
-
-@Qbyfriendship = Question.find(:all, :order => 'created_at DESC')
-@Qbyfriendship.each do |question|
-@posting_user = question.posted_by_uid
-if Friendship.are_friends(@posting_user,current_user.reecher_id)
-@Questions << question
-end
-end
-@Questions
-=end
-
-    friends_reecher_ids = []
-    friends_reecher_ids << current_user.reecher_id
-    user_friends = Friendship.where(:reecher_id => current_user.reecher_id, :status => 'accepted')
-    if user_friends.size > 0
-      user_friends.each do |uf|
-        friends_reecher_ids << uf.friend_reecher_id
-      end
-    end
-    @Questions = []
-    #questions = Question.where(:posted_by_uid => friends_reecher_ids,:created_at=>current_user.created_at).order("created_at DESC")
-    questions = Question.where("posted_by_uid  IN (?) AND created_at>=?" , friends_reecher_ids.to_a ,current_user.created_at).order("created_at DESC")
-    if !questions.blank?
+ def self.filterforuser user_id , question_list_obj
+   questions = question_list_obj
+   @Questions =[]
+   if !questions.blank?
       questions.each do |q|
         question_asker = q.posted_by_uid
         #puts "question_askerquestion_asker=#{question_asker}"
-        question_asker_name = q.posted_by
+        question_user = User.find_by_reecher_id(question_asker)
+        #question_asker_name = q.posted_by
+        question_asker_name = question_user.full_name
         question_is_public = q.is_public
         @pqtfs = PostQuestionToFriend.where("question_id = ?", q.question_id)
-
-        solution_posted_by_login_user = Solution.where( "solver_id = ? AND question_id =? ", current_user.reecher_id , q.question_id)
+        solution_posted_by_login_user = Solution.where( "solver_id = ? AND question_id =? ", user_id , q.question_id)
         puts "!solution_posted_by_login_user=#{question_asker}"
-
         if !solution_posted_by_login_user.empty?
           solution_posted_by_login_user_id = solution_posted_by_login_user.collect{|sol| sol.id}
         end
-
         purchased_sl_by_question_owner = PurchasedSolution.where(:user_id => question_asker)
         if !purchased_sl_by_question_owner.empty?
           purchased_sl_by_question_owner = purchased_sl_by_question_owner.collect {|s| s.solution_id}
@@ -81,31 +51,29 @@ end
         if ((!purchased_sl_by_question_owner.blank?) && (!solution_posted_by_login_user_id.blank?))
           match_ids= solution_posted_by_login_user_id & purchased_sl_by_question_owner
           if match_ids.size > 0
-            q[:question_referee] = q.posted_by
+            #q[:question_referee] = q.posted_by
+            q[:question_referee] = question_asker_name
             q[:no_profile_pic] = false
           end
-        elsif (( current_user.reecher_id ==  question_asker) || question_is_public)
-          q[:question_referee] = q.posted_by
+        elsif (( user_id ==  question_asker) || question_is_public)
+          #q[:question_referee] = q.posted_by
+          q[:question_referee] = question_asker_name
           q[:no_profile_pic] = false
-        elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? current_user.reecher_id.to_s))
-          q[:question_referee] = q.posted_by
+        elsif(!@pqtfs.blank? && (reecher_user_associated_to_question.include? user_id))
+          #q[:question_referee] = q.posted_by
+          q[:question_referee] = question_asker_name
           q[:no_profile_pic] = false
         else
           q[:question_referee] = "Friend"
           q[:no_profile_pic] = true
         end
-
         @Questions << q
-
       end
-
     else
-
       @Questions = []
     end
+ end
 
-    @Questions
-  end
 
   def self.get_stared_questions(user_id)
     @stared_questions = []

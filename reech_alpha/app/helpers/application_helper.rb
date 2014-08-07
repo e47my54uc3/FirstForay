@@ -245,7 +245,8 @@ module ApplicationHelper
             make_friendship_standard(user_details_for_phone.reecher_id, user.reecher_id)  
             if linked_quest_type !="INVITE"
                if linked_quest_type == "ASK"  
-                 LinkedQuestion.create(:user_id =>user_details_for_phone.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_phone.email,:phone_no=>user_details_for_phone.phone_number,:linked_type=>linked_quest_type)
+                #LinkedQuestion.create(:user_id =>user_details_for_phone.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_phone.email,:phone_no=>user_details_for_phone.phone_number,:linked_type=>linked_quest_type)
+                PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_for_phone.reecher_id, :question_id=>question.question_id)
                elsif (linked_quest_type == "LINKED" && !check_linked_question )
                   LinkedQuestion.create(:user_id =>user_details_for_phone.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_phone.email,:phone_no=>user_details_for_phone.phone_number,:linked_type=>linked_quest_type)
                end
@@ -342,7 +343,8 @@ module ApplicationHelper
                                           make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id) 
                                             if linked_quest_type !="INVITE"
                                               if linked_quest_type == "ASK"
-                                              LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
+                                              #LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
+                                              PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_for_email.reecher_id, :question_id=>question.question_id)
                                               elsif (linked_quest_type == "LINKED" && !check_linked_question )
                                               LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
                                               end  

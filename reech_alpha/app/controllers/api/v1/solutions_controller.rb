@@ -90,7 +90,8 @@ module Api
                   elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
                   response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
                   push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
-                  elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                  #elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                  elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.blank?) && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
                   response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
                   push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
                   else  
@@ -459,7 +460,8 @@ module Api
                    solution_attrs[:profile_pic_clickable] = true
              elsif(question_asker.to_s == (logined_user.reecher_id).to_s && @lk.blank?)
                 # When logged in person is question asker and solution provide is Not linked user
-                 if ((question_is_public == true) || (reecher_user_associated_to_question.include? sl.solver_id) )
+                 #if ((question_is_public == true) || (reecher_user_associated_to_question.include? sl.solver_id) )
+                 if ((question_is_public == true) || ((!reecher_user_associated_to_question.blank?) && (reecher_user_associated_to_question.include? sl.solver_id)) )
                    puts "When logged in person is question asker and solution provider is Not linked user"
                    #solution_attrs[:solution_provider_name] = sl.solver
                    solution_attrs[:solution_provider_name] = user.full_name

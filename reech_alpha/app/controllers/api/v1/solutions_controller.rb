@@ -85,7 +85,7 @@ module Api
                   device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                   # Start
                   if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
-                  push_title = "Your Friend #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
+                  push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                   response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
                   elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
                   response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
@@ -95,7 +95,7 @@ module Api
                   push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
                   else  
                   response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
-                  push_title = "Friend" + PUSH_TITLE_PRSLN 
+                  push_title = "Your Friend" + PUSH_TITLE_PRSLN 
                   end
                   
                 # End logic for string
@@ -175,13 +175,12 @@ module Api
 						
 				   # linked_by = LinkedQuestion.find_by_question_id(solution.question_id)
   					linked_by = LinkedQuestion.where("question_id=? AND linked_type=?", solution.question_id,"LINKED") 
-            linked_by=linked_by[0]  
+            linked_by=linked_by[0]  if !linked_by.blank?
             solver_details = User.find_by_reecher_id(solution.solver_id)
-				    
-				      msgText = "<"+user.full_name+">"
+				    linker_user = User.find_by_reecher_id(linked_by.linked_by_uid)  if !linked_by.blank?
+				    msgText = "<"+user.full_name+">"
 				     
   							if (!linked_by.blank?) && ((solver_details.reecher_id).to_s == (linked_by.user_id).to_s) 
-                 linker_user = User.find_by_reecher_id(linked_by.linked_by_uid)  
                  notify_string ="GRABLINK1," + msgText + "," + (solution.id).to_s + "," + Time.now().to_s
                 else
                  if check_friend  

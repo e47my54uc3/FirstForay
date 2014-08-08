@@ -417,7 +417,7 @@ module Api
                      notify_string ="LINKED,"+ "<" +user.full_name + ">" + ","+ question_id.to_s + "," +Time.now().to_s
                      device_details.each do |d|
                           send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+PUSH_TITLE_LINKED)
-                       
+                      
                      end
                      
                    end

@@ -38,7 +38,7 @@ class Question < ActiveRecord::Base
         question_is_public = q.is_public
         @pqtfs = PostQuestionToFriend.where("question_id = ?", q.question_id)
         solution_posted_by_login_user = Solution.where( "solver_id = ? AND question_id =? ", user_id , q.question_id)
-        puts "!solution_posted_by_login_user=#{question_asker}"
+        #puts "!solution_posted_by_login_user=#{question_asker}"
         if !solution_posted_by_login_user.empty?
           solution_posted_by_login_user_id = solution_posted_by_login_user.collect{|sol| sol.id}
         end

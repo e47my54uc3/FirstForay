@@ -99,6 +99,84 @@ module ApplicationHelper
     check
  end
   
+  # Start method for email notification 
+  
+  def check_email_question_when_answered user_id
+    #UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+     if ((setting[:emailnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
+     check =true
+    else
+     check =false
+    end
+    check 
+  end
+
+  def check_email_linked_to_question user_id
+    # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_linked_to_question] == true))
+      check =true
+    else
+       check =false
+    end
+    check
+  end
+
+   
+  def check_email_when_my_stared_question_get_answer user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_when_my_stared_question_get_answer] == true))
+      check =true
+    else
+       check =false
+    end
+    check
+  end
+  
+  def check_email_solution_got_highfive user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_solution_got_highfive] == true))
+      check =true
+    else
+      check =false
+    end
+    check
+  end
+  
+  
+  def check_email_audience_if_ask_for_help user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_audience_if_ask_for_help] == true))
+      check =true
+    else
+      check =false
+    end
+    check
+    
+  end
+  
+  def check_email_when_someone_grab_my_answer user_id
+    user = User.find_by_reecher_id(params[:user_id])
+    setting =user.user_settings
+    if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_when_someone_grab_my_answer] == true))
+      check =true
+    else
+      check =false
+    end
+    check
+ end
+  
+  
+  
+  # End of method for email notification
+  
+  
   
   def get_curio_points user_id
   
@@ -196,7 +274,7 @@ module ApplicationHelper
   end  
 
   
-  def linked_question_with_type linker_id,user_id="",question_id, email,phone,linked_type_str        
+  def linked_question_with_type linker_id,user_id="",question_id, email,phone,linked_type_str     
              @linkquest = LinkedQuestion.new()
              @linkquest.user_id =user_id
              @linkquest.question_id = question_id
@@ -205,8 +283,6 @@ module ApplicationHelper
              @linkquest.phone_no = phone
              @linkquest.linked_type = linked_type_str
              @linkquest.save
-             LinkedQuestion.create(:user_id =>user_id,:question_id=>question_id,:linked_by_uid=>linker_id,:email_id=>email,:phone_no=>phone,:linked_type=>linked_type_str)
-             @rand_has_key = random_key_generator(Time.now)
              rand_str = (('A'..'Z').to_a + (0..9).to_a)
              token = (0...32).map { |n| rand_str.sample }.join
              referral_code = (0...8).map { |n| rand_str.sample }.join
@@ -218,7 +294,7 @@ module ApplicationHelper
           arr.push(:referral_code=>referral_code)  
           arr.push(:token=>token)
           arr
-       
+           
   end
        
   def send_posted_question_notification_to_chosen_phones audien_details ,user,question,push_title_msg,push_contant_str,linked_quest_type
@@ -233,7 +309,7 @@ module ApplicationHelper
         audien_details[:phone_numbers].each do |number|
           # Extract the phone number and apply the filtering on it so that special characters can b removed   
           number = filter_phone_number(number)
-          
+          puts "AAAAAAAAAAAAAAA-number#{number}"
           # Try to find the whether this phone no. is associated with an existing user
           user_details_for_phone = User.find_by_phone_number(number) 
           puts "user_details_for_phone==#{user_details_for_phone.inspect}"
@@ -297,24 +373,22 @@ module ApplicationHelper
             end  
            end  
         else
+          puts " STEP1"
           # This case is for non-registered users
           # Find out the referral code which has been generated for this question by the reecher who asked this question
             if linked_quest_type !="INVITE"
              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
-             elsif linked_quest_type =="INVITE"          
+             elsif linked_quest_type =="INVITE"   
              get_referal_code_and_token = linked_question_with_type user.reecher_id , 0, '' , number , linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
             end 
-          # phone_number = filter_phone_number(user_details_for_phone.phone_number) 
-          # phone_number = "+919873992110"
-          
-           begin              
+           begin       
             client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
                       sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
-                      body: "Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
+                      body:"Hey! Got a minute? Your friend #{user.first_name} #{user.last_name} needs your help on Reech. Visit http://reechout.co to download the app and help them out. Invite code: #{refral_code}"
                      )
              logger.debug ">>>>>>>>>Sending sms to #{number} with text"     
              rescue Exception => e

@@ -224,8 +224,6 @@ module Api
       user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ?", referral_code ,current_date_time)
       if !user_ref.blank? 
       link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
-      
-      
       make_friendship_standard(reecher_id, link_question.linked_by_uid)   
         
       link_question.update_attributes(:user_id=>reecher_id,:status=>0) 

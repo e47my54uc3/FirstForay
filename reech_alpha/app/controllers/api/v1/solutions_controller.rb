@@ -480,6 +480,11 @@ module Api
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
                    question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+                 elsif ((((!@pqtfs.blank?)  && (!reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
+                   solution_attrs[:solution_provider_name] = "Friend"
+                   solution_attrs[:no_profile_pic] = true
+                   solution_attrs[:profile_pic_clickable] = false
+                   question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                  elsif ( ((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) || (question_is_public == true)) 
                    solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                    solution_attrs[:no_profile_pic] = false

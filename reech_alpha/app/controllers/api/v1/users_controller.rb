@@ -65,16 +65,6 @@ module Api
 							 render :json => msg
 						end   
 					elsif params[:provider] == "facebook"
-					validate_ref_code = validate_referral_code params[:referral_code] 
-         
-          if validate_ref_code
-          msg = { :status => 401, :message => "Invalid referral code"}
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-          render :json => msg  # note, no :location or :status option
-          else
-            invite_user_id = validate_referral_code[:invite_user_id]
-            link_question_id = validate_referral_code[:question_id]
-          end 
 						fb_user = User.find_by_fb_uid(params[:user_details][:uid])
 						@graph = Koala::Facebook::API.new(params[:user_details][:access_token])
 						fb_user_profile_pic_path = @graph.get_picture(params[:user_details][:uid])

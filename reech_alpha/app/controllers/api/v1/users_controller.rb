@@ -9,11 +9,22 @@ module Api
 			end
 
 			def create
-				if !params.blank?
+				if !params.blank?				  
+				  validate_ref_code = validate_referral_code params[:referral_code] 
+         
+          if validate_ref_code
+          msg = { :status => 401, :message => "Invalid referral code"}
+          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+          render :json => msg  # note, no :location or :status option
+          else
+            invite_user_id = validate_referral_code[:invite_user_id]
+            link_question_id = validate_referral_code[:question_id]
+          end 
+          
 					if params[:provider] == "standard"
 					  original_phone_number = params[:user_details][:phone_number]
 					  phone_number = filter_phone_number(params[:user_details][:phone_number])
-					  user = User.find_by_phone_number(phone_number)					  
+					  user = User.find_by_phone_number(phone_number)				  
 						if user.nil?
 						    
 								@user = User.new(params[:user_details])								
@@ -21,9 +32,8 @@ module Api
 								@user.phone_number = phone_number
 								@user.password_confirmation = params[:user_details][:password]
 											if @user.save
-      									friend_con=make_auto_connection_with_referral_code @user.reecher_id, params[:referral_code]
-                        
-      									 if friend_con
+      									friend_con=make_auto_connection_with_referral_code @user.reecher_id, invite_user_id ,link_question_id
+                      	 if friend_con
           									if !params[:profile_image].blank? 
           										data = StringIO.new(Base64.decode64(params[:profile_image]))
           										@user.user_profile.picture = data
@@ -75,7 +85,7 @@ module Api
     							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
     							  @user.user_profile.location = @profile["location"]["name"]
     							  @user.user_profile.save
-    							  friend_con=make_auto_connection_with_referral_code @user.reecher_id, params[:referral_code] 
+    							  friend_con=make_auto_connection_with_referral_code @user.reecher_id, invite_user_id ,link_question_id
       							  if friend_con
         							  #@user.user_profile.build
         							  #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
@@ -223,14 +233,13 @@ module Api
     end
     
     def validate_referral_code
-      
       current_date_time =Time.now
       referral_code = params[:referral_code]
       user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ? AND status =1", params[:referral_code] ,current_date_time)
       
       if !user_ref.blank? 
       link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
-      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id }
+      msg = {:status => 200, :is_valid => true,:question_id=>link_question.question_id ,:invite_user_id=>user_ref[0][:id]}
       elsif params[:referral_code].to_i == 1111
       msg = {:status => 200, :is_valid => true }  
       else
@@ -240,16 +249,15 @@ module Api
       
     end
       
-    def make_auto_connection_with_referral_code reecher_id, referral_code
+    def make_auto_connection_with_referral_code reecher_id, invite_user_id,link_question_id
       current_date_time =Time.now
       msg=''
-      user_ref =InviteUser.where("referral_code = ? AND token_validity_time >= ? AND status =1", referral_code ,current_date_time)
-      if !user_ref.blank? 
-      link_question = LinkedQuestion.find(user_ref[0][:linked_question_id]) 
+      updateInviteUser =InviteUser.find(invite_user_id)
+      link_question = LinkedQuestion.find(link_question_id) 
+      if !updateInviteUser.blank?
+     
       make_friendship_standard(reecher_id, link_question.linked_by_uid)   
-        
       link_question.update_attributes(:user_id=>reecher_id) 
-      updateInviteUser= InviteUser.find(user_ref[0][:id])
       updateInviteUser.update_attributes(:status=>0) 
       msg = true
       elsif params[:referral_code].to_i == 1111

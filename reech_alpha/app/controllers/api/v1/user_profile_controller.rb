@@ -201,7 +201,8 @@ module Api
 			# leader board
        def leader_board       
         final_leader = {}
-        all_users= User.all
+        #@user=User.find_by_reecher_id(params[:user_id])
+        all_users= User.includes(:friendships).where("users.reecher_id =?",params[:user_id])
         user_details =[]
         current_user_hash =[]
         ### Today

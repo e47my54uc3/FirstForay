@@ -27,7 +27,7 @@ module Api
       								@user.phone_number = phone_number
       								@user.password_confirmation = params[:user_details][:password]
       											if @user.save
-            								#make_auto_connection_with_referral_code @user.reecher_id, invite_user_id,link_question_id
+            								make_auto_connection_with_referral_code @user.reecher_id, invite_user_id,link_question_id
                             	
                 									if !params[:profile_image].blank? 
                 										data = StringIO.new(Base64.decode64(params[:profile_image]))
@@ -38,7 +38,7 @@ module Api
                 	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
                 	  							
                 									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
-                									msg = {:status => 201, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
+                									msg = {:status => 200, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
                 									#logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
                 								#	render :json => msg  # note, no :location or :status options
             								else

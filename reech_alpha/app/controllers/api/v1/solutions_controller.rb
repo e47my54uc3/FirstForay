@@ -366,6 +366,7 @@ module Api
         qust_details[:owner_location] = question_owner_profile.location
         qust_details[:avatar_file_name] != nil ? qust_details[:image_url] =  qust_details.avatar_original_url : qust_details[:image_url] = nil
         qust_details[:question_referee] = question_owner.full_name
+        qust_details[:question_referee_id] = question_owner.reecher_id
         question_owner_profile.picture_file_name != nil ? qust_details[:owner_image] = question_owner_profile.thumb_picture_url : qust_details[:owner_image] = nil
         logined_user = User.find_by_reecher_id(params[:user_id])
         @voting = Voting.where(:user_id=> logined_user.id, :question_id=> qust_details.id) 
@@ -396,7 +397,8 @@ module Api
            qust_details[:no_profile_pic] = false 
 =end           
         if (!@lk.blank? && (logined_user.reecher_id == linked_user_to_question))
-           qust_details[:question_referee] = question_linker_details.full_name   
+           qust_details[:question_referee] = "Friend of "+question_linker_details.full_name   
+           qust_details[:question_referee_id] = question_linker_details.reecher_id
            qust_details[:no_profile_pic] = false 
            question_linker_details_profile = question_linker_details.user_profile
            question_linker_details_profile.picture_file_name != nil ? qust_details[:owner_image] = question_linker_details_profile.thumb_picture_url : qust_details[:owner_image] = nil

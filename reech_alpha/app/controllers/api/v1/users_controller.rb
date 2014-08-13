@@ -156,7 +156,12 @@ module Api
 				
 			def create_session_for_fb_user(user)
 				user.reset_persistence_token!
-				UserSession.create(user, true)
+			   #	UserSession.create(user, true)
+				 # phone_number = filter_phone_number(user.phone_number)
+          @user_session = UserSession.new
+          @user_session.phone_number = user.email
+          @user_session.password = user.password
+          @user_session.save
 			end  
 
 			def make_friendship(fb_friends, fb_user,device_token)

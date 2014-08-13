@@ -558,7 +558,7 @@ module Api
             puts "When logged in person is in choosen audience and solution provider is a linked user"   
               if ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && check_friend_with_login_and_solver )
                  #solution_attrs[:solution_provider_name] = sl.solver
-                 solution_attrs[:solution_provider_name] = user.full_name
+                 sef post_solution_with_imageolution_attrs[:solution_provider_name] = user.full_name
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
                elsif ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && !check_friend_with_login_and_solver )
@@ -654,7 +654,159 @@ module Api
         logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{sorted_sol}"
         render :json => msg
       end  
+      
+      def post_solution_with_image
+        @solver = User.find_by_reecher_id(params[:user_id])
+        @solution = Solution.new()
+        @solution.body = params[:solution]
+        @solution.question_id = params[:question_id]
+        @solution.solver_id = @solver.reecher_id
+        @solution.solver = "#{@solver.first_name} #{@solver.last_name}"
+        @solution.ask_charisma = params[:ask_charisma] 
+
+        if !params[:file].blank? 
+          @solution.picture = params[:file]
+        end
+
+        if !params[:expert_details].nil?
+          if !params[:expert_details][:emails].nil?
+            # if the expert is in reech network directly link the question 
+            # Otherwise send an simple email to him
+            params[:expert_details][:emails].each do |email|
+              linked_user = User.find_by_email(email)
+              if linked_user.present?
+                linked_question = LinkedQuestion.where(:user_id => linked_user.reecher_id, :question_id => params[:question_id], :linked_by_uid => @solver.reecher_id)
+                if !linked_question.present?
+                  link_question = LinkedQuestion.new
+                  link_question.user_id = linked_user.reecher_id
+                  link_question.question_id = params[:question_id]
+                  link_question.linked_by_uid = @solver.reecher_id
+                  link_question.save
+                end 
+              else
+                
+                begin
+                  UserMailer.send_link_question_email(email, @solver).deliver
+                rescue Exception => e
+                  logger.error e.backtrace.join("\n")
+                end
+                
+              end 
+            end 
+          end
+
+          if !params[:expert_details][:phone_numbers].nil?
+            client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
+            params[:expert_details][:phone_numbers].each do |number|
+              sms = client.account.sms.messages.create(
+                      from: TWILIO_CONFIG['from'],
+                      to: number,
+                      body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
+                  )
+                  logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
+            end
+          end 
+       end  
+        
+      if @solution.save
+            # send push notification to user who posted this question
+            qust_details = Question.find_by_question_id(params[:question_id])
+            question_owner= User.find_by_reecher_id(qust_details.posted_by_uid) unless qust_details.blank? 
+            @lk = LinkedQuestion.find_by_question_id(qust_details.question_id)
+            @pqtfs = PostQuestionToFriend.where(:question_id=>qust_details.question_id)  
+            reecher_user_associated_to_question=@pqtfs.collect{|pq| pq.friend_reecher_id}  if !@pqtfs.blank?
+            logged_in_user = @solver.reecher_id 
+            question_asker = qust_details.posted_by_uid unless qust_details.blank? 
+            question_asker_name = question_owner.full_name   unless question_owner.blank? 
+            question_is_public = qust_details.is_public unless qust_details.blank? 
+            question_linker_reecher_id = @lk.linked_by_uid  unless @lk.blank? 
+            linked_user_to_question = @lk.user_id  unless @lk.blank? 
+            question_linker_details= User.find_by_reecher_id(question_linker_reecher_id) unless @lk.blank?
+            #user_details = User.includes(:questions).where("questions.question_id" =>params[:question_id]) 
+             #delete_linked_question(@solver.reecher_id,qust_details.question_id)
+             
+            if !qust_details.nil?
+               check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)  
+               check_email_setting = check_email_question_when_answered(qust_details.posted_by_uid)
+               puts "check_email_setting==#{check_email_setting.inspect}"
+                # Send push notification             
+                if check_setting
+                  #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
+                  device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
+                  # Start
+                  if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
+                  push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
+                  response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
+                  elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
+                  push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
+                  #elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                  elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.blank?) && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                  response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
+                  push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
+                  else  
+                  response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
+                  push_title = "Your Friend" + PUSH_TITLE_PRSLN 
+                  end
+                  
+                # End logic for string
+                #response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
+                if !device_details.empty? 
+                    device_details.each do |d|
+                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s, push_title)
+                    end  
+                end 
+               end
+              #Send email  notification 
+              if check_email_setting
+                 UserMailer.email_question_when_answered(question_owner.email,@solver,qust_details).deliver 
+              end
+               
+             
+            end
           
+           #Send push notification to those who starred this question
+           @voting = Voting.where(question_id: qust_details.id)
+           if !@voting.blank?
+            @voting.each do |v|
+             check_setting= notify_when_my_stared_question_get_answer(v.user_id)
+               if check_setting
+                starred_user = User.find_by_id(v.user_id)
+                device_details = Device.select("device_token,platform").where("reecher_id=?",starred_user.reecher_id)
+                checkFiendWithStarredUser = Friendship::are_friends(starred_user.reecher_id,@solution.solver_id) 
+                if checkFiendWithStarredUser
+                  response_string = "STARSOLS,"+ "Your Friend <"+@solution.solver + ">,"+params[:question_id]+"," +Time.now().to_s
+                  push_title = @solution.solver+PUSH_TITLE_STARSOLS
+                else  
+                  response_string = "STARSOLS,"+ "Your Friend" + ","+params[:question_id]+"," +Time.now().to_s
+                  push_title = "Friend"+ PUSH_TITLE_STARSOLS
+                end
+                if !device_details.blank?   
+                   device_details.each do |d|
+                     send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,push_title)
+                   end
+                end
+                #Send email notification to user who have starred this question
+                 check_email_setting = check_email_when_my_stared_question_get_answer(starred_user.reecher_id)
+                 if check_email_setting
+                   UserMailer.email_when_my_stared_question_get_answer(starred_user.email,@solver,qust_details).deliver 
+                 end
+                 
+                
+              end
+               
+           end
+          end
+        
+          msg = {:status => 200, :solution => @solution}
+          
+        else
+          msg = {:status => 400, :message => "Failed"}
+        end 
+        render :json => msg
+      end
+      
+=begin          
       def post_solution_with_image
         @solver = User.find_by_reecher_id(params[:user_id])
         @solution = Solution.new()
@@ -726,15 +878,12 @@ module Api
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)
                puts "check_setting==#{check_setting}"
                if check_setting
-                #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
-              
+                #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)              
                 device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                 #puts "device_details==#{deimplicit conversion of Fixnum into Svice_details.inspect}"
-                response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s
-                
+                response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]+","+Time.now().to_s                
                 if !device_details.empty? 
                     device_details.each do |d|
-                      
                    # begin
                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,@solution.solver+PUSH_TITLE_PRSLN)
                     #rescue Exception => e
@@ -754,7 +903,7 @@ module Api
         render :json => msg
         
       end    
-        
+=end        
 		def check_one_time_bonus_distribution (q_id,sol_id,asker_id)
 		 flag =true ;
 		  purchased_sl_for_q_id = PurchasedSolution.where(:user_id =>asker_id ,:solution_id=>sol_id)

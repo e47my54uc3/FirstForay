@@ -71,7 +71,9 @@ module Api
         							@user.fb_uid = params[:user_details][:uid]
           							if @user.save(:validate => false)		
           							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
-          							  @user.user_profile.location = @profile["location"]["name"]
+          							  if ((!@profile["location"].blank?) && (!@profile["location"]["name"].blank?))
+          							  @user.user_profile.location = @profile["location"]["name"] 
+          							  end
           							  @user.user_profile.save
           							    make_auto_connection_with_referral_code @user.reecher_id, invite_user_id ,link_question_id if params[:referral_code].to_i  != 1111
             								  #@user.user_profile.build
@@ -92,7 +94,7 @@ module Api
                        # logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
                        # render :json => msg  # note, no :location or :status option
           						 end 
-          					 	 msg = { :status => 401, :message => @user.errors.full_messages}
+          					 	
                        # logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
                        # render :json => msg  # note, no :location or :status option
       					else
@@ -106,13 +108,14 @@ module Api
       							#render :json => msg
       					end 
       		end  
-         logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+        logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+        render :json => msg  
     		else 
   			msg = { :status => 401, :message => "Failure!"}
   			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-  			#render :json => msg
+  			render :json => msg
   			end      
-        render :json => msg  
+       
 			end
 
 			

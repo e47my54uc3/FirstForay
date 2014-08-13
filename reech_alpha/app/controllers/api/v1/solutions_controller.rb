@@ -223,12 +223,10 @@ module Api
            
             #Send email notification when some grabmy solution
           check_email_setting = check_email_when_someone_grab_my_answer(solution.solver_id)
-          if check_email_setting
-           @solver = User.find_by_reecher_id(solution.solver_id)
-           UserMailer.email_when_someone_grab_my_answer(@solver.email,user,@solution[:body]).deliver 
-          end      
-                 
-            
+         # if check_email_setting
+        #   @solver = User.find_by_reecher_id(solution.solver_id)
+          #UserMailer.email_when_someone_grab_my_answer(@solver.email,user,@solution[:body]).deliver 
+         # end      
 						preview_solution = PreviewSolution.find_by_user_id_and_solution_id(user.id, solution.id)
 						preview_solution.destroy
 						#Add points to solution provider

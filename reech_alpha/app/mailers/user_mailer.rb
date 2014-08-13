@@ -44,7 +44,7 @@ class UserMailer < ActionMailer::Base
   end
 
   def email_question_when_answered(email,solver_details,question_details)
-    @solver_details = solver_details
+    @user = solver_details
     @question_details = question_details
     mail(to:  email, subject: "Solution provided on Reech Question #{@question_details.post}")
   end
@@ -58,7 +58,7 @@ class UserMailer < ActionMailer::Base
   def email_when_my_stared_question_get_answer(email,user,question_details)    
     @user = user
     @question_details = question_details
-    mail(to:  email, subject: "My Starred question got answer #{@question_details.post}")
+    mail(to:  email, subject: "My Starred question g  ot answer #{@question_details.post}")
     
   end
 

@@ -21,39 +21,38 @@ module Api
       					  original_phone_number = params[:user_details][:phone_number]
       					  phone_number = filter_phone_number(params[:user_details][:phone_number])
       					  user = User.find_by_phone_number(phone_number)				  
-      						if user.nil?
-      								@user = User.new(params[:user_details])								
-      								@user.original_phone_number = original_phone_number
-      								@user.phone_number = phone_number
-      								@user.password_confirmation = params[:user_details][:password]
-      											if @user.save
-            								make_auto_connection_with_referral_code @user.reecher_id, invite_user_id,link_question_id
-                            	
-                									if !params[:profile_image].blank? 
-                										data = StringIO.new(Base64.decode64(params[:profile_image]))
-                										@user.user_profile.picture = data
-                										@user.user_profile.save
-                									end
-                	  							@user.add_points(500)
-                	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
-                	  							
-                									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
-                									msg = {:status => 200, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
-                									#logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-                								#	render :json => msg  # note, no :location or :status options
-            								else
-            									msg = { :status => 401, :message => @user.errors.full_messages}
-            									#logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-            									#render :json => msg  # note, no :location or :status option
-            								end
-      					 	else
-      						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
-      							 #msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
-      							 msg = { :status => 401, :message => "Phone number Already exists"}
-      							 #logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-      							# render :json => msg
-      						end   
-      					     
+        						if user.nil?
+        								@user = User.new(params[:user_details])								
+        								@user.original_phone_number = original_phone_number
+        								@user.phone_number = phone_number
+        								@user.password_confirmation = params[:user_details][:password]
+        											if @user.save
+              								make_auto_connection_with_referral_code @user.reecher_id, invite_user_id,link_question_id if params[:referral_code].to_i  != 1111
+                   								if !params[:profile_image].blank? 
+                  										data = StringIO.new(Base64.decode64(params[:profile_image]))
+                  										@user.user_profile.picture = data
+                  										@user.user_profile.save
+                  									end
+                  	  							@user.add_points(500)
+                  	  							@api_key = ApiKey.create(:user_id => @user.reecher_id).access_token
+                  	  							
+                  									create_device_for_user(params[:device_token], params[:platform], @user.reecher_id)
+                  									msg = {:status => 200, :message => "Success",:api_key=>@api_key, :user_id=>@user.reecher_id,:email =>@user.email,:phone_number =>@user.phone_number.to_i }
+                  									#logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+                  								#	render :json => msg  # note, no :location or :status options
+              								else
+              									msg = { :status => 401, :message => @user.errors.full_messages}
+              									#logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+              									#render :json => msg  # note, no :location or :status option
+              								end
+        					 	else
+        						   #@api_key = ApiKey.create(:user_id => user.reecher_id).access_token
+        							 #msg = { :status => 401, :message => "Email Already exists",:api_key=>@api_key, :user_id=>user.reecher_id,:email =>user.email}
+        							 msg = { :status => 401, :message => "Phone number Already exists"}
+        							 #logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+        							# render :json => msg
+        						end   
+        					     
       					elsif params[:provider] == "facebook"
       						fb_user = User.find_by_fb_uid(params[:user_details][:uid])
       						@graph = Koala::Facebook::API.new(params[:user_details][:access_token])
@@ -74,7 +73,7 @@ module Api
           							  @user.user_profile.picture_from_url(fb_user_profile_pic_path.to_s)
           							  @user.user_profile.location = @profile["location"]["name"]
           							  @user.user_profile.save
-          							    make_auto_connection_with_referral_code @user.reecher_id, invite_user_id ,link_question_id
+          							    make_auto_connection_with_referral_code @user.reecher_id, invite_user_id ,link_question_id if params[:referral_code].to_i  != 1111
             								  #@user.user_profile.build
               							  #fb_user_profile_pic  = @user.create_user_profile(:profile_pic_path => fb_user_profile_pic_path)
               								#puts "1123213#{params[:device_token]}----#{params[:platform]}"
@@ -107,15 +106,13 @@ module Api
       							#render :json => msg
       					end 
       		end  
-       logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-       render :json => msg	
-      		
-			else 
-			msg = { :status => 401, :message => "Failure!"}
-			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
-			render :json => msg
-			end      
-
+         logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+    		else 
+  			msg = { :status => 401, :message => "Failure!"}
+  			logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{msg}"
+  			#render :json => msg
+  			end      
+        render :json => msg  
 			end
 
 			
@@ -214,7 +211,7 @@ module Api
      end
   
     def remove_connections
-        my_connection = Friendship.where("reecher_id=? && friend_reecher_id =? ", params[:user_id],params[:friend_id]).first
+        my_connection =Friendship.where("reecher_id=? && friend_reecher_id =? ", params[:user_id],params[:friend_id]).first
         friend_connection = Friendship.where("reecher_id=? && friend_reecher_id =? ", params[:friend_id],params[:user_id]).first
         my_connection.destroy unless  my_connection.blank?
         friend_connection.destroy unless  friend_connection.blank?
@@ -257,6 +254,8 @@ module Api
     end
       
     def make_auto_connection_with_referral_code reecher_id, invite_user_id,link_question_id
+      puts "invite_user_id==#{invite_user_id}"
+      puts "invite_user_id==#{link_question_id}"
       current_date_time =Time.now
       msg=''
       updateInviteUser =InviteUser.find(invite_user_id)
@@ -268,7 +267,7 @@ module Api
       end 
        
     end  
-#End of Class User Controller class
+   #End of Class User Controller class
   		end
 	end
 end

@@ -79,6 +79,7 @@ module Api
             if !qust_details.nil?
                check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)  
                check_email_setting = check_email_question_when_answered(qust_details.posted_by_uid)
+               puts "check_email_setting==#{check_email_setting.inspect}"
                 # Send push notification             
                 if check_setting
                   #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
@@ -108,11 +109,9 @@ module Api
                 end 
                end
               # Send email  notification 
-              #if check_email_setting
-               
-            #    UserMailer.email_question_when_answered(question_owner.email,@solver,qust_details).deliver 
-                
-             # end
+              if check_email_setting
+                 UserMailer.email_question_when_answered(question_owner.email,@solver,qust_details).deliver 
+              end
                
              
             end
@@ -133,12 +132,20 @@ module Api
                   response_string = "STARSOLS,"+ "Your Friend" + ","+params[:question_id]+"," +Time.now().to_s
                   push_title = "Friend"+ PUSH_TITLE_STARSOLS
                 end
-                 if !device_details.blank?   
-                     device_details.each do |d|
-                       send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,push_title)
-                     end
-                  end
-               end
+                if !device_details.blank?   
+                   device_details.each do |d|
+                     send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s,push_title)
+                   end
+                end
+                #Send email notification to user who have starred this question
+                 check_email_setting = check_email_when_my_stared_question_get_answer(starred_user.reecher_id)
+                 if check_email_setting
+                   UserMailer.email_when_my_stared_question_get_answer(starred_user.email,@solver,qust_details).deliver 
+                 end
+                 
+                
+              end
+               
            end
           end
 				
@@ -153,8 +160,7 @@ module Api
 			def purchase_solution
 			  user = User.find_by_reecher_id(params[:user_id])
 				solution = Solution.find(params[:solution_id])
-				question = Question.where(:question_id =>solution.question_id)
-				#sfdsdfs
+				question = Question.where(:question_id =>solution.question_id)				
 				question_id = question[0][:question_id]
 				quest_asker = question[0][:posted_by_uid]
         quest_is_public = question[0][:is_public]
@@ -197,11 +203,7 @@ module Api
          	  if !check_friend
          	  make_friendship_standard(user.reecher_id,solution.solver_id)			  					 
 						end
-			
 						#End of friendship  code
-						
-           
-						
 						# Send notification to the solver
 						check_setting= notify_when_someone_grab_my_answer(solution.solver_id)
 						if check_setting
@@ -217,9 +219,16 @@ module Api
 
                  end
               end  
-            
-                     
             end
+           
+            #Send email notification when some gram my solution
+           #check_email_setting = check_email_when_someone_grab_my_answer(solution.solver_id)
+          # if check_email_setting
+          # @solver = User.find_by_reecher_id(@solution[:solver_id])
+          # UserMailer.email_solution_got_highfive(@solver.email,user,@solution[:body]).deliver 
+          # end      
+                 
+            
 						preview_solution = PreviewSolution.find_by_user_id_and_solution_id(user.id, solution.id)
 						preview_solution.destroy
 						#Add points to solution provider
@@ -255,11 +264,9 @@ module Api
                  if ssss
                    user.add_points(10)        
                  end
-							   
 						    else
 						     user.subtract_points(solution.ask_charisma)	
 						    end	
-
 					    end 	
              # make friend 
   
@@ -329,7 +336,7 @@ module Api
 				@solution[:hi5] = solution.votes_for.size
 				solution.picture_file_name != nil ? @solution[:image_url] =  solution.picture_url : @solution[:image_url] = nil
 				# send push notification while hi5 solution
-				check_setting= notify_solution_got_highfive(solution.solver_id)
+				check_setting = notify_solution_got_highfive(solution.solver_id)
                if check_setting
                 device_details=Device.select("device_token,platform").where("reecher_id=?",solution.solver_id.to_s)
                 response_string ="HGHFV,"+ "<" +user.full_name + ">"+ "," + params[:solution_id] +","+Time.now().to_s
@@ -339,8 +346,17 @@ module Api
                     end  
                 end 
                end
+               
+        # Send email notification solution provider if any one hi5
+         check_email_setting = check_email_solution_got_highfive(@solution[:solver_id])
+         if check_email_setting
+           @solver = User.find_by_reecher_id(@solution[:solver_id])
+           UserMailer.email_solution_got_highfive(@solver.email,user,@solution[:body]).deliver 
+         end      
+               
 				solution.picture_file_name != nil ? @solution[:image_url] =solution.picture_url : @solution[:image_url] = nil
 				msg = {:status => 200, :solution => @solution}
+				
 				render :json => msg
 				
 				
@@ -731,29 +747,7 @@ module Api
                end            
             end
             
-=begin           
-           # Send push notification to those who starred this question
-           @voting = Voting.where(question_id: params[:question_id])
-           if @voting.blank?
-            @voting = Voting.new do |v|
-            response_string ="PRSLN,"+ @solution.solver + ","+params[:question_id]
-             check_setting= notify_solution_got_highfive(v.user_id)
-             if check_setting
-              device_details = Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
-              response_string ="HGHFV,"+ @solution.solver + ","+params[:question_id]+"," +Time.now().to_s
-              if !device_details.blank?   
-                 device_details.each do |d|
-                    begin
-                      send_device_notification(d[:device_token].to_s, response_string ,d[:platform].to_s)
-                    rescue Exception => e
-                      logger.error e.backtrace.join("\n")
-                    end
-                 end
-              end
-             end
-           end
-          end
-=end        
+       
           msg = {:status => 200, :solution => @solution}
           
         else
@@ -782,23 +776,7 @@ module Api
       end
 		  
 		end
-=begin		
-		def make_friendship_standard(friends, user)
-		#  Friendship.create(:reecher_id=>friends,:friend_reecher_id=>user,:status=>"accepted")
-		# Friendship.create(:reecher_id=>user,:friend_reecher_id=>friends,:status=>"accepted")		 
-		friend =  Friendship.new()
-		friend.reecher_id = friends
-		friend.friend_reecher_id = user
-		friend.status = "accepted"
-		friend.save
-
-    friend2 =  Friendship.new()
-    friend2.reecher_id = user
-    friend2.friend_reecher_id = friends
-    friend2.status = "accepted"
-    friend2.save
-    end  
-=end		
+	
 		end
 	end
 end			

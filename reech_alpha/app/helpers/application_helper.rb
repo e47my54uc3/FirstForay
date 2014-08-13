@@ -379,11 +379,12 @@ module ApplicationHelper
             if linked_quest_type !="INVITE"
              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
+           # email_notification_to_linked_user 
              elsif linked_quest_type =="INVITE"   
              get_referal_code_and_token = linked_question_with_type user.reecher_id , 0, '' , number , linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
             end 
-           begin       
+            begin       
             client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])    
                       sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
@@ -501,14 +502,18 @@ module ApplicationHelper
     @lk = LinkedQuestion.where("question_id=? AND linked_type=? AND user_id=? AND linked_by_uid=?" , question_id , "LINKED" , user_id , linked_by_uid)
     puts "AFTER CHECK LINKED:::::#{@lk.inspect}"
     if @lk.blank?
-      return flag
+     # do nothing
     else
       flag =true
-      return flag
+      
     end 
-    
-    puts "LINKFLAG=#{flag}"
-    
+    return flag
   end
+  
+  
+  def email_notification_to_linked_user linked_email, question_obj,user_details
+  
+  end
+  
   
 end

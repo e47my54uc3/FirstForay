@@ -20,17 +20,15 @@ module Api
 			def create
 				if params[:provider] == "standard"
 				  
-				 
-				  
-				  phone_number = filter_phone_number(params[:user_details][:phone_number])
-				   
-					@user_session = UserSession.new
-				  @user_session.phone_number = phone_number
-				  @user_session.password = params[:user_details][:password]
+				 # phone_number = filter_phone_number(params[:user_details][:phone_number])
+				#	#@user_session = UserSession.new
+				  #@user_session.phone_number = phone_number
+				 # @user_session.password = params[:user_details][:password]
+				 @user_session = UserSession.new(params[:user_details])
 					puts "@user_session=#{@user_session.inspect}"	
 					if @user_session.save
 						respond_to do |format|
-							@user_id = User.find_by_phone_number(@user_session.phone_number)							
+							@user_id = User.find_by_email(@user_session.email).reecher_id						
 							@api_key = ApiKey.create(:user_id => @user_id.reecher_id).access_token
 							#create a device token entry in device table for push notifications
 							if !params[:device_token].blank? && !params[:platform].blank?

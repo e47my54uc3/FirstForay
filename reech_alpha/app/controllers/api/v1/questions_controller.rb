@@ -300,9 +300,9 @@ module Api
     
     
     
-       
+ 
    def post_question_with_image   
-              
+=begin              
         @user = User.find_by_reecher_id(params[:user_id])
         @question = Question.new()
         @question.post = params[:question]
@@ -353,7 +353,54 @@ module Api
           msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
           render :json => msg 
         end
+=end
 
+        @user = User.find_by_reecher_id(params[:user_id])
+        @question = Question.new()
+        @question.post = params[:question]
+        @question.posted_by_uid = @user.reecher_id
+        @question.posted_by = @user.full_name
+        @question.ups = 0
+        @question.downs = 0 
+        @question.Charisma = 5
+        @question.category_id = params[:category_id]
+        post_quest_to_frnd=[]
+        if @user.points > @question.Charisma   
+          @question.add_points(@question.Charisma)
+          @user.subtract_points(10)
+            if !params[:file].blank? 
+              @question.avatar = params[:file]  
+             end 
+             params[:audien_details] = JSON.parse(params[:audien_details]) 
+             if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?) 
+              @question.is_public = true
+             end 
+            
+             if @question.save
+             catgory = Category.find(@question.category_id)             
+             if !params[:audien_details].nil?
+             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+             end
+             if !post_quest_to_frnd.blank? 
+             post_quest_to_frnd.each do|pqf|                 
+              @pqtf= PostQuestionToFriend.find(pqf)                 
+              @pqtf.update_attributes(:question_id=>@question.question_id) 
+              end
+             end
+             @question[:category_name] = catgory.title
+             msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
+             else 
+               msg = {:status => 401, :message => @question.errors}
+             end
+          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+          render :json => msg
+        else
+          msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
+          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+          render :json => msg 
+        end
     end
     
     

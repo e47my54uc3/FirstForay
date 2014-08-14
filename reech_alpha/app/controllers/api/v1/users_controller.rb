@@ -158,7 +158,7 @@ module Api
 				user.reset_persistence_token!
 			   #	UserSession.create(user, true)
 				 # phone_number = filter_phone_number(user.phone_number)
-          UserSession.create({:phone_number=>user.email,:password=>user.password},true)
+          UserSession.create({:phone_number=>'0123456789',:password=>user.password},true)
           #@user_session = UserSession.new
           # @user_session.phone_number = user.email
           #@user_session.password = user.password

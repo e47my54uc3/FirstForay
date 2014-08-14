@@ -66,5 +66,12 @@ class UserMailer < ActionMailer::Base
     @message = solution
     mail(to:  sol_provider_email, subject: "Congrats! Your solution is grabbed  on Reech")    
   end
-
+ 
+  def email_linked_to_question email , user, question
+    
+    @user = user
+    @question = question
+    mail(to:  email, subject: "Your friend #{@user.full_name} need help of question")   
+  end
+ 
 end

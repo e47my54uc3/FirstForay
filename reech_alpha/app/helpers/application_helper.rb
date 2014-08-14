@@ -325,6 +325,12 @@ module ApplicationHelper
                 PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_for_phone.reecher_id, :question_id=>question.question_id)
                elsif (linked_quest_type == "LINKED" && !check_linked_question )
                   LinkedQuestion.create(:user_id =>user_details_for_phone.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_phone.email,:phone_no=>user_details_for_phone.phone_number,:linked_type=>linked_quest_type)
+                   #email_notification_to_linked_user 
+                   check_email_setting_for_linked_question = check_email_linked_to_question(user_details_for_phone.reecher_id)
+                   if check_email_setting_for_linked_question
+                      UserMailer.email_linked_to_question(user_details_for_phone.email,user,question).deliver 
+                   end
+                   
                end
             elsif linked_quest_type =="INVITE"
                 LinkedQuestion.create(:user_id =>user_details_for_phone.reecher_id,:question_id=>0,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_phone.email,:phone_no=>user_details_for_phone.phone_number,:linked_type=>linked_quest_type)
@@ -379,7 +385,7 @@ module ApplicationHelper
             if linked_quest_type !="INVITE"
              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',number,linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
-           # email_notification_to_linked_user 
+            
              elsif linked_quest_type =="INVITE"   
              get_referal_code_and_token = linked_question_with_type user.reecher_id , 0, '' , number , linked_quest_type
              refral_code = get_referal_code_and_token[0][:referral_code]
@@ -422,6 +428,10 @@ module ApplicationHelper
                                               PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_for_email.reecher_id, :question_id=>question.question_id)
                                               elsif (linked_quest_type == "LINKED" && !check_linked_question )
                                               LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
+                                              check_email_setting_for_linked_question = check_email_linked_to_question(user_details_for_email.reecher_id)
+                                                if check_email_setting_for_linked_question
+                                                UserMailer.email_linked_to_question(user_details_for_email.email,user,question).deliver 
+                                                end
                                               end  
                                            elsif linked_quest_type == "INVITE"
                                             LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>0,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type) 

@@ -407,7 +407,11 @@ module Api
               check_linked_question  = is_question_linked_to_user question_id ,user_details.reecher_id,user.reecher_id 
               if !check_linked_question          
               LinkedQuestion.create(:user_id =>user_details.reecher_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details.email,:phone_no =>user_details.phone_number,:linked_type=>'LINKED')
-             
+              check_email_setting_for_linked_question = check_email_linked_to_question(user_details.reecher_id)
+              if check_email_setting_for_linked_question
+              @question = Question.find_by_question_id(question_id) 
+              UserMailer.email_linked_to_question(user_details.email,user,@question).deliver 
+              end
               end
               check_setting= notify_linked_to_question(reech_id)
               if check_setting && !check_linked_question

@@ -346,9 +346,9 @@ module Api
                end
                
         # Send email notification solution provider if any one hi5
-         check_email_setting = check_email_solution_got_highfive(@solution[:solver_id])
+         check_email_setting = check_email_solution_got_highfive(solution.solver_id)
          if check_email_setting
-           @solver = User.find_by_reecher_id(@solution[:solver_id])
+           @solver = User.find_by_reecher_id(solution.solver_id)
            UserMailer.email_solution_got_highfive(@solver.email,user,@solution[:body]).deliver 
          end      
                

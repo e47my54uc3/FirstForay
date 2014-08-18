@@ -11,9 +11,9 @@ class UserInvitationWithQuestionDetails < ActionMailer::Base
     @question_id = question_id
     @linked_quest_type = linked_quest_type
     if question_id != 0
-       mail(to:  email, subject: "Invitation to Answer a question in Reechout")
+       mail(to:  email, subject: "You've been referred to a question on Reech")
     else
-       mail(to:  email, subject: "Invitation to join Reechout")
+       mail(to:  email, subject: "Your friends are Reeching, are you?")
     end
   end 
   

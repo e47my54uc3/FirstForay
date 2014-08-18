@@ -10,7 +10,7 @@ class UserInvitationWithContact < ActionMailer::Base
     @token = token
     #@referral_code = referral_code
     #@question_id = question_id
-    mail(to:  email, subject: "Your friend @user.full_name needs your help…")
+    mail(to:  email, subject: "Your friend @user.full_name needs your help on Reech")
   end 
   
 end

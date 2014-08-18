@@ -178,6 +178,7 @@ p {
   padding-bottom: 10px;
 }
 .contentfromreech {
+  display: none;
   padding: 15px 30px 15px 29px;
 }
 .actionbuttons {
@@ -509,15 +510,22 @@ p {
             <div class="emailmessage">
               <div class="emailtext">Greetings!
                 <br>
-                <br>Your friend <%= @user.first_name %> <%= @user.last_name %> thinks very highly of you and wants you to be part of their private network on Reech - the best place to get help from friends easily. Please download the application to help them out!
+                <br>Your friend <%= @user.full_name %> thinks very highly of you and wants you to be part of their private network on Reech - the best place to get help from friends easily. Please download the application to help them out!
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
             </div>
+            <div class="contentfromreech">
+              <div class="profilebar">
+                <img class="profileicon" src="http://reechout.co/img/profileIcon.png" alt="Reech Me!">
+                <div class="profilename"><%= @user.full_name %></div>
+              </div>
+              <div class="reechcontent"><%= @question.post %></div>
+            </div>
             <div class="invitecodearea">
               <div class="invitecodetext">Your private invitation code:</div>
               <div class="invitecode"><%=@referral_code%></div>
-              <div class="invitedisclaimer">This private code and the content shared by your friend is for your eyes only! So please do not share this. You can easily invite others through the mobile app :)</div>
+              <div class="invitedisclaimer">This private code and the content shared by your friend is for your eyes only! So please do not share this. You can easily invite others through the mobile app :)&nbsp;</div>
             </div>
             <div class="actionbuttons">
               <div class="actiontype">

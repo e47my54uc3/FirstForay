@@ -493,12 +493,14 @@ module Api
              elsif (question_asker==logined_user.reecher_id && !@lk.blank? )
               puts "When logged in person is question asker and solution provide is linked user"
                  
-                 if ((((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
+                 #if ((((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
+                 if ((((!@pqtfs.blank?) && reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s )
                    solution_attrs[:solution_provider_name] = question_linker_details.full_name
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
                    question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
-                 elsif ((((!@pqtfs.blank?)  && (!reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
+                 #elsif ((((!@pqtfs.blank?)  && (!reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
+                 elsif ((((!@pqtfs.blank?) && !reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s )
                    solution_attrs[:solution_provider_name] = "Friend"
                    solution_attrs[:no_profile_pic] = true
                    solution_attrs[:profile_pic_clickable] = false
@@ -558,7 +560,8 @@ module Api
             puts "When logged in person is in choosen audience and solution provider is a linked user"   
               if ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && check_friend_with_login_and_solver )
                  #solution_attrs[:solution_provider_name] = sl.solver
-                 sef post_solution_with_imageolution_attrs[:solution_provider_name] = user.full_name
+                 #sef post_solution_with_imageolution_attrs[:solution_provider_name] = user.full_name
+                 solution_attrs[:solution_provider_name] = user.full_name
                  solution_attrs[:no_profile_pic] = false
                  solution_attrs[:profile_pic_clickable] = true
                elsif ((((!@pqtfs.blank?)&& (reecher_user_associated_to_question.include? question_linker_reecher_id)) || question_is_public == true ) && !check_friend_with_login_and_solver )

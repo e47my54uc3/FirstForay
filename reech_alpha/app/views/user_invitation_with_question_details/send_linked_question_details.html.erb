@@ -510,7 +510,7 @@ p {
             <div class="emailmessage">
               <div class="emailtext">Greetings!
                 <br>
-                <br>Your friend <%= @user.full_name %> thinks very highly of you and wants you to be part of their private network on Reech - the best place to get help from friends easily. Please download the application to help them out!
+                <br>Your friend <b><%= @user.first_name %> <%= @user.last_name %></b> thinks very highly of you and wants you to be part of their private network on Reech - the best place to get help from friends easily. Please download the application to help them out!
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
@@ -518,9 +518,8 @@ p {
             <div class="contentfromreech">
               <div class="profilebar">
                 <img class="profileicon" src="http://reechout.co/img/profileIcon.png" alt="Reech Me!">
-                <div class="profilename"><%= @user.full_name %></div>
+                <div class="profilename"><%= @user.first_name %> <%= @user.last_name %></div>
               </div>
-              <div class="reechcontent"><%= @question.post %></div>
             </div>
             <div class="invitecodearea">
               <div class="invitecodetext">Your private invitation code:</div>

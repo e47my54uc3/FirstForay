@@ -105,7 +105,7 @@ module Api
                   puts "Our condition is linked, linked by user is solving, and linker is in choosen audience and it is public"
                   push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                   response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
-                  elsif ((question_is_public == true) && (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  elsif ((!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) || (question_is_public == true))
                   puts "Our condition and solver is in choosen audience and it is public"
                   response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
                   push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
@@ -762,7 +762,7 @@ module Api
                   puts "Our condition is linked, linked by user is solving, and linker is in choosen audience and it is public"
                   push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                   response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
-                  elsif ((question_is_public == true) && (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  elsif ((!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) || (question_is_public == true) )
                   puts "Our condition and solver is in choosen audience and it is public"
                   response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
                   push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN

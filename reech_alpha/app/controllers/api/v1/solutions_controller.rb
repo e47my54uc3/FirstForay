@@ -85,6 +85,7 @@ module Api
                   #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                   device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                   # Start
+=begin
                   if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
                   push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                   response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
@@ -96,6 +97,25 @@ module Api
                   response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
                   push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
                   else  
+                  response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
+                  push_title = "Your Friend" + PUSH_TITLE_PRSLN 
+                  end
+=end
+                  if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (((!@pqtfs.blank?) && reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true)))
+                  puts "Our condition is linked, linked by user is solving, and linker is in choosen audience and it is public"
+                  push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
+                  response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
+                  elsif ((question_is_public == true) && (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  puts "Our condition and solver is in choosen audience and it is public"
+                  response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
+                  push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
+                  #elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+                  elsif ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && ((!reecher_user_associated_to_question.include?(question_linker_reecher_id)) && (question_is_public == false)))
+                  puts "Our condition is linked, linked by user is solving, and linker is not in choosen audience and it is not public"
+                  response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
+                  push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
+                  else  
+                  puts "Our condition is something else"
                   response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
                   push_title = "Your Friend" + PUSH_TITLE_PRSLN 
                   end
@@ -737,17 +757,22 @@ module Api
                   #device_details = Device.where("reecher_id=?",user_details[0][:posted_by_uid].to_s)
                   device_details=Device.select("device_token,platform").where("reecher_id=?",qust_details.posted_by_uid.to_s)
                   # Start
-                  if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
+                  #if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (!@pqtfs.blank?) &&(reecher_user_associated_to_question.include? question_linker_reecher_id))
+                  if ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && (((!@pqtfs.blank?) && reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true)))
+                  puts "Our condition is linked, linked by user is solving, and linker is in choosen audience and it is public"
                   push_title = "Friend of #{question_linker_details.first_name}" + PUSH_TITLE_PRSLN
                   response_string ="PRSLN,"+ "Friend of <#{question_linker_details.first_name}>" + ","+params[:question_id]
-                  elsif ((question_is_public == true) || (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  elsif ((question_is_public == true) && (!@pqtfs.blank? && (reecher_user_associated_to_question.include? @solution.solver_id)) )
+                  puts "Our condition and solver is in choosen audience and it is public"
                   response_string ="PRSLN,"+ "Your Friend <"+@solution.solver + ">,"+ params[:question_id] +","+Time.now().to_s
                   push_title = "#{@solution.solver}" + PUSH_TITLE_PRSLN
                   #elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
-                  elsif(question_is_public == false && (!@lk.blank? && !(reecher_user_associated_to_question.blank?) && !(reecher_user_associated_to_question.include? question_linker_reecher_id) && (@solution.solver_id == linked_user_to_question) ) )
+		              elsif ((!@lk.blank?)  &&  (@solution.solver_id.to_s == linked_user_to_question.to_s) && ((!reecher_user_associated_to_question.include?(question_linker_reecher_id)) && (question_is_public == false)))
+		              puts "Our condition is linked, linked by user is solving, and linker is not in choosen audience and it is not public"
                   response_string ="PRSLN,"+ "Friend of Friend" + ","+params[:question_id]+","+Time.now().to_s
                   push_title = FRIEND_OF_FRIEND + PUSH_TITLE_PRSLN 
                   else  
+                  puts "Our condition is something else"
                   response_string ="PRSLN,"+ "Your Friend" + ","+params[:question_id]+","+Time.now().to_s 
                   push_title = "Your Friend" + PUSH_TITLE_PRSLN 
                   end

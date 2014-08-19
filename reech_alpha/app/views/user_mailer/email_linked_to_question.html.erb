@@ -85,6 +85,8 @@ p {
 }
 .headersection {
   height: auto;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   background-color: white;
 }
 .bodysection {
@@ -92,6 +94,8 @@ p {
   background-color: white;
 }
 .footersection {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
   background-color: white;
 }
 .logoblock {
@@ -509,7 +513,7 @@ p {
             <div class="emailmessage">
               <div class="emailtext">Greetings!
                 <br>
-                <br>Your friend <%= @user.first_name %> thinks very highly of you and has invited you to be part of their private network on Reech. Please download the application to help them out!
+                <br>Your friend <%= @user.first_name %> thinks very highly of you and has asked for your help on Reech. Please download the application to help them out!
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
@@ -523,7 +527,7 @@ p {
             </div>
             <div class="invitecodearea">
               <div class="invitecodetext">Your private invitation code:</div>
-              <div class="invitecode">&lt;INVITE CODE&gt;</div>
+              <div class="invitecode"> <%= @referral_code %> </div>
               <div class="invitedisclaimer">This private code and the content shared by your friend is for your eyes only! So please do not share this. You can easily invite others through the mobile app :)&nbsp;</div>
             </div>
             <div class="actionbuttons">

@@ -85,6 +85,8 @@ p {
 }
 .headersection {
   height: auto;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
   background-color: white;
 }
 .bodysection {
@@ -93,6 +95,8 @@ p {
 }
 .footersection {
   background-color: white;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 .logoblock {
   display: block;
@@ -514,12 +518,6 @@ p {
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
-            </div>
-            <div class="contentfromreech">
-              <div class="profilebar">
-                <img class="profileicon" src="http://reechout.co/img/profileIcon.png" alt="Reech Me!">
-                <div class="profilename"><%= @user.first_name %> <%= @user.last_name %></div>
-              </div>
             </div>
             <div class="invitecodearea">
               <div class="invitecodetext">Your private invitation code:</div>

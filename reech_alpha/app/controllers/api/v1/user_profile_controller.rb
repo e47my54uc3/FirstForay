@@ -201,14 +201,20 @@ module Api
 			# leader board
        def leader_board       
         final_leader = {}
-        #@user=User.find_by_reecher_id(params[:user_id])
-        all_users= User.includes(:friendships).where("users.reecher_id =?",params[:user_id])
+        @user=User.find_by_reecher_id(params[:user_id])
+        puts "STEP1  Current USER =#{(@user.inspect).to_yaml}"
+        all_friend_of_users= @user.friendships.where(:status =>"accepted").pluck(:friend_reecher_id)
+        puts "STEP2  ALL Friend of USER =#{(all_friend_of_users.inspect).to_yaml}"
+        all_users = User.where(:reecher_id=>all_friend_of_users) 
+       # User.joins(:friendships).where("users.reecher_id =?",params[:user_id])
+        puts "STEP1  ALL USER =#{(all_users.inspect).to_yaml}"
         user_details =[]
         current_user_hash =[]
         ### Today
         if !all_users.blank?
           all_users.each do |user|
             @user_profile = user.user_profile 
+            puts " STEP2 USER PROFILE =#{@user_profile.inspect}"
             profile_pic_path = (@user_profile.profile_pic_path).to_s
             if @user_profile.picture_file_name
              image_url =  @user_profile.picture_url      
@@ -216,16 +222,22 @@ module Api
               image_url = profile_pic_path
             else
               image_url = nil
-            end
-            questions=user.questions.where("created_at"=>(Time.now()).to_date)
-            solution = user.solutions.where("created_at"=>(Time.now()).to_date)
-            tot_question = questions.count
-            tot_answer = solution.count
+            end        
+            tot_question = get_user_total_question user.reecher_id
+            tot_answer = get_user_total_solution user.reecher_id
             tot_hi5 = user.user_profile.votes_for.size 
             tot_curios = user.points
+            
+            puts "tot_question=#{tot_question}"
+            puts "tot_answer=#{tot_answer}"
+            puts "tot_hi5=#{tot_hi5}"
+            puts "tot_curios=#{tot_curios}"
            # position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
            #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
-             position =  ((0.15 * tot_curios) + (0.2*tot_question) + (0.3*tot_answer) + (0.35*tot_hi5)).floor
+            position =    
+             
+             puts "position==#{position}"
+             
             user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
  
           end

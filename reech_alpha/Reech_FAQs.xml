@@ -1,0 +1,479 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<questions type="array">
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24230</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T22:26:21Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T22:26:21Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">57</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>What do the different icons mean? </post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-2241075992</question-id>
+    <sash-id type="integer">75</sash-id>
+    <updated-at type="datetime">2014-08-18T22:26:23Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24251</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T22:36:34Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T22:36:34Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">58</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>Can I create groups? </post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-7045465711</question-id>
+    <sash-id type="integer">76</sash-id>
+    <updated-at type="datetime">2014-08-18T22:36:36Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24251</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T22:40:48Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T22:40:48Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">59</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>How do I navigate this app? </post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-83512924372</question-id>
+    <sash-id type="integer">77</sash-id>
+    <updated-at type="datetime">2014-08-18T22:40:50Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24230</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T22:54:37Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T22:54:37Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">60</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>How can I help my friends? </post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-88572096554</question-id>
+    <sash-id type="integer">78</sash-id>
+    <updated-at type="datetime">2014-08-18T22:54:39Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24230</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T23:04:05Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T23:04:05Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">61</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>How do I ask a question and who sees them?</post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-7470731509</question-id>
+    <sash-id type="integer">79</sash-id>
+    <updated-at type="datetime">2014-08-18T23:04:06Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+  <question>
+    <Charisma type="integer">5</Charisma>
+    <audien-user-ids type="array"/>
+    <avatar-content-type>image/jpeg</avatar-content-type>
+    <avatar-file-name>filename.jpg</avatar-file-name>
+    <avatar-file-size type="integer">24251</avatar-file-size>
+    <avatar-updated-at type="datetime">2014-08-18T23:12:45Z</avatar-updated-at>
+    <category-id type="integer">14</category-id>
+    <catgory-id type="integer" nil="true"/>
+    <created-at type="datetime">2014-08-18T23:12:45Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">62</id>
+    <is-public type="boolean">true</is-public>
+    <level type="integer">0</level>
+    <post>How do I create my Reech network? </post>
+    <posted-by>ASK REECH</posted-by>
+    <posted-by-uid>Reecher-21483774819</posted-by-uid>
+    <question-id>question-57563418335</question-id>
+    <sash-id type="integer">80</sash-id>
+    <updated-at type="datetime">2014-08-18T23:12:47Z</updated-at>
+    <ups type="integer">0</ups>
+  </question>
+</questions>
+<?xml version="1.0" encoding="UTF-8"?>
+<solutions type="array">
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>C is for Curiosity points. "Curios" are earned by providing solutions that people like and grab (25 c). You can also get Curios when you successfully link someone to answer a question (10 c)- i.e someone you linked gave a solution that was grabbed.</body>
+    <created-at type="datetime">2014-08-18T22:29:23Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">56</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">160828</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:29:22Z</picture-updated-at>
+    <question-id>question-2241075992</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:29:23Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>A Hi5 is received for a solution you provided that someone liked and found useful. Give good solutions, get more Hi5s!</body>
+    <created-at type="datetime">2014-08-18T22:32:23Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">57</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">160828</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:32:21Z</picture-updated-at>
+    <question-id>question-2241075992</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:32:23Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Anti-spam feature: To make sure people aren’t abusing the ask question button we take 10 curios into “escrow” up front, towards your solution total. This means asking any question costs 10 curios by default.  Don’t worry, we refill curios regularly! </body>
+    <created-at type="datetime">2014-08-18T22:34:55Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">58</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">160828</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:34:53Z</picture-updated-at>
+    <question-id>question-2241075992</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:34:55Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Yes! You can create personal groups for easy categorization of friends in your Reech network. No one else will see who’s in the groups you create. To create a group, click to the right of your connection where it says “in your reech” and hit “Create </body>
+    <created-at type="datetime">2014-08-18T22:37:36Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">59</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">134190</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:37:35Z</picture-updated-at>
+    <question-id>question-7045465711</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:37:36Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Hint: If you click on one of your reech connection’s pictures you’ll be able to see some of their profile stats like # questions asked, answers, hi5s, and their profile blurb. That can be useful when you're creating your groups of helpful experts. </body>
+    <created-at type="datetime">2014-08-18T22:38:54Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">60</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-7045465711</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:38:54Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>On the main screen, you'll see “All” (shows all questions asked by your reech network). “Mine” (questions you’ve asked and answers you’ve grabbed from others) and “Starred” (shows saved questions for easy access).</body>
+    <created-at type="datetime">2014-08-18T22:47:11Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">61</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">25423</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:47:09Z</picture-updated-at>
+    <question-id>question-83512924372</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:47:11Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Clicking on your profile from the main screen will access your profile drawer. Here you can check your settings, stats, and other useful features.</body>
+    <created-at type="datetime">2014-08-18T22:49:01Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">62</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">185376</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:49:00Z</picture-updated-at>
+    <question-id>question-83512924372</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:49:01Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Notifications: See your unchecked notifications here
+Linked Questions: See questions referred to you by your friends. Leaderboard: Shows the top most helpful people in your personal network, for your convenience.</body>
+    <created-at type="datetime">2014-08-18T22:53:25Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">63</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">185376</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:53:23Z</picture-updated-at>
+    <question-id>question-83512924372</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:53:25Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Tap into any question that you see and choose one of 2 options: Answer or Link. The “Answer Question” button will take you to the solution providing page. Write your answer in the space and tap “Answer”</body>
+    <created-at type="datetime">2014-08-18T22:56:19Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">64</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">91546</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T22:56:17Z</picture-updated-at>
+    <question-id>question-88572096554</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T22:56:19Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Refer a friend to answer by clicking the green link button. The person being linked won’t see the name of who is asking the question. They’ll see “friend of (you)” is asking the question. If you make a successful link you'll earn 10 curios! </body>
+    <created-at type="datetime">2014-08-18T23:02:01Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">65</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">36773</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:01:59Z</picture-updated-at>
+    <question-id>question-88572096554</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:02:01Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Answers can be seen below the questions. Scroll through them by swiping left or right.</body>
+    <created-at type="datetime">2014-08-18T23:03:01Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">66</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">112474</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:02:59Z</picture-updated-at>
+    <question-id>question-88572096554</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:03:01Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>To ask a question: tap the big orange ? at the bottom, type your question, and then choose your “audience”.</body>
+    <created-at type="datetime">2014-08-18T23:07:16Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">67</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">40051</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:07:15Z</picture-updated-at>
+    <question-id>question-7470731509</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:07:16Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Select the audience in your question to control who sees it. Only people you choose will know that you’re asking for help. Everyone else will see the question anonymously, from a friend. By default your question will go to all of your Reech friends. </body>
+    <created-at type="datetime">2014-08-18T23:11:33Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">68</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">80449</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:11:32Z</picture-updated-at>
+    <question-id>question-7470731509</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:11:33Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Invite friends in the connections tab at the bottom. Select the “Contacts” tab to access your email and phone numbers. If you’ve signed up through Facebook we’ll find your other FB friends. You can see all your connections in “My Reech”.</body>
+    <created-at type="datetime">2014-08-18T23:14:29Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">69</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">103173</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:14:28Z</picture-updated-at>
+    <question-id>question-57563418335</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:14:29Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>You can also invite by asking a question and selecting a contact,  or clicking the “+” icon and inviting friends through email or SMS.</body>
+    <created-at type="datetime">2014-08-18T23:15:35Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">70</id>
+    <linked-user nil="true"/>
+    <picture-content-type>image/jpeg</picture-content-type>
+    <picture-file-name>filename.jpg</picture-file-name>
+    <picture-file-size type="integer">78388</picture-file-size>
+    <picture-updated-at type="datetime">2014-08-18T23:15:34Z</picture-updated-at>
+    <question-id>question-57563418335</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-18T23:15:35Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Test answer</body>
+    <created-at type="datetime">2014-08-19T19:07:47Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">82</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-37894480637</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-19T19:07:47Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Answer when linker is audience </body>
+    <created-at type="datetime">2014-08-19T19:08:19Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">83</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-1060440903</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-19T19:08:19Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Answer when linker not audience </body>
+    <created-at type="datetime">2014-08-19T19:08:39Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">84</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-4090161083</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-19T19:08:39Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Audience all</body>
+    <created-at type="datetime">2014-08-19T19:09:55Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">85</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-37894480637</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-19T19:09:55Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+  <solution>
+    <ask-charisma type="integer">25</ask-charisma>
+    <body>Audience is linker </body>
+    <created-at type="datetime">2014-08-19T19:10:27Z</created-at>
+    <downs type="integer">0</downs>
+    <id type="integer">86</id>
+    <linked-user nil="true"/>
+    <picture-content-type nil="true"/>
+    <picture-file-name nil="true"/>
+    <picture-file-size type="integer" nil="true"/>
+    <picture-updated-at type="datetime" nil="true"/>
+    <question-id>question-1060440903</question-id>
+    <solver>ASK REECH</solver>
+    <solver-id>Reecher-21483774819</solver-id>
+    <updated-at type="datetime">2014-08-19T19:10:27Z</updated-at>
+    <ups type="integer">0</ups>
+  </solution>
+</solutions>

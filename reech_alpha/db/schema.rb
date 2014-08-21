@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140728130848) do
+ActiveRecord::Schema.define(:version => 20140812103340) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -58,7 +58,7 @@ ActiveRecord::Schema.define(:version => 20140728130848) do
   add_index "chats", ["broadcasted_to"], :name => "index_chats_on_broadcasted_to"
 
   create_table "devices", :force => true do |t|
-    t.string   "device_token"
+    t.text     "device_token"
     t.string   "platform"
     t.string   "reecher_id"
     t.datetime "created_at",   :null => false
@@ -110,9 +110,10 @@ ActiveRecord::Schema.define(:version => 20140728130848) do
     t.string   "linked_question_id"
     t.text     "token"
     t.string   "referral_code"
+    t.boolean  "status",              :default => true
     t.datetime "token_validity_time"
-    t.datetime "created_at",          :null => false
-    t.datetime "updated_at",          :null => false
+    t.datetime "created_at",                            :null => false
+    t.datetime "updated_at",                            :null => false
   end
 
   create_table "linked_questions", :force => true do |t|
@@ -349,19 +350,20 @@ ActiveRecord::Schema.define(:version => 20140728130848) do
   create_table "users", :force => true do |t|
     t.string   "first_name"
     t.string   "last_name"
-    t.string   "email",                             :default => ""
-    t.string   "phone_number",        :limit => 11
-    t.datetime "created_at",                                               :null => false
-    t.datetime "updated_at",                                               :null => false
-    t.string   "profile_name",                      :default => "reecher"
-    t.string   "profile_id",                                               :null => false
-    t.string   "reecher_id",                                               :null => false
+    t.string   "email",                               :default => ""
+    t.string   "phone_number",          :limit => 15
+    t.string   "original_phone_number", :limit => 20
+    t.datetime "created_at",                                                 :null => false
+    t.datetime "updated_at",                                                 :null => false
+    t.string   "profile_name",                        :default => "reecher"
+    t.string   "profile_id",                                                 :null => false
+    t.string   "reecher_id",                                                 :null => false
     t.string   "crypted_password"
     t.string   "password_salt"
     t.string   "persistence_token"
     t.string   "single_access_token"
-    t.integer  "login_count",                       :default => 0
-    t.integer  "failed_login_count",                :default => 0
+    t.integer  "login_count",                         :default => 0
+    t.integer  "failed_login_count",                  :default => 0
     t.datetime "last_request_at"
     t.datetime "current_login_at"
     t.datetime "last_login_at"
@@ -369,7 +371,7 @@ ActiveRecord::Schema.define(:version => 20140728130848) do
     t.string   "last_login_ip"
     t.text     "omniauth_data"
     t.integer  "sash_id"
-    t.integer  "level",                             :default => 0
+    t.integer  "level",                               :default => 0
     t.string   "fb_token"
     t.string   "fb_uid"
   end

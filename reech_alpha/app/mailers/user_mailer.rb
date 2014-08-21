@@ -19,8 +19,9 @@ def send_invitation_email_for_audien(email,user)
     mail(to:  email, subject: "Your friends are Reeching, are you?")
   end
 
-  def send_link_question_email(email, user)
+  def send_link_question_email(email, user, question)
     @user = user
+    @question = question
     mail(to:  email, subject: "You've been referred to a question on Reech")
   end  
   
@@ -29,9 +30,11 @@ def send_invitation_email_for_audien(email,user)
     mail(to:  email, subject: "Invitation to Reech friend")
   end  
 
-  def send_question_details_to_audien(email,user)
+  def send_question_details_to_audien(email,friend_fname,question,user)
     @user = user
-    mail(to:  email, subject: "Question posted on Reechout")
+    @friend_fname = friend_fname
+    @question = question
+    mail(to:  email, subject: "Need your help on Reech")
   end
 
   def send_new_password_as_forgot_password(user,new_passwd)

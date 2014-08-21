@@ -412,7 +412,7 @@ module Api
                     if !audien_details[:reecher_ids].empty? 
                       post_quest_to_frnd =[]
                        audien_details[:reecher_ids].each do |reech_id|
-                           user_details_with_reech_id = User.find_by_reecher_id(reech_id)   
+                           user_details_with_reech_id = User.find_by_reecher_id(reech_id) 
                            pqtf=PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_with_reech_id.reecher_id, :question_id=>question.question_id)
                            post_quest_to_frnd << pqtf.id
                            check_setting= notify_audience_if_ask_for_help(user_details_with_reech_id.reecher_id) if !user_details_with_reech_id.blank?
@@ -431,7 +431,7 @@ module Api
                             # Send email notofication to all reecher users
                             begin
                               if user_details_with_reech_id.email !=nil
-                              UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user).deliver
+                              UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user_details_with_reech_id.first_name,question, user).deliver
                               end
                             rescue Exception => e
                               logger.error e.backtrace.join("\n")

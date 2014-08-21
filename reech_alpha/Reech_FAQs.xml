@@ -136,7 +136,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <solutions type="array">
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>C is for Curiosity points. "Curios" are earned by providing solutions that people like and grab (25 c). You can also get Curios when you successfully link someone to answer a question (10 c)- i.e someone you linked gave a solution that was grabbed.</body>
     <created-at type="datetime">2014-08-18T22:29:23Z</created-at>
     <downs type="integer">0</downs>
@@ -153,7 +153,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>A Hi5 is received for a solution you provided that someone liked and found useful. Give good solutions, get more Hi5s!</body>
     <created-at type="datetime">2014-08-18T22:32:23Z</created-at>
     <downs type="integer">0</downs>
@@ -170,7 +170,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Anti-spam feature: To make sure people aren’t abusing the ask question button we take 10 curios into “escrow” up front, towards your solution total. This means asking any question costs 10 curios by default.  Don’t worry, we refill curios regularly! </body>
     <created-at type="datetime">2014-08-18T22:34:55Z</created-at>
     <downs type="integer">0</downs>
@@ -187,7 +187,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Yes! You can create personal groups for easy categorization of friends in your Reech network. No one else will see who’s in the groups you create. To create a group, click to the right of your connection where it says “in your reech” and hit “Create </body>
     <created-at type="datetime">2014-08-18T22:37:36Z</created-at>
     <downs type="integer">0</downs>
@@ -204,7 +204,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Hint: If you click on one of your reech connection’s pictures you’ll be able to see some of their profile stats like # questions asked, answers, hi5s, and their profile blurb. That can be useful when you're creating your groups of helpful experts. </body>
     <created-at type="datetime">2014-08-18T22:38:54Z</created-at>
     <downs type="integer">0</downs>
@@ -221,7 +221,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>On the main screen, you'll see “All” (shows all questions asked by your reech network). “Mine” (questions you’ve asked and answers you’ve grabbed from others) and “Starred” (shows saved questions for easy access).</body>
     <created-at type="datetime">2014-08-18T22:47:11Z</created-at>
     <downs type="integer">0</downs>
@@ -238,7 +238,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Clicking on your profile from the main screen will access your profile drawer. Here you can check your settings, stats, and other useful features.</body>
     <created-at type="datetime">2014-08-18T22:49:01Z</created-at>
     <downs type="integer">0</downs>
@@ -255,7 +255,7 @@
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Notifications: See your unchecked notifications here
 Linked Questions: See questions referred to you by your friends. Leaderboard: Shows the top most helpful people in your personal network, for your convenience.</body>
     <created-at type="datetime">2014-08-18T22:53:25Z</created-at>
@@ -273,7 +273,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Tap into any question that you see and choose one of 2 options: Answer or Link. The “Answer Question” button will take you to the solution providing page. Write your answer in the space and tap “Answer”</body>
     <created-at type="datetime">2014-08-18T22:56:19Z</created-at>
     <downs type="integer">0</downs>
@@ -290,7 +290,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Refer a friend to answer by clicking the green link button. The person being linked won’t see the name of who is asking the question. They’ll see “friend of (you)” is asking the question. If you make a successful link you'll earn 10 curios! </body>
     <created-at type="datetime">2014-08-18T23:02:01Z</created-at>
     <downs type="integer">0</downs>
@@ -307,7 +307,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Answers can be seen below the questions. Scroll through them by swiping left or right.</body>
     <created-at type="datetime">2014-08-18T23:03:01Z</created-at>
     <downs type="integer">0</downs>
@@ -324,7 +324,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>To ask a question: tap the big orange ? at the bottom, type your question, and then choose your “audience”.</body>
     <created-at type="datetime">2014-08-18T23:07:16Z</created-at>
     <downs type="integer">0</downs>
@@ -341,7 +341,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Select the audience in your question to control who sees it. Only people you choose will know that you’re asking for help. Everyone else will see the question anonymously, from a friend. By default your question will go to all of your Reech friends. </body>
     <created-at type="datetime">2014-08-18T23:11:33Z</created-at>
     <downs type="integer">0</downs>
@@ -358,7 +358,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Invite friends in the connections tab at the bottom. Select the “Contacts” tab to access your email and phone numbers. If you’ve signed up through Facebook we’ll find your other FB friends. You can see all your connections in “My Reech”.</body>
     <created-at type="datetime">2014-08-18T23:14:29Z</created-at>
     <downs type="integer">0</downs>
@@ -375,7 +375,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>You can also invite by asking a question and selecting a contact,  or clicking the “+” icon and inviting friends through email or SMS.</body>
     <created-at type="datetime">2014-08-18T23:15:35Z</created-at>
     <downs type="integer">0</downs>
@@ -392,7 +392,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Test answer</body>
     <created-at type="datetime">2014-08-19T19:07:47Z</created-at>
     <downs type="integer">0</downs>
@@ -409,7 +409,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Answer when linker is audience </body>
     <created-at type="datetime">2014-08-19T19:08:19Z</created-at>
     <downs type="integer">0</downs>
@@ -426,7 +426,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Answer when linker not audience </body>
     <created-at type="datetime">2014-08-19T19:08:39Z</created-at>
     <downs type="integer">0</downs>
@@ -443,7 +443,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Audience all</body>
     <created-at type="datetime">2014-08-19T19:09:55Z</created-at>
     <downs type="integer">0</downs>
@@ -460,7 +460,7 @@ Linked Questions: See questions referred to you by your friends. Leaderboard: Sh
     <ups type="integer">0</ups>
   </solution>
   <solution>
-    <ask-charisma type="integer">25</ask-charisma>
+    <ask-charisma type="integer">0</ask-charisma>
     <body>Audience is linker </body>
     <created-at type="datetime">2014-08-19T19:10:27Z</created-at>
     <downs type="integer">0</downs>

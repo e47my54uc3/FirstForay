@@ -501,7 +501,7 @@ p {
           </div>
         </div>
         <div class="fillerorange">
-          <div class="topicsubject">Someone needs your help</div>
+          <div class="topicsubject">Hey, I need your help!</div>
         </div>
       </div>
     </div>
@@ -511,29 +511,19 @@ p {
         <div class="w-col w-col-10">
           <div class="contentholder">
             <div class="emailmessage">
-              <div class="emailtext">Greetings!
+              <div class="emailtext">Hi <%= @friend_fname %>,
                 <br>
-                <br>Your friend <%= @user.first_name %> needs your help answering a question on Reech. Please download the application to help them out!
+                <br>Your friend <%= @user.first_name %> could use your help on a question asked on Reech. Login to the mobile application and help them out!
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
             </div>
-            <div class="invitecodearea">
-              <div class="invitecodetext">Your private invitation code:</div>
-              <div class="invitecode"> <%= @referral_code %> </div>
-              <div class="invitedisclaimer">This private code and the content shared by your friend is for your eyes only! So please do not share this. You can easily invite others through the mobile app :)&nbsp;</div>
-            </div>
-            <div class="actionbuttons">
-              <div class="actiontype">
-                <div class="respondtext">Get Reech now to respond!</div>
+            <div class="contentfromreech">
+              <div class="profilebar">
+                <img class="profileicon" src="http://reechout.co/img/profileIcon.png" alt="Reech Me!">
+                <div class="profilename"><%= @user.full_name %></div>
               </div>
-              <div class="w-row iconcontainer">
-                <div class="w-col w-col-6 appstore_col">
-                  <img class="appstore" src="http://reechout.co/img/appStore_comingSoon.png" alt="Apple Store">
-                </div>
-                <div class="w-col w-col-6 w-clearfix"> <a href="https://play.google.com/store/apps/details?id=com.reech.reechpush"><img class="playstore" src="http://reechout.co/img/playStore_icon.png" alt="Google Play"></a>
-                </div>
-              </div>
+              <div class="reechcontent"><%= @question.post %></div>
             </div>
           </div>
         </div>

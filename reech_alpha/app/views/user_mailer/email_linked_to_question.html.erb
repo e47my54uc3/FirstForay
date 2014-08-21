@@ -501,7 +501,7 @@ p {
           </div>
         </div>
         <div class="fillerorange">
-          <div class="topicsubject">Someone needs your help</div>
+          <div class="topicsubject">Your friend needs your help</div>
         </div>
       </div>
     </div>
@@ -513,7 +513,7 @@ p {
             <div class="emailmessage">
               <div class="emailtext">Greetings!
                 <br>
-                <br>Your friend <%= @user.first_name %> thinks very highly of you and has asked for your help on Reech. Please download the application to help them out!
+                <br>Your friend <%= @user.first_name %> has asked you for help on a question on Reech.
                 <br>
                 <br>Cheers,
                 <br>Reech team</div>
@@ -524,23 +524,6 @@ p {
                 <div class="profilename"><%= @user.full_name %></div>
               </div>
               <div class="reechcontent"><%= @question.post %></div>
-            </div>
-            <div class="invitecodearea">
-              <div class="invitecodetext">Your private invitation code:</div>
-              <div class="invitecode"> <%= @referral_code %> </div>
-              <div class="invitedisclaimer">This private code and the content shared by your friend is for your eyes only! So please do not share this. You can easily invite others through the mobile app :)&nbsp;</div>
-            </div>
-            <div class="actionbuttons">
-              <div class="actiontype">
-                <div class="respondtext">Get Reech now to respond!</div>
-              </div>
-              <div class="w-row iconcontainer">
-                <div class="w-col w-col-6 appstore_col">
-                  <img class="appstore" src="http://reechout.co/img/appStore_comingSoon.png" alt="Apple Store">
-                </div>
-                <div class="w-col w-col-6 w-clearfix"> <a href="https://play.google.com/store/apps/details?id=com.reech.reechpush"><img class="playstore" src="http://reechout.co/img/playStore_icon.png" alt="Google Play"></a>
-                </div>
-              </div>
             </div>
           </div>
         </div>

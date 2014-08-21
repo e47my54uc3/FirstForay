@@ -37,7 +37,7 @@ module Api
 							else
 							  
 				        begin
-                  UserMailer.send_link_question_email(email, @solver).deliver
+                  UserMailer.send_link_question_email(email, @solver, Question.find_by_question_id(params[:question_id])).deliver
                 rescue Exception => e
                   logger.error e.backtrace.join("\n")
                 end
@@ -269,8 +269,8 @@ module Api
 						    end	
 						    
 					    else
-					    	one_by_five = (((solution.ask_charisma).to_i ) * 1/5).floor
-					    	fourth_by_five = (((solution.ask_charisma).to_i ) * 4/5).floor
+					    	one_by_five = (((solution.ask_charisma).to_i ) * 2/5).floor
+					    	fourth_by_five = (((solution.ask_charisma).to_i ) * 3/5).floor
 					    	linker_user.add_points(one_by_five)
 					    	solution_provider.add_points(fourth_by_five)					    	
                 all_solution_for_this_question = Solution.where(:question_id=>solution.question_id)
@@ -538,7 +538,7 @@ module Api
                  
             # When logged in person is a linked user  
             elsif (logined_user.reecher_id==linked_user_to_question && !@lk.blank? )
-              puts "When logged in person is question asker and solution provide is linked user"
+              puts "When logged in person is question asker and solution provider is linked user"
                  if ((question_linker_reecher_id.to_s == (user.reecher_id).to_s))
                    solution_attrs[:solution_provider_name] = question_linker_details.full_name
                    solution_attrs[:no_profile_pic] = false
@@ -709,7 +709,7 @@ module Api
               else
                 
                 begin
-                  UserMailer.send_link_question_email(email, @solver).deliver
+                  UserMailer.send_link_question_email(email, @solver, Question.find_by_question_id(params[:question_id])).deliver
                 rescue Exception => e
                   logger.error e.backtrace.join("\n")
                 end
@@ -724,7 +724,7 @@ module Api
               sms = client.account.sms.messages.create(
                       from: TWILIO_CONFIG['from'],
                       to: number,
-                      body: "your friend #{@solver.first_name} #{@user.last_name}  want to solve his friend's question on Reech."
+                      body: "Hi, your friend #{@solver.first_name} has referred you to a question on Reech."
                   )
                   logger.debug ">>>>>>>>>Sending sms to #{number} with text #{sms.body}"
             end

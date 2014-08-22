@@ -501,18 +501,20 @@ module ApplicationHelper
   end
   
   def is_question_linked_to_user question_id,user_id,linked_by_uid
+    puts "I am in linked question block"
     flag= false
-    
     @lk = LinkedQuestion.where("question_id=? AND linked_type=? AND user_id=? AND linked_by_uid=?" , question_id , "LINKED" , user_id , linked_by_uid)
     puts "AFTER CHECK LINKED:::::#{@lk.inspect}"
     question_owner = Question.find_by_question_id(question_id) 
+    puts "question_owner====#{question_owner.reecher_id}-----#{user_id}"
     if @lk.blank?
      # do nothing
-    elsif question_owner.reecher_id.to_s ==  user_id.to_s
+    elsif question_owner.reecher_id ==  user_id
       flag =true
     else
       flag =true
-    end     
+    end 
+    puts "flag123:#{flag}"    
     return flag
   end
   

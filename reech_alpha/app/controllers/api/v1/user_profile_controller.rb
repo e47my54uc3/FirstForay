@@ -98,7 +98,7 @@ module Api
 					if !@user.blank?           
               
               begin
-              UserMailer.send_new_password_as_forgot_password(@user,pass_token).deliver    
+              UserMailer.send_new_password_as_forgot_password(@user,pass_token).deliver    unless @user.email.blank?
                client = Twilio::REST::Client.new(TWILIO_CONFIG['sid'], TWILIO_CONFIG['token'])
                 sms = client.account.sms.messages.create(
                           from: TWILIO_CONFIG['from'],
@@ -170,7 +170,7 @@ module Api
 						if !params[:contact_details].nil?
 
 							if !params[:contact_details][:email].nil?
-								UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver
+								UserMailer.send_invitation_email_for_new_contact(params[:contact_details][:email], @user).deliver  unless params[:contact_details][:email].blank?
                  msg = {:status => 200, :message => "Email sent to the contact."}
 							end	
 
@@ -202,19 +202,15 @@ module Api
        def leader_board       
         final_leader = {}
         @user=User.find_by_reecher_id(params[:user_id])
-        puts "STEP1  Current USER =#{(@user.inspect).to_yaml}"
-        all_friend_of_users= @user.friendships.where(:status =>"accepted").pluck(:friend_reecher_id)
-        puts "STEP2  ALL Friend of USER =#{(all_friend_of_users.inspect).to_yaml}"
-        all_users = User.where(:reecher_id=>all_friend_of_users) 
-       # User.joins(:friendships).where("users.reecher_id =?",params[:user_id])
-        puts "STEP1  ALL USER =#{(all_users.inspect).to_yaml}"
+        all_friend_of_users= @user.friendships.where(:status =>"accepted").pluck(:friend_reecher_id) if !@user.blank?
+        all_friend_of_users.unshift(@user.reecher_id)
+        all_users = User.where(:reecher_id=>all_friend_of_users) if !all_friend_of_users.empty?
+        if ((!@user.blank?) && (!all_users.blank?))
         user_details =[]
         current_user_hash =[]
-        ### Today
-        if !all_users.blank?
-          all_users.each do |user|
+         if (!all_users.blank?)
+           all_users.each do |user|
             @user_profile = user.user_profile 
-            puts " STEP2 USER PROFILE =#{@user_profile.inspect}"
             profile_pic_path = (@user_profile.profile_pic_path).to_s
             if @user_profile.picture_file_name
              image_url =  @user_profile.picture_url      
@@ -227,34 +223,23 @@ module Api
             tot_answer = get_user_total_solution user.reecher_id
             tot_hi5 = user.user_profile.votes_for.size 
             tot_curios = user.points
-            
-            puts "tot_question=#{tot_question}"
-            puts "tot_answer=#{tot_answer}"
-            puts "tot_hi5=#{tot_hi5}"
-            puts "tot_curios=#{tot_curios}"
            # position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
            #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
-            position =    
-             
-             puts "position==#{position}"
-             
+            position = ((0.15 * tot_curios) + (0.2* tot_question) + (0.3*tot_answer) + (0.35*tot_hi5))          
             user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
- 
           end
          end
          
         current_user_hash =   user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
-        
         sort_user_detail = user_details.sort_by{ |h| h["position"]}.reverse
-        
         sort_user_detail=sort_user_detail.take(5)
-      
         final_leader[:today]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
         final_leader[:week]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
         final_leader[:month] = {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
-    
-        ###############################################         
         msg = { :status => 200, :message => "Success",:leader_detail=>final_leader}
+        else
+        msg = { :status => 401, :message => "Failure"}  
+        end  
         render :json => msg
       end
 

@@ -179,27 +179,23 @@ module ApplicationHelper
   
   
   def get_curio_points user_id
-  
   @user1 = User.find_by_reecher_id(user_id)
   points = @user1.points
   
   end
   
   def get_user_total_question user_id
-    
   @user2 = User.find_by_reecher_id(user_id)
   tot_question = @user2.questions.size
-  
   end
   
   def get_user_total_solution user_id
-    
   sols = Solution.where(:solver_id=>user_id)
   tot_sol = sols.size
   end
   
   def get_user_total_connection user_id
-    
+  puts "CONNECTION  ==#{user_id}"    
   @user4 = User.find_by_reecher_id(user_id)
   tot_question = @user4.friendships.where('status = "accepted"').size
   
@@ -328,7 +324,7 @@ module ApplicationHelper
                    #email_notification_to_linked_user 
                    check_email_setting_for_linked_question = check_email_linked_to_question(user_details_for_phone.reecher_id)
                    if check_email_setting_for_linked_question
-                      UserMailer.email_linked_to_question(user_details_for_phone.email,user,question).deliver 
+                      UserMailer.email_linked_to_question(user_details_for_phone.email,user,question).deliver unless user_details_for_phone.email.blank?
                    end
                    
                end
@@ -430,7 +426,7 @@ module ApplicationHelper
                                               LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details_for_email.email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)
                                               check_email_setting_for_linked_question = check_email_linked_to_question(user_details_for_email.reecher_id)
                                                 if check_email_setting_for_linked_question
-                                                UserMailer.email_linked_to_question(user_details_for_email.email,user,question).deliver 
+                                                UserMailer.email_linked_to_question(user_details_for_email.email,user,question).deliver  unless user_details_for_email.email.blank?
                                                 end
                                               end  
                                            elsif linked_quest_type == "INVITE"
@@ -481,12 +477,15 @@ module ApplicationHelper
                                        begin
                                           if linked_quest_type !="INVITE"
                                              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,linked_quest_type
-                                             UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id,linked_quest_type).deliver
+                                             if !email.blank?
+                                             UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id,linked_quest_type).deliver  
+                                             end
                                           elsif linked_quest_type == "INVITE"
                                              # Below code used for invite
                                              get_referal_code_and_token = linked_question_with_type user.reecher_id , 0 , '' , email , linked_quest_type
+                                             if !email.blank?
                                              UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],0,linked_quest_type).deliver
-                                              
+                                             end 
                                           end
                                        rescue Exception => e
                                          logger.error e.to_s
@@ -503,27 +502,24 @@ module ApplicationHelper
   
   def is_question_linked_to_user question_id,user_id,linked_by_uid
     flag= false
-    puts "BEFORE CHECK LINKED"
-    
-    puts "question_id==#{question_id}"
-    puts "user_id==#{user_id}"
-    puts "linked_by_uid==#{linked_by_uid}"
     
     @lk = LinkedQuestion.where("question_id=? AND linked_type=? AND user_id=? AND linked_by_uid=?" , question_id , "LINKED" , user_id , linked_by_uid)
     puts "AFTER CHECK LINKED:::::#{@lk.inspect}"
+    question_owner = Question.find_by_question_id(question_id) 
     if @lk.blank?
      # do nothing
+    elsif question_owner.reecher_id.to_s ==  user_id.to_s
+      flag =true
     else
       flag =true
-      
-    end 
+    end     
     return flag
   end
   
   
-  def email_notification_to_linked_user linked_email, question_obj,user_details
+#  def email_notification_to_linked_user linked_email, question_obj,user_details
   
-  end
+  #end
   
   
 end

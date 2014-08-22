@@ -247,6 +247,7 @@ module Api
       if ((!@user.blank?) && (!@question.blank?))
       # Outer if condition    
           if !params[:audien_details].nil? 
+             threads_msg = []
              Thread.new{link_questions_to_expert_for_users params[:audien_details] ,@user,@question.question_id}
              Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
              Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
@@ -431,7 +432,8 @@ module Api
                             # Send email notofication to all reecher users
                             begin
                               if user_details_with_reech_id.email !=nil
-                              UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user_details_with_reech_id.first_name,question, user).deliver
+                              UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user_details_with_reech_id.first_name,question, user).deliver 
+                              #UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user).deliver  unless user_details_with_reech_id.email..blank?
                               end
                             rescue Exception => e
                               logger.error e.backtrace.join("\n")
@@ -457,7 +459,7 @@ module Api
               check_email_setting_for_linked_question = check_email_linked_to_question(user_details.reecher_id)
               if check_email_setting_for_linked_question
               @question = Question.find_by_question_id(question_id) 
-              UserMailer.email_linked_to_question(user_details.email,user,@question).deliver 
+              UserMailer.email_linked_to_question(user_details.email,user,@question).deliver  unless user_details.email.blank?
               end
               end
               check_setting= notify_linked_to_question(reech_id)

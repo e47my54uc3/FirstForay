@@ -28,6 +28,8 @@ module Api
           @friends_list << {:name => user.first_name + " " + user.last_name,:email=> user.email,"reecherId" =>user.reecher_id,:location=>userProfile.location ,:image_url =>image_url,:associated_group_ids=>user_group_ids }
           end 
 				end
+				
+				@friends_list=@friends_list.sort_by{|s| s[:name]}
 				groups=Group::reecher_personal_groups params[:user_id]
 				logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ @friends_list }"
 				msg = {:status => 200, :friends_list => @friends_list,:groups =>groups }

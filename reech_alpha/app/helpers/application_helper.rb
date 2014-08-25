@@ -414,6 +414,7 @@ module ApplicationHelper
                                 # If audien is a reecher store his reedher_id in question record
                                 # Else send an Invitation mail to the audien
                                  check_linked_question  = is_question_linked_to_user question.question_id ,user_details_for_email.reecher_id,user.reecher_id if linked_quest_type=="LINKED"
+                                    puts "check_linked_question==#{check_linked_question}"
                                     if user_details_for_email.present?
                                           audien_reecher_ids << user_details_for_email.reecher_id
                                           #send notification to existing user
@@ -501,20 +502,25 @@ module ApplicationHelper
   end
   
   def is_question_linked_to_user question_id,user_id,linked_by_uid
-    puts "I am in linked question block"
-    flag= false
+    puts "I am in linked question block =#{question_id}"
+    puts "user_id===#{user_id}"
+    puts "linked_by_uid===#{linked_by_uid}"
+    
     @lk = LinkedQuestion.where("question_id=? AND linked_type=? AND user_id=? AND linked_by_uid=?" , question_id , "LINKED" , user_id , linked_by_uid)
     puts "AFTER CHECK LINKED:::::#{@lk.inspect}"
-    question_owner = Question.find_by_question_id(question_id) 
-    puts "question_owner====#{question_owner.reecher_id}-----#{user_id}"
-    if @lk.blank?
-     # do nothing
-    elsif question_owner.reecher_id ==  user_id
-      flag =true
+    quest_owner = Question.find_by_question_id(question_id) 
+    puts "quest_owner=#{quest_owner.inspect}"
+    puts "quest_owner_class=#{quest_owner.posted_by_uid.class }"
+    puts "user_id=#{user_id.class }"
+     
+    if(quest_owner.posted_by_uid == user_id) 
+       flag =true  
+    elsif (!@lk.blank?)
+       flag =true   
     else
-      flag =true
+       flag =false                   
     end 
-    puts "flag123:#{flag}"    
+  
     return flag
   end
   

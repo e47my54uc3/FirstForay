@@ -519,22 +519,31 @@ module Api
                  
                  #if ((((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
                  if ((((!@pqtfs.blank?) && reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s )
+                   puts "11111"
                    solution_attrs[:solution_provider_name] = question_linker_details.full_name
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
                    question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                  #elsif ((((!@pqtfs.blank?)  && (!reecher_user_associated_to_question.include? question_linker_reecher_id ) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s) || (question_is_public == true))
                  elsif ((((!@pqtfs.blank?) && !reecher_user_associated_to_question.include?(question_linker_reecher_id)) || (question_is_public == true) ) && question_linker_reecher_id.to_s == (user.reecher_id).to_s )
+                    puts "2222"
                    solution_attrs[:solution_provider_name] = "Friend"
                    solution_attrs[:no_profile_pic] = true
                    solution_attrs[:profile_pic_clickable] = false
                    question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
+                 elsif ( ((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) && (question_linker_reecher_id == question_asker)) || (question_is_public == true)) 
+                   puts "3333"
+                   solution_attrs[:solution_provider_name] = user.full_name
+                   solution_attrs[:no_profile_pic] = false
+                   solution_attrs[:profile_pic_clickable] = true                   
                  elsif ( ((!@pqtfs.blank?)  && (reecher_user_associated_to_question.include? question_linker_reecher_id ) ) || (question_is_public == true)) 
+                   puts "4444"
                    solution_attrs[:solution_provider_name] = "Friend of #{question_linker_details.first_name}"
                    solution_attrs[:no_profile_pic] = false
                    solution_attrs[:profile_pic_clickable] = false
                    question_linker_details.user_profile.picture_file_name != nil ? solution_attrs[:solver_image] = question_linker_details.user_profile.thumb_picture_url : solution_attrs[:solver_image] = nil
                  else
+                    puts "5555"
                    solution_attrs[:solution_provider_name] = "Friend of Friend"
                    solution_attrs[:no_profile_pic] = true
                    solution_attrs[:profile_pic_clickable] = false

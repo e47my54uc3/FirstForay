@@ -30,8 +30,9 @@ module ApplicationHelper
 
   def check_notify_question_when_answered user_id
     #UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
      if ((setting[:pushnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
      check =true
     else
@@ -42,8 +43,9 @@ module ApplicationHelper
 
   def notify_linked_to_question user_id
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_linked_to_question] == true))
       check =true
     else
@@ -52,10 +54,23 @@ module ApplicationHelper
     check
   end
 
+ def check_push_notification_enable user_id
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
+    if (setting[:pushnotif_is_enabled]== true) 
+      check =true
+    else
+       check =false
+    end
+    check
+  end
    
   def notify_when_my_stared_question_get_answer user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    puts "notify_when_my_stared_question_get_answer==#{user_id}"
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_when_my_stared_question_get_answer] == true))
       check =true
     else
@@ -65,8 +80,9 @@ module ApplicationHelper
   end
   
   def notify_solution_got_highfive user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_solution_got_highfive] == true))
       check =true
     else
@@ -77,8 +93,9 @@ module ApplicationHelper
   
   
   def notify_audience_if_ask_for_help user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+     user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_audience_if_ask_for_help] == true))
       check =true
     else
@@ -89,13 +106,15 @@ module ApplicationHelper
   end
   
   def notify_when_someone_grab_my_answer user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+      setting  = setting[0]
     if ((setting[:pushnotif_is_enabled]== true) && (setting[:notify_when_someone_grab_my_answer] == true))
       check =true
     else
       check =false
     end
+     puts "EMAIL-notify_when_someone_grab_my_answer=#{check}"
     check
  end
   
@@ -103,20 +122,25 @@ module ApplicationHelper
   
   def check_email_question_when_answered user_id
     #UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
-     if ((setting[:emailnotif_is_enabled] == true ) && (setting[:notify_question_when_answered] == true))
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
+     puts "setting===#{setting.inspect}"
+     if ((setting[:emailnotif_is_enabled] == true) && (setting[:notify_question_when_answered] == true))
      check =true
     else
      check =false
     end
+    
+    puts "EMAIL-check_email_question_when_answered=#{check}"
     check 
   end
 
   def check_email_linked_to_question user_id
     # UserSettings.find_bu_pushnotif_is_enabled_and_notify_question_when_answered
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+    setting =UserSettings.where("reecher_id=?",user.reecher_id)
+    setting  = setting[0]
     if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_linked_to_question] == true))
       check =true
     else
@@ -127,8 +151,10 @@ module ApplicationHelper
 
    
   def check_email_when_my_stared_question_get_answer user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    puts "check_email_when_my_stared_question_get_answer==#{user_id}"
+    user = User.find_by_reecher_id(user_id)
+    setting =UserSettings.where("reecher_id=?",user.reecher_id)
+    setting  = setting[0]
     if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_when_my_stared_question_get_answer] == true))
       check =true
     else
@@ -138,37 +164,45 @@ module ApplicationHelper
   end
   
   def check_email_solution_got_highfive user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+    setting =UserSettings.where("reecher_id=?",user.reecher_id)
+    setting  = setting[0]
     if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_solution_got_highfive] == true))
       check =true
     else
       check =false
     end
+    puts "EMAIL-check_email_solution_got_highfive=#{check}"
     check
   end
   
   
   def check_email_audience_if_ask_for_help user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    puts "user_idAAAAAAAAAAAAAAA=#{user_id}"
+    user = User.find_by_reecher_id(user_id)
+    setting =UserSettings.where("reecher_id=?",user.reecher_id)
+    setting  = setting[0]
+    puts "setting7888881212321321==#{setting.inspect}"
     if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_audience_if_ask_for_help] == true))
       check =true
     else
       check =false
     end
+    puts "EMAIL-check_email_audience_if_ask_for_help=#{check}"
     check
     
   end
   
   def check_email_when_someone_grab_my_answer user_id
-    user = User.find_by_reecher_id(params[:user_id])
-    setting =user.user_settings
+    user = User.find_by_reecher_id(user_id)
+     setting =UserSettings.where("reecher_id=?",user.reecher_id)
+     setting  = setting[0]
     if ((setting[:emailnotif_is_enabled]== true) && (setting[:notify_when_someone_grab_my_answer] == true))
       check =true
     else
       check =false
     end
+     puts "EMAIL-check_email_question_when_answered=#{check}"
     check
  end
   
@@ -289,6 +323,7 @@ module ApplicationHelper
           arr =[]
           arr.push(:referral_code=>referral_code)  
           arr.push(:token=>token)
+          puts "arrarrarrarrarr=#{arr.inspect}"
           arr
            
   end
@@ -349,7 +384,9 @@ module ApplicationHelper
                   if (linked_quest_type == "LINKED" && check_linked_question )
                     # do nothing
                   else
-                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
+                  check_push_notification_setting = check_push_notification_setting_ask_link_invite(linked_quest_type ,user_details_for_phone.reecher_id)  
+                  puts "check_push_notification_setting==#{check_push_notification_setting}"
+                  send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)  if check_push_notification_setting  
                   end
                 end
               end
@@ -412,10 +449,11 @@ module ApplicationHelper
                                audien_details["emails"].each do |email|
                                 user_details_for_email = User.find_by_email(email)
                                 # If audien is a reecher store his reedher_id in question record
-                                # Else send an Invitation mail to the audien
-                                 check_linked_question  = is_question_linked_to_user question.question_id ,user_details_for_email.reecher_id,user.reecher_id if linked_quest_type=="LINKED"
-                                    puts "check_linked_question==#{check_linked_question}"
+                                # Else send an Invitation mail to the audien                                
+                                   
                                     if user_details_for_email.present?
+                                      puts "XXXXXXXXXXXXXXXXX"
+                                      check_linked_question  = is_question_linked_to_user question.question_id ,user_details_for_email.reecher_id,user.reecher_id if linked_quest_type=="LINKED"
                                           audien_reecher_ids << user_details_for_email.reecher_id
                                           #send notification to existing user
                                           make_friendship_standard(user_details_for_email.reecher_id, user.reecher_id) 
@@ -446,7 +484,11 @@ module ApplicationHelper
                                                   if (linked_quest_type == "LINKED" && check_linked_question )
                                                    # Do not send 
                                                    else
-                                                   send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg)
+                                                   
+                                                   check_push_notification_setting = check_push_notification_setting_ask_link_invite(linked_quest_type ,user_details_for_email.reecher_id)
+                                                   puts "check_push_notification_setting==#{check_push_notification_setting}"
+                                                   send_device_notification(d[:device_token].to_s, notify_string ,d[:platform].to_s,user.full_name+push_title_msg) if check_push_notification_setting  
+                                                   
                                                   end
                                                 end
                           
@@ -474,22 +516,27 @@ module ApplicationHelper
                                           
                                         #LinkedQuestion.create(:user_id =>user_details_for_email.reecher_id,:question_id=>question.question_id,:linked_by_uid=>user.reecher_id,:email_id=>email,:phone_no=>user_details_for_email.phone_number,:linked_type=>linked_quest_type)   
                                     else
-                                     
+                                       puts "SSSSSSSSSSSSSSSSSSSS"
+                                     puts "STEP1111"
                                        begin
                                           if linked_quest_type !="INVITE"
+                                            puts "STEP2222"
                                              get_referal_code_and_token = linked_question_with_type user.reecher_id,question.question_id,'',email,linked_quest_type
-                                             if !email.blank?
+                                            puts "I am on linked question for send referal code1===#{get_referal_code_and_token.inspect}"
+                                             if !email.blank?                                              
                                              UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],question.question_id,linked_quest_type).deliver  
                                              end
                                           elsif linked_quest_type == "INVITE"
                                              # Below code used for invite
                                              get_referal_code_and_token = linked_question_with_type user.reecher_id , 0 , '' , email , linked_quest_type
+                                            
                                              if !email.blank?
+                                               puts "I am on linked question for send referal code2===#{email}"
                                              UserInvitationWithQuestionDetails.send_linked_question_details(email,user,get_referal_code_and_token[0][:token],get_referal_code_and_token[0][:referral_code],0,linked_quest_type).deliver
                                              end 
                                           end
                                        rescue Exception => e
-                                         logger.error e.to_s
+                                        logger.error e.to_s
                                        end
                                       
                                     end 
@@ -502,17 +549,9 @@ module ApplicationHelper
   end
   
   def is_question_linked_to_user question_id,user_id,linked_by_uid
-    puts "I am in linked question block =#{question_id}"
-    puts "user_id===#{user_id}"
-    puts "linked_by_uid===#{linked_by_uid}"
-    
     @lk = LinkedQuestion.where("question_id=? AND linked_type=? AND user_id=? AND linked_by_uid=?" , question_id , "LINKED" , user_id , linked_by_uid)
-    puts "AFTER CHECK LINKED:::::#{@lk.inspect}"
+   
     quest_owner = Question.find_by_question_id(question_id) 
-    puts "quest_owner=#{quest_owner.inspect}"
-    puts "quest_owner_class=#{quest_owner.posted_by_uid.class }"
-    puts "user_id=#{user_id.class }"
-     
     if(quest_owner.posted_by_uid == user_id) 
        flag =true  
     elsif (!@lk.blank?)
@@ -524,10 +563,19 @@ module ApplicationHelper
     return flag
   end
   
+ 
+ def check_push_notification_setting_ask_link_invite linked_type , reecher_id 
+   if linked_type == "LINKED"
+    c_setting = notify_linked_to_question reecher_id
+   elsif linked_type == "ASK"
+      c_setting = notify_audience_if_ask_for_help reecher_id
+   elsif linked_type == "INVITE"  
+      c_setting =  check_push_notification_enable reecher_id
+   end
+   c_setting
+   
+ end
   
-#  def email_notification_to_linked_user linked_email, question_obj,user_details
-  
-  #end
-  
+ 
   
 end

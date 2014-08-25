@@ -77,7 +77,8 @@ module Api
              #delete_linked_question(@solver.reecher_id,qust_details.question_id)
              
             if !qust_details.nil?
-               check_setting= check_notify_question_when_answered(qust_details.posted_by_uid)  
+               check_setting= check_notify_question_when_answered(qust_details.posted_by_uid) 
+               puts "qust_details-posted_by_uid==#{qust_details.posted_by_uid}" 
                check_email_setting = check_email_question_when_answered(qust_details.posted_by_uid)
                puts "check_email_setting==#{check_email_setting.inspect}"
                 # Send push notification             
@@ -129,7 +130,9 @@ module Api
                 end 
                end
               #Send email  notification question owner 
+              puts "check_email_setting1232131 ==#{check_email_setting}"
               if check_email_setting
+                 puts "I am sending email while post solution"
                  UserMailer.email_question_when_answered(question_owner.email,@solver,qust_details).deliver  unless question_owner.email.blank?
               end
                
@@ -140,9 +143,12 @@ module Api
            @voting = Voting.where(question_id: qust_details.id)
            if !@voting.blank?
             @voting.each do |v|
-             check_setting= notify_when_my_stared_question_get_answer(v.user_id)
+             puts "AAAAAAAAAAAAAAAAAAAAA==#{v.user_id}"
+             starred_user = User.find_by_id(v.user_id)
+             puts "starred_user==#{starred_user.inspect}"
+             check_setting= notify_when_my_stared_question_get_answer(starred_user.reecher_id)
                if check_setting
-                starred_user = User.find_by_id(v.user_id)
+                #starred_user = User.find_by_id(v.user_id)
                 device_details = Device.select("device_token,platform").where("reecher_id=?",starred_user.reecher_id)
                 checkFiendWithStarredUser = Friendship::are_friends(starred_user.reecher_id,@solution.solver_id) 
                 if checkFiendWithStarredUser
@@ -811,9 +817,12 @@ module Api
            @voting = Voting.where(question_id: qust_details.id)
            if !@voting.blank?
             @voting.each do |v|
-             check_setting= notify_when_my_stared_question_get_answer(v.user_id)
+             puts "AAAAAAAAAAAAAAAAAAAAAAAAAAA==#{v.user_id}"
+             starred_user = User.find_by_id(v.user_id)
+             puts "starred_user==#{starred_user.inspect}"
+             check_setting= notify_when_my_stared_question_get_answer(starred_user.reecher_id)
                if check_setting
-                starred_user = User.find_by_id(v.user_id)
+               # starred_user = User.find_by_id(v.user_id)
                 device_details = Device.select("device_token,platform").where("reecher_id=?",starred_user.reecher_id)
                 checkFiendWithStarredUser = Friendship::are_friends(starred_user.reecher_id,@solution.solver_id) 
                 if checkFiendWithStarredUser

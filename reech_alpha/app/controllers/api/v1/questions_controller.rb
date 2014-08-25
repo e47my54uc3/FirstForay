@@ -77,7 +77,10 @@ module Api
           q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
           q.avatar_file_name != nil ? q_hash[:image_url] =   q.avatar_url : q_hash[:image_url] = nil
           if !q.avatar_file_name.blank?
-             avatar_geo=((q.avatar_geometry).to_s).split('x') 	
+            puts "QUESTION 1213===#{((q.avatar_geometry).to_s)}"
+            
+            avatar_geo=((q.avatar_geometry).to_s).split('x') 	
+            puts "QUESTION ===#{avatar_geo}"
 	           q_hash[:image_width]=avatar_geo[0]	
 	          q_hash[:image_height] = avatar_geo[1] 	
 	       end
@@ -244,10 +247,10 @@ module Api
     def link_questions_to_expert
       @user = User.find_by_reecher_id(params[:user_id])
       @question = Question.find_by_question_id(params[:question_id]) 
+      puts "link_questions_to_expert==#{params.inspect}"
       if ((!@user.blank?) && (!@question.blank?))
       # Outer if condition    
-          if !params[:audien_details].nil? 
-             threads_msg = []
+          if !params[:audien_details].nil?            
              Thread.new{link_questions_to_expert_for_users params[:audien_details] ,@user,@question.question_id}
              Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
              Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_LINKED,"LINKED","LINKED"}
@@ -303,58 +306,6 @@ module Api
     
  
    def post_question_with_image   
-=begin              
-        @user = User.find_by_reecher_id(params[:user_id])
-        @question = Question.new()
-        @question.post = params[:question]
-        @question.posted_by_uid = @user.reecher_id
-        @question.posted_by = @user.full_name
-        @question.ups = 0
-        @question.downs = 0 
-        @question.Charisma = 5
-        @question.category_id = params[:category_id]
-        if @user.points > @question.Charisma   
-          @question.add_points(@question.Charisma)
-          @user.subtract_points(10)
-          if !params[:file].blank? 
-           @question.avatar = params[:file]  
-          end 
-           post_quest_to_frnd=[]
-           params[:audien_details] = JSON.parse(params[:audien_details]) 
-            if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?)
-              @question.is_public = true
-            end 
-             if @question.save
-             catgory = Category.find(@question.category_id)
-             @question[:category_name] = catgory.title
-             if params[:audien_details].class.to_s == 'String'            
-                        
-            # Setting audiens for displaying posetd user details of a question
-             if !params[:audien_details].blank?  
-             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             end  # end of nil checking
-             
-            if !post_quest_to_frnd.blank?  
-               post_quest_to_frnd.each do|pqf|
-               @pqtf= PostQuestionToFriend.find(pqf)                 
-               @pqtf.update_attributes(:question_id=>@question.question_id) 
-               end
-             end 
-              
-            end # end of string class checking 
-                           
-               msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
-             else 
-               msg = {:status => 401, :message => @question.errors}
-             end
-          render :json => msg
-        else
-          msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
-          render :json => msg 
-        end
-=end
 
         @user = User.find_by_reecher_id(params[:user_id])
         @question = Question.new()
@@ -406,7 +357,7 @@ module Api
     
     
   def send_posted_question_notification_to_reech_users audien_details ,user,question,push_title_msg,push_contant_str,linked_quest_type
-     
+     puts " I am in send_posted_question_notification_to_reech_users"
      if !audien_details.blank?
      if audien_details.has_key?("reecher_ids") 
                  post_quest_to_frnd =[]
@@ -417,6 +368,9 @@ module Api
                            pqtf=PostQuestionToFriend.create(:user_id =>user.reecher_id ,:friend_reecher_id =>user_details_with_reech_id.reecher_id, :question_id=>question.question_id)
                            post_quest_to_frnd << pqtf.id
                            check_setting= notify_audience_if_ask_for_help(user_details_with_reech_id.reecher_id) if !user_details_with_reech_id.blank?
+                           check_email_setting_for_ask_for_help = check_email_audience_if_ask_for_help user_details_with_reech_id.reecher_id if !user_details_with_reech_id.blank?
+                          
+                           puts "user_details_with_reech_id========#{user_details_with_reech_id.email}"
                              if check_setting
                                  if !user.blank?
                                      device_details = Device.where(:reecher_id=>user_details_with_reech_id.reecher_id)
@@ -431,12 +385,14 @@ module Api
                              end
                             # Send email notofication to all reecher users
                             begin
+                             puts "user_details_with_reech_id========#{user_details_with_reech_id.email}"
                               if user_details_with_reech_id.email !=nil
-                              UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user_details_with_reech_id.first_name,question, user).deliver 
-                              #UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user).deliver  unless user_details_with_reech_id.email..blank?
+                                puts "user_details_with_reech_id========#{user_details_with_reech_id.email}"
+                                UserMailer.send_question_details_to_audien(user_details_with_reech_id.email, user_details_with_reech_id.first_name,question, user).deliver  if check_email_setting_for_ask_for_help
+                              
                               end
                             rescue Exception => e
-                              logger.error e.backtrace.join("\n")
+                             logger.error e.backtrace.join("\n")
                             end
                             
                        end # end of do
@@ -454,13 +410,16 @@ module Api
               params[:audien_details][:reecher_ids].each do |reech_id|
               user_details =User.find_by_reecher_id(reech_id)
               check_linked_question  = is_question_linked_to_user question_id ,user_details.reecher_id,user.reecher_id 
+              
+              puts "check_linked_question==#{check_linked_question}"
+              
               if !check_linked_question          
               LinkedQuestion.create(:user_id =>user_details.reecher_id,:question_id=>question_id,:linked_by_uid=>user.reecher_id,:email_id=>user_details.email,:phone_no =>user_details.phone_number,:linked_type=>'LINKED')
               check_email_setting_for_linked_question = check_email_linked_to_question(user_details.reecher_id)
-              if check_email_setting_for_linked_question
-              @question = Question.find_by_question_id(question_id) 
-              UserMailer.email_linked_to_question(user_details.email,user,@question).deliver  unless user_details.email.blank?
-              end
+                if check_email_setting_for_linked_question
+                @question = Question.find_by_question_id(question_id) 
+                UserMailer.email_linked_to_question(user_details.email,user,@question).deliver  unless user_details.email.blank?
+                end
               end
               check_setting= notify_linked_to_question(reech_id)
               if check_setting && !check_linked_question

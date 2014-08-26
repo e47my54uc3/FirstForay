@@ -1,7 +1,7 @@
 Reech::Application.routes.draw do
 
   namespace :api, defaults: {format: 'json'} do
-    
+
     namespace :v1 do
 
       resources :users
@@ -10,8 +10,8 @@ Reech::Application.routes.draw do
       post "send_reech_request" => "users#send_reech_request", :as => "send_reech_request"
       post "remove_connections" => "users#remove_connections", :as => "remove_connections"
       post "validate_referral_code" => "users#validate_referral_code", :as => "validate_referral_code"
-      
-      
+
+
       resources :user_sessions
       post "logout_user" => "user_sessions#destroy", :as => "logout_user"
       post "login_user" => "user_sessions#create", :as => "login_user"
@@ -33,11 +33,11 @@ Reech::Application.routes.draw do
       #   :confirmations => 'devise/confirmations',
       #   :unlocks => 'devise/unlocks'
       # }
-      
+
       resources :categories
       post "get_category_list" => "categories#get_category_list", :as =>"get_category_list"
-      
-      
+
+
       resources :questions
       post "question_feed" => "questions#index"
       post "mark_question_stared" => "questions#mark_question_stared"
@@ -46,9 +46,9 @@ Reech::Application.routes.draw do
       post "/send_gcm_notification" => "questions#send_gcm_notification", :as => "send_gcm_notification"
       #post "/get_question_details" => "questions#get_question_details", :as => "get_question_details"
       post "post_question_with_image" => "questions#post_question_with_image",:as =>"post_question_with_image"
-        
-        
-        
+
+
+
       resources :solutions
       post "view_solution" => "solutions#view_solution", :as => "view_solution"
       post "all_solutions" => "solutions#view_all_solutions", :as => "all_solutions"
@@ -60,7 +60,7 @@ Reech::Application.routes.draw do
       post "question_details_with_solutions" =>"solutions#question_details_with_solutions", :as => "question_details_with_solutions"
       post "post_solution_with_image" =>"solutions#post_solution_with_image", :as => "post_solution_with_image"
 
-    
+
       resources :user_profile
       post "/connections" => "user_profile#showconnections", :as=>"connections"
       post "/changepassword" => "user_profile#changepass", :as=>"changepassword"
@@ -72,7 +72,7 @@ Reech::Application.routes.draw do
       post "/add_contact" => "user_profile#add_contact", :as => "add_contact"
       post "/leader_board" => "user_profile#leader_board", :as => "leader_board"
       post "user_profile_info" => "user_profile#user_profile_info", :as => "user_profile_info"
-      
+
       resources :user_settings
       post "/view_settings" => "user_settings#view_settings", :as=>"view_settings"
       post "/update_settings" => "user_settings#update_settings", :as=>"update_settings"
@@ -83,15 +83,15 @@ Reech::Application.routes.draw do
           get 'req',:as=>"addfriend"
           get 'accept',:as=>"accept_fr"
           get 'reject',:as=>"reject_fr"
-          
+
         end
-        
-         
+
+
       end
-      
+
      resources :groups
      post "associate_user_to_group" => "groups#associate_user_to_group", :as=>"associate_user_to_group"
-     post "reecher_personal_groups" => "groups#reecher_personal_groups" ,:as =>"reecher_personal_groups"      
+     post "reecher_personal_groups" => "groups#reecher_personal_groups" ,:as =>"reecher_personal_groups"
 
     # resources :authorizations
     # post '/auth/:provider/callback' => 'authorizations#create'
@@ -161,11 +161,11 @@ Reech::Application.routes.draw do
       get 'accept',:as=>"accept_fr"
       get 'reject',:as=>"reject_fr"
     end
-    
+
   end
 
   resources :password_resets, :only => [ :new, :create, :edit, :update ]
-
+  resources :categories
 # The priority is based upon order of creation:
 # first created -> highest priority.
 

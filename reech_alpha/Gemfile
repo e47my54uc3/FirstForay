@@ -91,7 +91,8 @@ gem 'gcm','0.0.7',:path=> "vendor/plugins/gcm-0.0.7"
 
 gem 'aws-sdk'
 
-
+#thinking-sphinx
+gem 'thinking-sphinx', '~> 3.1.1'
 
 
 #For debugging application only for development ENV

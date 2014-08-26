@@ -2,32 +2,29 @@ development:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: reechAlpha_dev
-  host: reechproductionmysql.cjtueze66lis.us-west-2.rds.amazonaws.com
+  database: reechAlpha_development
   port: 3306
   pool: 5
-  username: reechDev
-  password: r33ch!
+  username: root
+  password: 
   socket: /var/run/mysqld/mysqld.sock
 test:
   adapter: mysql2
   encoding: utf8
   reconnect: false
   database: reechAlpha_test
-  host: reechproductionmysql.cjtueze66lis.us-west-2.rds.amazonaws.com
   port: 3306
   pool: 5
-  username: reechDev
-  password: r33ch!
+  username: root
+  password:
   socket: /var/run/mysqld/mysqld.sock
 production:
   adapter: mysql2
   encoding: utf8
   reconnect: false
-  database: reechAlpha_test2
-  host: reechproductionmysql.cjtueze66lis.us-west-2.rds.amazonaws.com
+  database: reechAlpha_production
   port: 3306
   pool: 5
-  username: reechDev
-  password: r33ch!
+  username: root
+  password: 
   socket: /var/run/mysqld/mysqld.sock

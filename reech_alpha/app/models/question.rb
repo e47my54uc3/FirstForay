@@ -21,10 +21,29 @@ class Question < ActiveRecord::Base
 	:foreign_key => 'question_id',
 	:order => "solutions.created_at DESC"
   #default_scope { where(:published_at => Time.now - 1.week) }
+
+  # Need to test
+  scope :feed, ->(arg){where("posted_by_uid  IN (?) AND created_at >= ?" , arg.friends.pluck(:friend_reecher_id) ,arg.created_at).order("created_at DESC")}
+
+  scope :stared, ->(arg){where("id in (?)", arg.votings.questions.pluck(:question_id)).order("created_at DESC")}
+
+  scope :self, ->(arg) do
+    my_questions = arg.questions.order("created_at DESC").pluck("id")
+    my_all_questions = (PurchasedSolution.questions + my_questions).sort
+    where("id in (?)", my_all_question).order("created_at DESC")
+  end
+
+  scope :get_questions, ->(type, current_user) do
+    questions_list = send(type, current_user)
+    filterforuser(current_user.reecher_id, questions_list)
+  end
+
+  ##########################
   def create_question_id
     self.question_id=gen_question_id
   end
 
+  # Instead of constructing a JSON array it is better to write a json file usin jbuilder which renders from index action
  def self.filterforuser user_id , question_list_obj
    questions = question_list_obj
    @Questions =[]

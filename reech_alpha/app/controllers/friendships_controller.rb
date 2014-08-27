@@ -1,10 +1,9 @@
 class FriendshipsController < ApplicationController
 
   def req
-    @user = current_user
     @friend = User.find_by_reecher_id(params[:reecher_id])
     unless @friend.nil?
-      if Friendship.request(@user, @friend)
+      if Friendship.request(current_user, @friend)
         flash[:notice] = "Friendship with #{@friend.full_name} requested"
       else
         flash[:notice] = "Friendship with #{@friend.full_name} cannot be requested"
@@ -14,10 +13,9 @@ class FriendshipsController < ApplicationController
   end
 
   def accept
-    @user = current_user
     @friend = User.find_by_reecher_id(params[:reecher_id])
     unless @friend.nil?
-      if Friendship.accept(@user, @friend)
+      if Friendship.accept(current_user, @friend)
         flash[:notice] = "Friendship with #{@friend.full_name} accepted"
       else
         flash[:notice] = "Friendship with #{@friend.full_name} cannot be accepted"
@@ -27,10 +25,9 @@ class FriendshipsController < ApplicationController
   end
 
   def reject
-    @user = current_user
     @friend = User.find_by_reecher_id(params[:reecher_id])
     unless @friend.nil?a
-      if Friendship.reject(@user, @friend)
+      if Friendship.reject(current_user, @friend)
         flash[:notice] = "Friendship with #{@friend.full_name} rejected"
       else
         flash[:notice] = "Friendship with #{@friend.full_name} cannot be rejected"

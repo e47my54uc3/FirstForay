@@ -2,11 +2,64 @@ class QuestionsController < ApplicationController
   # GET /questions
   # GET /questions.json
   def index
-      @Questions = Question.filterforuser(current_user.reecher_id)
-      respond_to do |format|
-      format.html # index.html.erb
-      format.json { render :json => ["Questions:", @Questions] }
-    end
+      # @Questions = Question.filterforuser(current_user.reecher_id)
+      # respond_to do |format|
+      #   format.html # index.html.erb
+      #   format.json { render :json => ["Questions:", @Questions] }
+      # end
+      @questions = [] 
+      questions_hash = []
+      #user = User.find_by_reecher_id(params[:user_id])
+      @questions = Question.get_questions(params[:type], current_user)
+      
+      #referred_friend_ids = PostQuestionToFriend::get_referred_friend_ids current_user.reecher_id
+      
+      
+      if @questions.size > 0
+        purchasedSolutionId =PurchasedSolution.pluck(:solution_id)        
+        @questions.each do |q|
+          q_hash = q.attributes
+          question_owner = User.find_by_reecher_id(q.posted_by_uid)
+          question_owner_profile = question_owner.user_profile
+          solutions = Solution.find_all_by_question_id(q.question_id)
+          #solutions = solutions.map!(&:id).to_s
+          solutions = solutions.collect!{|i| (i.id).to_s}   
+          user_who_purchases_sol = PurchasedSolution.select(:user_id).where(:solution_id =>solutions) if !solutions.blank?
+          #has_solution= purchasedSolutionId & solutions
+          if !user_who_purchases_sol.blank?
+            user_who_purchases_sol = user_who_purchases_sol.collect!{|i| (i.user_id)} 
+            if user_who_purchases_sol.include? (question_owner.id).to_s
+            q_hash[:has_solution] = true
+            else
+            q_hash[:has_solution] = false 
+            end 
+          else
+            q_hash[:has_solution] = false    
+          end
+          #has_solution.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
+          q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
+          q.avatar_file_name != nil ? q_hash[:image_url] =   q.avatar_url : q_hash[:image_url] = nil
+          if !q.avatar_file_name.blank?
+            puts "QUESTION 1213===#{((q.avatar_geometry).to_s)}"
+            
+            avatar_geo=((q.avatar_geometry).to_s).split('x')  
+            puts "QUESTION ===#{avatar_geo}"
+             q_hash[:image_width]=avatar_geo[0] 
+            q_hash[:image_height] = avatar_geo[1]   
+         end
+
+          q_hash[:owner_location] = question_owner_profile.location
+          question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
+          questions_hash << q_hash
+          
+        end 
+      end
+        logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@questions.size}"
+        msg = {:status => 200, :questions => questions_hash }
+        respond_to do |format|
+          format.html # index.html.erb
+          format.json { render :json => ["Questions:", @questions] }
+        end
   end
 
   # GET /questions/1

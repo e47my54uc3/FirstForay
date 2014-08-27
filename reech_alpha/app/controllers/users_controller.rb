@@ -1,9 +1,4 @@
-class UsersController < ApplicationController
-
-  def index
-    @users = User.search(params[:search])
-    render json: @users
-  end
+class UsersController < ApplicationController 
 
   def new
     @user = User.new

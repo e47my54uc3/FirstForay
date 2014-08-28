@@ -4,6 +4,6 @@ class PurchasedSolution < ActiveRecord::Base
   belongs_to :solution
 
   scope :questions, ->(arg) do
-  	includes(:solutions).where(user_id: arg).references(:solutions).pluck("solution.question_id")
+  	joins(:solution).where(:user_id => arg).includes(:solution).pluck("solutions.question_id")
   end
 end

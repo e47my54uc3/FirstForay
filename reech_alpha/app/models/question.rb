@@ -25,12 +25,12 @@ class Question < ActiveRecord::Base
   # Need to test
   scope :feed, ->(arg){where("posted_by_uid  IN (?) AND created_at >= ?" , arg.friends.pluck(:friend_reecher_id) ,arg.created_at).order("created_at DESC")}
 
-  scope :stared, ->(arg){where("id in (?)", arg.votings.questions.pluck(:question_id)).order("created_at DESC")}
+  scope :stared, ->(arg){where("id in (?)", arg.votings.pluck(:question_id)).order("created_at DESC")}
 
   scope :self, ->(arg) do
     my_questions = arg.questions.order("created_at DESC").pluck("id")
-    my_all_questions = (PurchasedSolution.questions + my_questions).sort
-    where("id in (?)", my_all_question).order("created_at DESC")
+    my_all_questions = (PurchasedSolution.questions(arg) + my_questions).sort
+    where("id in (?)", my_all_questions).order("created_at DESC")
   end
 
   scope :get_questions, ->(type, current_user) do

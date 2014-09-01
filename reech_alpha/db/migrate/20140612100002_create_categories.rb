@@ -5,8 +5,5 @@ class CreateCategories < ActiveRecord::Migration
 
       t.timestamps
     end
-    Category.create(:title => "News")
-    Category.create(:title => "Sports")
-    Category.create(:title => "Entertainment")
   end
 end

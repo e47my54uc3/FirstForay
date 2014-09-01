@@ -79,7 +79,7 @@ Reech::Application.routes.draw do
 
       resources :friendships do
         collection do
-          post 'index'
+          get 'index'
           get 'req',:as=>"addfriend"
           get 'accept',:as=>"accept_fr"
           get 'reject',:as=>"reject_fr"

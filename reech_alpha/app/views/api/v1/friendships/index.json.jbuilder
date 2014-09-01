@@ -1,33 +1,13 @@
 json.status 200
 user = User.find_by_reecher_id(params[:user_id])
-@friends = user.friendships.where(:status => "accepted")
-@friends_list = []
-if @friends.size >0
-  @friends.each do |f| 
-    user= User.find_by_reecher_id(f.friend_reecher_id)  
-    group_ids = Group::get_friend_associated_groups params[:user_id] ,user.id
-    user_group_ids =[]
-    group_ids.each do |i|
-      user_group_ids.push(i.values)
-    end
-    user_group_ids.flatten! 
-    userProfile = user.user_profile if user
-
-    if !userProfile.picture_file_name.blank?  
-      image_url = userProfile.picture_url 
-    else 
-      image_url =  userProfile.profile_pic_path 
-    end
-    userProfile.picture_file_name != nil ? userProfile[:image_url] =  userProfile.picture_url : userProfile[:image_url] = nil
-    @friends_list << {:name => user.first_name + " " + user.last_name,:email=> user.email,"reecherId" =>user.reecher_id,:location=>userProfile.location ,:image_url =>image_url,:associated_group_ids=>user_group_ids }
-  end 
+#friends = user.friendships.accepted
+json.friends_list(user.friends) do |row|
+  json.name row.full_name
+  json.email row.email
+  json.reecherId row.reecher_id
+  json.location row.location
+  json.image_url row.user_profile.image_url
+  json.associated_group_ids row.get_friend_associated_groups(user.reecher_id)
 end
-
-@friends_list=@friends_list.sort_by{|s| s[:name]}
 groups=Group::reecher_personal_groups params[:user_id]
-msg = {:status => 200, :friends_list => @friends_list,:groups =>groups }
-
-json.friends_list do
-  json.array! @friends_list
-end
 json.groups groups

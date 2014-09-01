@@ -3,7 +3,7 @@ class Friendship < ActiveRecord::Base
 	belongs_to :user,:foreign_key=>"reecher_id",:primary_key=>"reecher_id"
 	belongs_to :friend, :class_name => "User",:primary_key=>"reecher_id",:foreign_key => "friend_reecher_id"
 	validates_presence_of :friend_reecher_id, :reecher_id
-
+  scope :accepted, ->{where(:status => "accepted")}
 	def self.are_friends(user, friend)
 		return false if user == friend
 		return true unless find_by_reecher_id_and_friend_reecher_id_and_status(user,friend,"accepted").nil?

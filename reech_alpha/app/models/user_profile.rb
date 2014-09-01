@@ -35,6 +35,12 @@ class UserProfile < ActiveRecord::Base
   def thumb_picture_url
     picture.url(:thumb)
   end
-  
+  def image_url
+    if !self.picture_file_name.blank? 
+      picture_url
+    else
+      profile_pic_path
+    end
+  end
   
 end

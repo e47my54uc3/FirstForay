@@ -48,9 +48,8 @@ class User < ActiveRecord::Base
 	# friendships
 	has_many :friendships,:primary_key=>"reecher_id",:foreign_key=>'reecher_id'
 	has_many :friends, 
-					 :through => :friendship,
-					 :conditions => "status = 'accepted'", 
-					 :order => :first_name
+					 :through => :friendships,
+					 :conditions => "status = 'accepted'"
 
 	has_many :requested_friends, 
 					 :through => :friendship, 
@@ -129,6 +128,20 @@ class User < ActiveRecord::Base
 
 	def full_name
 		return "#{self.first_name} #{self.last_name}"
+	end
+
+	def location
+		user_profile.location if user_profile
+	end
+
+	def get_friend_associated_groups friend
+		#copied from original needs refactoring
+		group_ids = Group::get_friend_associated_groups friend ,self.id
+		user_group_ids =[]
+		group_ids.each do |i|
+			user_group_ids.push(i.values)
+		end
+		user_group_ids.flatten!
 	end
 
 	def prefix

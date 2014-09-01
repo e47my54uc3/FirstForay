@@ -25,7 +25,7 @@ gem 'rvm-capistrano','~>1.2.7'
 #ActiveModels has_secure_password
 gem 'bcrypt-ruby', '~>3.0.1',:require => 'bcrypt'
 #Authentication Framework
-
+gem 'jbuilder'
 gem 'authlogic','~>3.2.0'
 gem 'omniauth','~>1.1.4'
 gem 'omniauth-facebook','~>1.4.1'

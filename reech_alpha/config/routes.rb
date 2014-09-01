@@ -35,7 +35,7 @@ Reech::Application.routes.draw do
       # }
 
       resources :categories
-      post "get_category_list" => "categories#get_category_list", :as =>"get_category_list"
+      post "get_category_list" => "categories#index", :as =>"get_category_list"
 
 
       resources :questions

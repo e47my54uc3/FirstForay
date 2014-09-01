@@ -4,96 +4,15 @@ module Api
     #http_basic_authenticate_with name: "admin", password "secret"
     require 'thread'
     before_filter :restrict_access , :except =>[:index,:send_apns_notification,:send_gcm_notification]
+    before_filter :set_user, except: [:show]
     #doorkeeper_for :all
     respond_to :json
 
     def index
-      @Questions = [] 
-      questions_hash = []
-      user = User.find_by_reecher_id(params[:user_id])
-      if params[:type] == "feed"
-         friends_reecher_ids = []
-        friends_reecher_ids << user.reecher_id
-        user_friends = Friendship.where(:reecher_id => user.reecher_id, :status => 'accepted')
-        if user_friends.size > 0
-          user_friends.each do |uf|
-            friends_reecher_ids << uf.friend_reecher_id
-          end
-        end
-        @Questions = []
-        @Questions_obj = Question.where("posted_by_uid  IN (?) AND created_at>=?" , friends_reecher_ids.to_a ,user.created_at).order("created_at DESC")
-        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
-       
-      elsif params[:type] == "stared"
-        question_ids = Voting.select("question_id").where("user_id = ?", user.id) unless user.blank?  
-        question_ids = question_ids.map{|q| q.question_id}
-        @Questions_obj = Question.where("id in (?)", question_ids).order("created_at DESC")  unless user.blank? 
-        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
-        
-      elsif params[:type] == "self"
-        @Questions = user.questions.order("created_at DESC")
-        my_purchases_solid = PurchasedSolution.select(:solution_id).where("user_id = ?", user.id) 
-        quest_hash =[]
-        my_purchases_solid.each do |sid|
-        qust_purc_sol=Question.joins(:solutions)
-                   .select("questions.*,solutions.id as sol_id,solutions.question_id as sol_question_id")
-                   .where("solutions.id = ?", sid.solution_id)
-        quest_hash.push(qust_purc_sol[0][:id]) unless qust_purc_sol.blank?
-        end
-        my_quest= @Questions.map{|q| q.id}
-        merge_question = quest_hash + my_quest
-        my_all_question = merge_question.sort
-        @Questions_obj = Question.where("id in (?)", my_all_question).order("created_at DESC")        
-        @Questions = Question.filterforuser user.reecher_id , @Questions_obj 
-          
-      end 
-      
-     
-      #referred_friend_ids = PostQuestionToFriend::get_referred_friend_ids current_user.reecher_id
-      
-      
-      if @Questions.size > 0
-        purchasedSolutionId =PurchasedSolution.pluck(:solution_id)        
-        @Questions.each do |q|
-          q_hash = q.attributes
-          question_owner = User.find_by_reecher_id(q.posted_by_uid)
-          question_owner_profile = question_owner.user_profile
-          solutions = Solution.find_all_by_question_id(q.question_id)
-          #solutions = solutions.map!(&:id).to_s
-          solutions = solutions.collect!{|i| (i.id).to_s}   
-          user_who_purchases_sol = PurchasedSolution.select(:user_id).where(:solution_id =>solutions) if !solutions.blank?
-          #has_solution= purchasedSolutionId & solutions
-          if !user_who_purchases_sol.blank?
-            user_who_purchases_sol = user_who_purchases_sol.collect!{|i| (i.user_id)} 
-            if user_who_purchases_sol.include? (question_owner.id).to_s
-            q_hash[:has_solution] = true
-            else
-            q_hash[:has_solution] = false 
-            end 
-          else
-            q_hash[:has_solution] = false    
-          end
-          #has_solution.size > 0 ? q_hash[:has_solution] = true : q_hash[:has_solution] = false
-          q.is_stared? ? q_hash[:stared] = true : q_hash[:stared] =false
-          q.avatar_file_name != nil ? q_hash[:image_url] =   q.avatar_url : q_hash[:image_url] = nil
-          if !q.avatar_file_name.blank?
-            puts "QUESTION 1213===#{((q.avatar_geometry).to_s)}"
-            
-            avatar_geo=((q.avatar_geometry).to_s).split('x') 	
-            puts "QUESTION ===#{avatar_geo}"
-	           q_hash[:image_width]=avatar_geo[0]	
-	          q_hash[:image_height] = avatar_geo[1] 	
-	       end
+      #user = User.find_by_reecher_id(params[:user_id])
+      @questions = Question.get_questions(params[:type], @user)
 
-          q_hash[:owner_location] = question_owner_profile.location
-          question_owner_profile.picture_file_name != nil ? q_hash[:owner_image] =   question_owner_profile.thumb_picture_url : q_hash[:owner_image] = nil
-          questions_hash << q_hash
-          
-        end 
-      end
-        logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{@Questions.size}"
-        msg = {:status => 200, :questions => questions_hash }
-        render :json => msg 
+      render "index.json.jbuilder"
     end
 
 

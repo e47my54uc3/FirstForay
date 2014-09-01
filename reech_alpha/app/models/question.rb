@@ -20,10 +20,12 @@ class Question < ActiveRecord::Base
 	:primary_key=>'question_id',
 	:foreign_key => 'question_id',
 	:order => "solutions.created_at DESC"
+
+  has_many :post_question_to_friends
   #default_scope { where(:published_at => Time.now - 1.week) }
 
   # Need to test
-  scope :feed, ->(arg){where("posted_by_uid  IN (?) AND created_at >= ?" , arg.friends.pluck(:friend_reecher_id) ,arg.created_at).order("created_at DESC")}
+  scope :feed, ->(arg){where("posted_by_uid  IN (?) AND created_at >= ?" , arg.friends.pluck(:friend_reecher_id).push(arg.reecher_id) ,arg.created_at).order("created_at DESC")}
 
   scope :stared, ->(arg){where("id in (?)", arg.votings.pluck(:question_id)).order("created_at DESC")}
 
@@ -35,7 +37,7 @@ class Question < ActiveRecord::Base
 
   scope :get_questions, ->(type, current_user) do
     questions_list = send(type, current_user)
-    filterforuser(current_user.reecher_id, questions_list)
+    #filterforuser(current_user.reecher_id, questions_list)
   end
 
   ##########################

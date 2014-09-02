@@ -2,12 +2,12 @@ json.status 200
 json.questions @questions do |q|
 	pqtfs = PostQuestionToFriend.where("question_id = ?", q.question_id).pluck(:friend_reecher_id)
 	
-	owner_purchased_solutions = PurchasedSolution.where(user_id: q.user, :solution_id => Solution.where(solver_id: @user, question_id: q)).pluck(:solution_id)
+	owner_purchased_solutions = PurchasedSolution.where(user_id: q.user, :solution_id => Solution.where(solver_id: current_user, question_id: q)).pluck(:solution_id)
 
-	if(!owner_purchased_solutions.blank? || (( @user ==  q.posted_by_uid) || q.is_public))
+	if(!owner_purchased_solutions.blank? || (( current_user ==  q.posted_by_uid) || q.is_public))
 		json.question_referee q.user.full_name
 		json.no_profile_pic false
-	elsif(!pqtfs.blank? && (pqtfs.include? @user))
+	elsif(!pqtfs.blank? && (pqtfs.include? current_user))
 		json.question_referee q.user.full_name
 		json.no_profile_pic false
 	else

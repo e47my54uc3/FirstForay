@@ -63,9 +63,9 @@ class CrudController < ListController
     respond_options = options.reverse_merge(success: created)
     #respond_with(entry, respond_options, &block)
     if entry.errors.any?
-      respond_with(status: 403, message: entry.errors)
+      render json: {status: 403, message: entry.errors}
     else
-      respond_with(status: 200, controller_name => entry, message: I18n.t("#{controller_name}.#{action_name}.message"))
+      render json: {status: 200, controller_name => entry, message: (I18n.t "#{controller_name}.#{action_name}.message")}
     end
   end
 

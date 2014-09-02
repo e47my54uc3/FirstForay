@@ -1,12 +1,9 @@
 module Api
 	module V1
-		class UsersController < ApplicationController
+		class UsersController < ApiController
 		respond_to :json ,:except =>[:send_apns_notification,:send_gcm_notification,:validate_referral_code]
 			#http_basic_authenticate_with name: "admin", password: "secret"
-			def new
-				@user = User.new
-				respond_with @user
-			end
+			
 
 			def create
         

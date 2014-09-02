@@ -4,7 +4,6 @@ module Api
     #http_basic_authenticate_with name: "admin", password "secret"
     require 'thread'
     before_filter :restrict_access , :except =>[:index,:send_apns_notification,:send_gcm_notification]
-    before_filter :set_user, except: [:show]
     before_filter :set_create_params, only: [:create]
     after_filter :send_notifications, only: [:create]
     #doorkeeper_for :all
@@ -12,7 +11,7 @@ module Api
 
     def index
       #user = User.find_by_reecher_id(params[:user_id])
-      @questions = Question.get_questions(params[:type], @user)
+      @questions = Question.get_questions(params[:type], current_user)
 
       render "index.json.jbuilder"
     end
@@ -370,8 +369,8 @@ module Api
       params = {}
       params[:question] = {
         post: old_params[:question], 
-        posted_by_uid: @user.reecher_id, 
-        posted_by: @user.full_name,
+        posted_by_uid: current_user.reecher_id, 
+        posted_by: current_user.full_name,
         ups: 0,
         downs: 0,
         Charisma: 5,
@@ -391,9 +390,9 @@ module Api
 
     def send_notifications
       if !params[:audien_details].nil?
-        Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-        Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-        Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+        Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], current_user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+        Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], current_user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+        Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], current_user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
       end
       if !post_quest_to_frnd.blank? 
         post_quest_to_frnd.each do|pqf|                 

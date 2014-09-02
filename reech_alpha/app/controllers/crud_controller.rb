@@ -65,7 +65,7 @@ class CrudController < ListController
     if entry.errors.any?
       respond_with(status: 403, message: entry.errors)
     else
-      respond_with(status: 200, controller_name => entry, message: "")
+      respond_with(status: 200, controller_name => entry, message: I18n.t("#{controller_name}.#{action_name}.message"))
     end
   end
 

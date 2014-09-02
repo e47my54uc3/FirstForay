@@ -5,6 +5,8 @@ module Api
     require 'thread'
     before_filter :restrict_access , :except =>[:index,:send_apns_notification,:send_gcm_notification]
     before_filter :set_user, except: [:show]
+    before_filter :set_create_params, only: [:create]
+    after_filter :send_notifications, only: [:create]
     #doorkeeper_for :all
     respond_to :json
 
@@ -30,58 +32,58 @@ module Api
        respond_with @question, @solutions, @allsolutions
     end
 
-
-    def create   
-        @user = User.find_by_reecher_id(params[:user_id])
-        @question = Question.new()
-        @question.post = params[:question]
-        @question.posted_by_uid = @user.reecher_id
-        @question.posted_by = @user.full_name
-        @question.ups = 0
-        @question.downs = 0 
-        @question.Charisma = 5
-        @question.category_id = params[:category_id]
-        post_quest_to_frnd=[]
-        if @user.points > @question.Charisma   
-          @question.add_points(@question.Charisma)
-          @user.subtract_points(10)
-            if !params[:attached_image].blank? 
-              data = StringIO.new(Base64.decode64(params[:attached_image]))
-              @question.avatar = data
+    
+    # def create   
+    #     @user = User.find_by_reecher_id(params[:user_id])
+    #     @question = Question.new()
+    #     @question.post = params[:question]
+    #     @question.posted_by_uid = @user.reecher_id
+    #     @question.posted_by = @user.full_name
+    #     @question.ups = 0
+    #     @question.downs = 0 
+    #     @question.Charisma = 5
+    #     @question.category_id = params[:category_id]
+    #     post_quest_to_frnd=[]
+    #     if @user.points > @question.Charisma   
+    #       @question.add_points(@question.Charisma)
+    #       @user.subtract_points(10)
+    #         if !params[:attached_image].blank? 
+    #           data = StringIO.new(Base64.decode64(params[:attached_image]))
+    #           @question.avatar = data
               
-            end
+    #         end
             
-             if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?) 
-              @question.is_public = true
-             end 
+    #          if params[:audien_details].blank? || (params[:audien_details][:reecher_ids].blank? && params[:audien_details][:emails].blank? && params[:audien_details][:phone_numbers].blank?) 
+    #           @question.is_public = true
+    #          end 
             
-             if @question.save
-             catgory = Category.find(@question.category_id)             
-             if !params[:audien_details].nil?
-             Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
-             end
-             if !post_quest_to_frnd.blank? 
-             post_quest_to_frnd.each do|pqf|                 
-              @pqtf= PostQuestionToFriend.find(pqf)                 
-              @pqtf.update_attributes(:question_id=>@question.question_id) 
-              end
-             end
-             @question[:category_name] = catgory.title
-             msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
-             else 
-               msg = {:status => 401, :message => @question.errors}
-             end
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-          render :json => msg
-        else
-          msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
-          logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
-          render :json => msg 
-        end
+    #          if @question.save
+    #          catgory = Category.find(@question.category_id)             
+    #          if !params[:audien_details].nil?
+    #          Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+    #          Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+    #          Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, @question,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+    #          end
+    #          if !post_quest_to_frnd.blank? 
+    #          post_quest_to_frnd.each do|pqf|                 
+    #           @pqtf= PostQuestionToFriend.find(pqf)                 
+    #           @pqtf.update_attributes(:question_id=>@question.question_id) 
+    #           end
+    #          end
+    #          @question[:category_name] = catgory.title
+    #          msg = {:status => 200, :question => @question, :message => "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"} 
+    #          else 
+    #            msg = {:status => 401, :message => @question.errors}
+    #          end
+    #       logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+    #       render :json => msg
+    #     else
+    #       msg = {:status => 401, :message => "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!"}                   
+    #       logger.debug "******Response To #{request.remote_ip} at #{Time.now} => #{ msg}"
+    #       render :json => msg 
+    #     end
 
-    end
+    # end
 
     def mark_question_stared
       @user = User.find_by_reecher_id(params[:user_id])
@@ -361,6 +363,46 @@ module Api
      
      
   #  End for class, modules
+    private
+
+    def set_create_params
+      old_params = params
+      params = {}
+      params[:question] = {
+        post: old_params[:question], 
+        posted_by_uid: @user.reecher_id, 
+        posted_by: @user.full_name,
+        ups: 0,
+        downs: 0,
+        Charisma: 5,
+        category_id: old_params[:category_id],
+      }
+
+      if !old_params[:attached_image].blank? 
+        data = StringIO.new(Base64.decode64(old_params[:attached_image]))
+        params[:question][:avatar] = data
+      end
+    
+      if old_params[:audien_details].blank? || (old_params[:audien_details][:reecher_ids].blank? && old_params[:audien_details][:emails].blank? && old_params[:audien_details][:phone_numbers].blank?) 
+        params[:question][:is_public] = true
+      end
+      params[:audien_details] = old_params[:audien_details]
+    end
+
+    def send_notifications
+      if !params[:audien_details].nil?
+        Thread.new{send_posted_question_notification_to_reech_users params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+        Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+        Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], @user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
+      end
+      if !post_quest_to_frnd.blank? 
+        post_quest_to_frnd.each do|pqf|                 
+          @pqtf= PostQuestionToFriend.find(pqf)                 
+          @pqtf.update_attributes(:question_id=>entry.question_id) 
+        end
+      end
+    end
+    
     end
   end
 end

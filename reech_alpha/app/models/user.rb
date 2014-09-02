@@ -52,19 +52,20 @@ class User < ActiveRecord::Base
 					 :conditions => "status = 'accepted'"
 
 	has_many :requested_friends, 
-					 :through => :friendship, 
+					 :through => :friendships, 
 					 :source => :friend,
 					 :conditions => "status = 'requested'", 
 					 :order => :created_at
 
 	has_many :pending_friends, 
-					 :through => :friendship, 
+					 :through => :friendships, 
 					 :source => :friend,
 					 :conditions => "status = 'pending'", 
 					 :order => :created_at
 
 	#Questions
 	has_many :questions, :primary_key=>"reecher_id",:foreign_key=>'posted_by_uid'
+	has_many :post_question_to_friends
 
 	has_many :votings, :through => :questions , :dependent => :destroy
   

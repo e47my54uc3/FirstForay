@@ -62,16 +62,16 @@ Reech::Application.routes.draw do
 
 
       resources :user_profile
-      post "/connections" => "user_profile#showconnections", :as=>"connections"
+      get "/connections" => "user_profile#showconnections", :as=>"connections"
       post "/changepassword" => "user_profile#changepass", :as=>"changepassword"
       post "/forgetpassword" => "user_profile#forget_password", :as=>"forgetpassword"
-      post "/profile" => "user_profile#index", :as=>"profile"
+      get "/profile" => "user_profile#index", :as=>"profile"
       post "/update_profile" => "user_profile#update", :as => "update_profile"
-      post "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
+      get "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
       post "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
       post "/add_contact" => "user_profile#add_contact", :as => "add_contact"
-      post "/leader_board" => "user_profile#leader_board", :as => "leader_board"
-      post "user_profile_info" => "user_profile#user_profile_info", :as => "user_profile_info"
+      get "/leader_board" => "user_profile#leader_board", :as => "leader_board"
+      get "user_profile_info" => "user_profile#user_profile_info", :as => "user_profile_info"
 
       resources :user_settings
       post "/view_settings" => "user_settings#view_settings", :as=>"view_settings"
@@ -90,8 +90,8 @@ Reech::Application.routes.draw do
       end
 
      resources :groups
-     post "associate_user_to_group" => "groups#associate_user_to_group", :as=>"associate_user_to_group"
-     post "reecher_personal_groups" => "groups#reecher_personal_groups" ,:as =>"reecher_personal_groups"
+     get "associate_user_to_group" => "groups#associate_user_to_group", :as=>"associate_user_to_group"
+     get "reecher_personal_groups" => "groups#reecher_personal_groups" ,:as =>"reecher_personal_groups"
 
     # resources :authorizations
     # post '/auth/:provider/callback' => 'authorizations#create'

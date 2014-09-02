@@ -2,3 +2,6 @@ en:
   questions: 
     create: 
       message: "Question broadcasted for 10 Charisma Creds! Solutions come from your experts - lend a helping hand in the mean time and get rewarded!"
+  groups: 
+    create: 
+      message: "Group has been created Successfully!"

@@ -2,19 +2,27 @@ module Api
 	module V1
 		class ApiController < CrudController
 		respond_to :json	
+     
 
-			private
+
+private
 			def restrict_access
-				unless  ApiKey.exists?(access_token: params[:api_key])
-			  		authenticate_or_request_with_http_token do |token, options|
-			    		ApiKey.exists?(access_token: token)
-			  		end
+				render :status => 401, :json => {error: "Not authenticated"} unless check_auth
+			end
+
+			def check_auth
+				unless @current_user 
+				  key = ApiKey.find_by_access_token_and_user_id(params[:api_key], params[:user_id])
+				  @current_user = key ? User.find_by_reecher_id(params[:user_id]) : nil 
 				end
 			end
 
-			def set_user
-				@user = User.find_by_reecher_id(params[:user_id])
+			def current_user
+				@current_user
 			end
+			
+			 
+			
 		end
 	end
 end

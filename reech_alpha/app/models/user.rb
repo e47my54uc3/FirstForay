@@ -70,8 +70,8 @@ class User < ActiveRecord::Base
 	has_many :votings, :through => :questions , :dependent => :destroy
   
   
-  has_and_belongs_to_many :groups 
-
+  has_and_belongs_to_many :groups, join_table: "groups_users", uniq: true
+  has_many :owned_groups, class_name: "Group", primary_key: 'reecher_id', foreign_key: 'reecher_id'
 	# purchased solutions
 	has_many :purchased_solutions
 	has_many :solutions, :through => :purchased_solutions
@@ -110,7 +110,7 @@ class User < ActiveRecord::Base
 	def self.create_from_omniauth_data(omniauth_data)
 		user = User.new(
 			:first_name => omniauth_data['info']['name'].to_s.downcase,
-			:email => omniauth_data['info']['email'].to_s.downcase#if present
+			:email => omniauth_data['info']['email'].to_s.downcase #if present
 			)
 		user.omniauth_data = omniauth_data.to_json #shove OmniAuth::AuthHash as json data to be parsed later!
 		user.save(:validate => false) #create without validations because most of the fields are not set.
@@ -118,7 +118,20 @@ class User < ActiveRecord::Base
 		user
 	end
 
- 
+  def all_groups
+  	owned_groups + groups
+  end
+
+  def name 
+  	full_name
+  end
+
+  def image_url 
+  	user_profile.image_url
+  end
+  def reecherId
+  	reecher_id
+  end
 	def create_reecher_id
 		self.reecher_id=gen_reecher_id
 	end

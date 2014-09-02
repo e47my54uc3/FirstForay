@@ -141,7 +141,7 @@ module Api
 
 				def showconnections
 						@user=User.find_by_reecher_id(params[:user_id])
-						@all_connections = @user.friends.find(:all, :select => "first_name, last_name, email,friend_reecher_id")
+						@all_connections = @user.friends.select("first_name, last_name, email,friend_reecher_id")
 						if !@all_connections.nil?
 							msg = {:status=> 200, :message => @all_connections}
 							render :json => msg
@@ -153,7 +153,7 @@ module Api
 
 				def profile_dash_board
 					@user = User.find_by_reecher_id(params[:user_id])
-					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.where('status = "accepted"').size} : msg = {:status => 400, :message => "User doesn't exist"}
+					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.accepted.size} : msg = {:status => 400, :message => "User doesn't exist"}
 					render :json => msg
 				end	
 

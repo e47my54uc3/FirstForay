@@ -7,8 +7,6 @@ module Api
 			def index		
 				render "index.json.jbuilder"
 			end
-      #END 
-      
       
 		end
 	end   

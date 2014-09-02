@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140812103340) do
+ActiveRecord::Schema.define(:version => 20140902134045) do
 
   create_table "api_keys", :force => true do |t|
     t.string   "access_token"
@@ -276,7 +276,6 @@ ActiveRecord::Schema.define(:version => 20140812103340) do
     t.integer  "avatar_file_size"
     t.datetime "avatar_updated_at"
     t.text     "audien_user_ids"
-    t.integer  "catgory_id"
     t.integer  "category_id"
   end
 

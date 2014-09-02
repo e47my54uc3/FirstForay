@@ -7,9 +7,11 @@ class Question < ActiveRecord::Base
   serialize :audien_user_ids, Array
   #do_not_validate_attachment_file_type :avatar
   validates_attachment :avatar, :content_type => { :content_type => "image/jpeg" } , unless: Proc.new { |record| record[:avatar].nil? }
+  validate :user_and_charisma_points, on: :create
 
   #validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
   before_save :create_question_id
+  before_create :update_points
 
   belongs_to :user, :foreign_key => 'posted_by_uid', :primary_key => 'reecher_id'
   has_many :votings, :dependent => :destroy
@@ -153,6 +155,15 @@ class Question < ActiveRecord::Base
   def check_question_refer_to_me user_id , friend_reecher_id, question_id
     @question_owner_name = PostQuestionToFriend.where("user_id = ? AND friend_reecher_id= ? AND question_id = ?", q.posted_by_uid, current_user.reecher_id, q.question_id)
 
+  end
+
+  def update_points
+    self.add_points(self.Charisma)
+    self.user.subtract_points(10)
+  end
+
+  def user_and_charisma_points
+    errors.add(:user_points, "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!") unless self.user.points > self.Charisma
   end
 
 end

@@ -61,7 +61,12 @@ class CrudController < ListController
     assign_attributes
     created = with_callbacks(:create, :save) { entry.save }
     respond_options = options.reverse_merge(success: created)
-    respond_with(entry, respond_options, &block)
+    #respond_with(entry, respond_options, &block)
+    if entry.errors.any?
+      respond_with(status: 403, message: entry.errors)
+    else
+      respond_with(status: 200, controller_name => entry, message: "")
+    end
   end
 
   # Display a form to edit an exisiting entry of this model.

@@ -208,5 +208,12 @@ class User < ActiveRecord::Base
     self.picture = open(url)
   end
 
+  def linked_with_question?(question_id, linked_user)
+  	linked_questions.exists?(question_id: question_id, linked_by_uid: linked_user, linked_type: "LINKED")
+  end
+
+  def notify_when_question_linked?
+  	(user_settings.emailnotif_is_enabled && user_settings.notify_linked_to_question)
+  end
 
 end

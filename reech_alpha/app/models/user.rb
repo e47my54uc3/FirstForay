@@ -81,7 +81,7 @@ class User < ActiveRecord::Base
 
 
 	#Profile
-	has_one :user_profile,:primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
+	has_one :user_profile, :primary_key => :reecher_id, :foreign_key => :reecher_id, :dependent => :destroy
 	delegate :reecher_interests, :reecher_hobbies, :reecher_fav_music, :reecher_fav_movies, 
 					 :reecher_fav_books, :reecher_fav_sports, :reecher_fav_destinations,
 					 :reecher_fav_cuisines, :bio, :snippet,:reecher_interests=, :reecher_hobbies=, :reecher_fav_music=,

@@ -6,7 +6,7 @@ class User < ActiveRecord::Base
 	#       :recoverable, :rememberable  #, :trackable, :validatable
 
 	# Setup accessible (or protected) attributes for your model
-	attr_accessible :email,:phone_number ,:password, :password_confirmation, :remember_me
+	attr_accessible :email,:phone_number ,:password, :password_confirmation, :remember_me, :group_ids
 	has_merit
 	acts_as_voter
 
@@ -16,7 +16,7 @@ class User < ActiveRecord::Base
 	#For OmniAuth
 	has_many :authorizations, :dependent => :destroy
 
-	
+
 	#For Authlogic
 	acts_as_authentic do |c|
 		c.ignore_blank_passwords = true #ignoring passwords
@@ -30,7 +30,7 @@ class User < ActiveRecord::Base
 	before_create :create_unique_profile_id
 	before_create :create_reecher_id
 	validates :email, uniqueness: true ,:allow_blank => true, :allow_nil => true
-	validates :phone_number, uniqueness: true ,:allow_blank => true, :allow_nil => true 
+	validates :phone_number, uniqueness: true ,:allow_blank => true, :allow_nil => true
 	#Authentications
 	validate do |user|
 		if user.new_record? #adds validation if it is a new record
@@ -47,20 +47,20 @@ class User < ActiveRecord::Base
 
 	# friendships
 	has_many :friendships,:primary_key=>"reecher_id",:foreign_key=>'reecher_id'
-	has_many :friends, 
+	has_many :friends,
 					 :through => :friendships,
 					 :conditions => "status = 'accepted'"
 
-	has_many :requested_friends, 
-					 :through => :friendships, 
+	has_many :requested_friends,
+					 :through => :friendships,
 					 :source => :friend,
-					 :conditions => "status = 'requested'", 
+					 :conditions => "status = 'requested'",
 					 :order => :created_at
 
-	has_many :pending_friends, 
-					 :through => :friendships, 
+	has_many :pending_friends,
+					 :through => :friendships,
 					 :source => :friend,
-					 :conditions => "status = 'pending'", 
+					 :conditions => "status = 'pending'",
 					 :order => :created_at
 
 	#Questions
@@ -68,9 +68,9 @@ class User < ActiveRecord::Base
 	has_many :post_question_to_friends
 
 	has_many :votings, :through => :questions , :dependent => :destroy
-  
-  
-  has_and_belongs_to_many :groups, join_table: "groups_users", uniq: true
+
+
+  has_and_belongs_to_many :groups, join_table: "groups_users"
   has_many :owned_groups, class_name: "Group", primary_key: 'reecher_id', foreign_key: 'reecher_id'
 	# purchased solutions
 	has_many :purchased_solutions
@@ -82,7 +82,7 @@ class User < ActiveRecord::Base
 
 	#Profile
 	has_one :user_profile,:primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
-	delegate :reecher_interests, :reecher_hobbies, :reecher_fav_music, :reecher_fav_movies, 
+	delegate :reecher_interests, :reecher_hobbies, :reecher_fav_music, :reecher_fav_movies,
 					 :reecher_fav_books, :reecher_fav_sports, :reecher_fav_destinations,
 					 :reecher_fav_cuisines, :bio, :snippet,:reecher_interests=, :reecher_hobbies=, :reecher_fav_music=,
 					 :reecher_fav_movies=,:reecher_fav_books=, :reecher_fav_sports=, :reecher_fav_destinations=,
@@ -90,15 +90,15 @@ class User < ActiveRecord::Base
 					 :to => :user_profile
 
 	has_one :user_settings, :primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
-	
-	has_many :preview_solutions	
+
+	has_many :preview_solutions
 
 	#Linked questions
 	has_many :linked_questions, :primary_key=>"reecher_id", :foreign_key=>"user_id"
-	
+
 	# Devices association for push notifications
-	has_many :devices, :primary_key=>"reecher_id", :foreign_key=>"reecher_id" 
-	
+	has_many :devices, :primary_key=>"reecher_id", :foreign_key=>"reecher_id"
+
 	# Alias Profile of a reecher to be called User Profile or Reecher Profile
 	alias_attribute :reecher_profile,:user_profile
 
@@ -122,11 +122,11 @@ class User < ActiveRecord::Base
   	owned_groups + groups
   end
 
-  def name 
+  def name
   	full_name
   end
 
-  def image_url 
+  def image_url
   	user_profile.image_url
   end
   def reecherId
@@ -173,7 +173,7 @@ class User < ActiveRecord::Base
 	def mailbox
 		Mailbox.new(self)
 	end
-	
+
 
 	# after_create callback to create new profile associated with the Reecher
 	def create_reecher_profile
@@ -195,16 +195,16 @@ class User < ActiveRecord::Base
 		user_settings.notify_when_someone_grab_my_answer = true
 		user_settings.notify_when_my_stared_question_get_answer = true
 		user_settings.save!
-	end	
+	end
 
 	def deliver_password_reset_instructions!
 		reset_persistence_token!
 		UserMailer.password_reset_instructions(self).deliver
 	end
-	
+
   def picture_from_url(url)
     self.picture = open(url)
   end
 
-  
+
 end

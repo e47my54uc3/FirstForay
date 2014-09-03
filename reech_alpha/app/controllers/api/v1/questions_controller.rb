@@ -85,13 +85,12 @@ module Api
     # end
 
     def mark_question_stared
-      @user = User.find_by_reecher_id(params[:user_id])
       @question = Question.find_by_question_id(params[:question_id])      
       if params[:stared] == "true"
-        @voting = Voting.where(user_id: @user.id, question_id: @question.id).first
+        @voting = Voting.where(user_id: current_user.id, question_id: @question.id).first
         if @voting.blank?
         @voting = Voting.new do |v|
-                  v.user_id = @user.id
+                  v.user_id = current_user.id
                   v.question_id = @question.id
                 end
         @voting.save ? msg = {:status => 200, :message => "Successfully Stared",:is_login_user_starred_qst=>true} : msg = {:status => 401, :message => "Failed!",:is_login_user_starred_qst=>false}
@@ -99,7 +98,7 @@ module Api
         msg = {:status => 200, :message => "Already Stared",:is_login_user_starred_qst=>true}
        end  
       elsif params[:stared] == "false"
-        @voting = Voting.where(user_id: @user.id, question_id: @question.id).first
+        @voting = Voting.where(user_id: current_user.id, question_id: @question.id).first
         if @voting.present?
           @voting.destroy
           @voting.destroyed? ? msg = {:status => 200, :message => "Successfully UnStared",:is_login_user_starred_qst=>false} : msg = {:status => 401, :message => "Failed!",:is_login_user_starred_qst=>false}

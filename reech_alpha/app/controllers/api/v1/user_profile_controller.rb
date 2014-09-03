@@ -5,17 +5,15 @@ module Api
 		before_filter :restrict_access, :except => [:forget_password]	
 		respond_to :json
 				
-				def index
-					@user = User.find_by_reecher_id(params[:user_id])
-					
-					if @user.nil?
+				def index					
+					if !current_user
 						msg = {:status => 400, :message => "User does not exist."}
 						render :json => msg
 					else
-						@profile = @user.user_profile.attributes
-						@profile[:hi5] = @user.user_profile.votes_for.size
-						@user.user_profile.picture_file_name != nil ? @profile[:image_url] =  @user.user_profile.picture_url : @profile[:image_url] = nil
-						msg = {:status => 200, :user => @user, :profile => @profile ,:curio_points=> @user.points }
+						@profile = current_user.user_profile.attributes
+						@profile[:hi5] = current_user.user_profile.votes_for.size
+						current_user.user_profile.picture_file_name != nil ? @profile[:image_url] =  current_user.user_profile.picture_url : @profile[:image_url] = nil
+						msg = {:status => 200, :user => current_user, :profile => @profile ,:curio_points=> current_user.points }
 						render :json => msg
 					end
 				end
@@ -140,27 +138,19 @@ module Api
 			#	end	
 
 				def showconnections
-						@user=User.find_by_reecher_id(params[:user_id])
-						@all_connections = @user.friends.select("first_name, last_name, email,friend_reecher_id")
-						if !@all_connections.nil?
-							msg = {:status=> 200, :message => @all_connections}
-							render :json => msg
-						else
-							msg = {:status=> 400, :message => "No connections"}
-							render :json => msg
-						end
+					@all_connections = current_user.friends.select("first_name, last_name, email,friend_reecher_id")
+					render json: {:status=> 200, :message => @all_connections.nil? ? "No connections" : @all_connections}
 				end
 
-				def profile_dash_board
-					@user = User.find_by_reecher_id(params[:user_id])
-					@user.present? ? msg = {:status => 200, :questions => @user.questions.size, :solutions => @user.solutions.size, :connections => @user.friendships.accepted.size} : msg = {:status => 400, :message => "User doesn't exist"}
+				def profile_dash_board					
+					current_user.present? ? msg = {:status => 200, :questions => current_user.questions.size, :solutions => current_user.solutions.size, :connections => current_user.friendships.accepted.size} : msg = {:status => 400, :message => "User doesn't exist"}
 					render :json => msg
 				end	
 
 				def profile_hi5
-					voting_user = User.find_by_reecher_id(params[:user_id])
+					#voting_user = User.find_by_reecher_id(params[:user_id])
 					votable_user = User.find_by_reecher_id(params[:votable_user_id])
-					votable_user.user_profile.liked_by(voting_user)
+					current_user.user_profile.liked_by(current_user)
 					msg = {:status => 200 , :message => "Success"}
 					render :json => msg
 				end	
@@ -245,47 +235,11 @@ module Api
 
       
       def user_profile_info
-      @user = User.joins(:user_profile)
-                   .select("users.*,user_profiles.location,user_profiles.bio,user_profiles.picture_file_name,user_profiles.profile_pic_path,user_profiles.reecher_interests,user_profiles.reecher_fav_music,user_profiles.reecher_fav_movies,user_profiles.reecher_fav_books,user_profiles.reecher_fav_sports,user_profiles.reecher_fav_destinations,user_profiles.snippet")
-                   .where("users.reecher_id =?" ,params[:user_id])
-      
-      
-                   
-      profile_obj = UserProfile.find_by_reecher_id(@user[0][:reecher_id].to_s)
-      picture_file =  @user[0][:picture_file_name].to_s
-      profile_pic  =  @user[0][:profile_pic_path].to_s
-      if !picture_file.blank?
-       image_url =  profile_obj.picture_url      
-      elsif !profile_pic.blank?
-        image_url = profile_pic.to_s
-      else
-        image_url = nil
-      end 
-      
-      
-      user_hash = {}
-      @user.each do |u|
-        user_hash =u.attributes
-      end
-      
-      tot_curio = get_curio_points(params[:user_id])
-      #tot_curio = current_user.points
-      tot_quest = get_user_total_question(params[:user_id])
-      tot_sol = get_user_total_solution(params[:user_id])
-      tot_conn = get_user_total_connection(params[:user_id])
-      
-      user_hash[:image_url] = image_url
-      user_hash[:curio_points] = tot_curio
-      user_hash[:total_questions_asked] = tot_quest
-      user_hash[:total_solutions_provided] = tot_sol
-      user_hash[:total_connections] =tot_conn
-      msg = { :status => 200, :user_details => user_hash}
-      render :json =>msg            
-
-     end
+      	render "user_profile_info.json.jbuilder"
+     	end
       
      def picture_from_url(url)
-     self.picture = open(url)
+       self.picture = open(url)
      end 
     
 

@@ -366,7 +366,7 @@ module Api
 
     def set_create_params
       old_params = params
-      params = {}
+      
       params[:question] = {
         post: old_params[:question], 
         posted_by_uid: current_user.reecher_id, 
@@ -394,6 +394,7 @@ module Api
         Thread.new{send_posted_question_notification_to_chosen_emails params[:audien_details], current_user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
         Thread.new{send_posted_question_notification_to_chosen_phones params[:audien_details], current_user, entry,PUSH_TITLE_ASKHELP,"ASKHELP","ASK"}
       end
+      post_quest_to_frnd = []
       if !post_quest_to_frnd.blank? 
         post_quest_to_frnd.each do|pqf|                 
           @pqtf= PostQuestionToFriend.find(pqf)                 

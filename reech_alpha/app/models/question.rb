@@ -1,8 +1,8 @@
-include Scrubber
 class Question < ActiveRecord::Base
+  include Scrubber
   has_merit
 
-  attr_accessible :post,:id, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids
+  attr_accessible :post,:id, :posted_by, :posted_by_uid,:question_id, :points, :Charisma, :avatar, :has_solution, :stared, :image_url, :audien_user_ids, :category_id
   has_attached_file :avatar, :styles => {:medium => "300x300>", :thumb => "100x100>" }, :default_url => "/images/:style/missing.png" ,:default_style => :original
   serialize :audien_user_ids, Array
   #do_not_validate_attachment_file_type :avatar
@@ -11,7 +11,7 @@ class Question < ActiveRecord::Base
 
   #validates_attachment_content_type :avatar, :content_type => /\Aimage\/.*\Z/
   before_save :create_question_id
-  before_create :update_points
+  after_create :set_points
 
   belongs_to :user, :foreign_key => 'posted_by_uid', :primary_key => 'reecher_id'
   has_many :votings, :dependent => :destroy
@@ -157,13 +157,13 @@ class Question < ActiveRecord::Base
 
   end
 
-  def update_points
-    self.add_points(self.Charisma)
+  def set_points
+    self.add_points(5)
     self.user.subtract_points(10)
   end
 
   def user_and_charisma_points
-    errors.add(:user_points, "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!") unless self.user.points > self.Charisma
+    errors.add(:user_points, "Sorry, you need at least 10 Charisma Credits to ask a Question! Earn some by providing Solutions!") unless (user.points > 10)
   end
 
 end

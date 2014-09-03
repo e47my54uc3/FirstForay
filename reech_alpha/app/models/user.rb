@@ -81,13 +81,10 @@ class User < ActiveRecord::Base
 
 
 	#Profile
-<<<<<<< HEAD
+
 	has_one :user_profile,:primary_key=>:reecher_id,:foreign_key=>:reecher_id, :dependent => :destroy
 	delegate :reecher_interests, :reecher_hobbies, :reecher_fav_music, :reecher_fav_movies,
-=======
-	has_one :user_profile, :primary_key => :reecher_id, :foreign_key => :reecher_id, :dependent => :destroy
-	delegate :reecher_interests, :reecher_hobbies, :reecher_fav_music, :reecher_fav_movies, 
->>>>>>> f18ff13f35388514afdc47c0916addf79536d31d
+
 					 :reecher_fav_books, :reecher_fav_sports, :reecher_fav_destinations,
 					 :reecher_fav_cuisines, :bio, :snippet,:reecher_interests=, :reecher_hobbies=, :reecher_fav_music=,
 					 :reecher_fav_movies=,:reecher_fav_books=, :reecher_fav_sports=, :reecher_fav_destinations=,

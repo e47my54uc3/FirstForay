@@ -196,8 +196,12 @@ module Api
         all_friend_of_users.unshift(@user.reecher_id)
         all_users = User.where(:reecher_id=>all_friend_of_users) if !all_friend_of_users.empty?
         if ((!@user.blank?) && (!all_users.blank?))
-        user_details =[]
-        current_user_hash =[]
+        today_user_details =[]        
+        weekly_user_details =[]
+        monthly_user_details =[]
+        current_user_hash_for_today =[]
+        current_user_hash_for_week =[]
+        current_user_hash_for_month =[]
          if (!all_users.blank?)
            all_users.each do |user|
             @user_profile = user.user_profile 
@@ -209,23 +213,55 @@ module Api
             else
               image_url = nil
             end        
+            #Todays calculation           
             tot_question = get_user_total_question user.reecher_id
             tot_answer = get_user_total_solution user.reecher_id
             tot_hi5 = user.user_profile.votes_for.size 
             tot_curios = user.points
-           # position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
-           #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
-            position = ((0.15 * tot_curios) + (0.2* tot_question) + (0.3*tot_answer) + (0.35*tot_hi5))          
-            user_details.push({"position" => position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
+            #position = ((0.3 * tot_curios) + (0.7*tot_hi5)).floor
+            #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
+            today_position = ((0.15 * tot_curios) + (0.2* tot_question) + (0.3*tot_answer) + (0.35*tot_hi5))          
+            today_user_details.push({"position" => today_position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_curios ,"questions_asked" =>tot_question, "answers_given" =>tot_answer,"high_fives" =>tot_hi5}})
+            #Week calculation
+            #Todays calculation           
+            tot_week_question = get_user_total_week_question user.reecher_id
+            tot_week_answer = get_user_total_week_solution user.reecher_id
+            tot_hi5 = user.user_profile.votes_for.size 
+            tot_week_curios = get_weekly_points user.sash_id
+            #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
+            weekly_position = ((0.15 * tot_curios) + (0.2* tot_question) + (0.3*tot_answer) + (0.35*tot_hi5))          
+            weekly_user_details.push({"position" => weekly_position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_week_curios ,"questions_asked" =>tot_week_question, "answers_given" =>tot_week_answer,"high_fives" =>tot_hi5}})
+            #Monthly calculation
+            tot_month_question = get_user_total_month_question user.reecher_id
+            tot_month_answer = get_user_total_month_solution user.reecher_id
+            tot_hi5 = user.user_profile.votes_for.size 
+            tot_month_curios = get_monthly_points user.sash_id
+            #(15%)Total curios + (20%)# of questions asked + (30%)# of solutions provided + (35%)# of hi5 received
+            monthly_position = ((0.15 * tot_curios) + (0.2* tot_question) + (0.3*tot_answer) + (0.35*tot_hi5))          
+            monthly_user_details.push({"position" => monthly_position,"reecherid"=>user.reecher_id,"reechername"=>user.first_name+" "+ user.last_name,"reecherimage"=>image_url,"level"=>7,"scores"=> {"points_earned" => tot_month_curios ,"questions_asked" =>tot_month_question, "answers_given" =>tot_month_answer,"high_fives" =>tot_hi5}})
           end
          end
          
-        current_user_hash =   user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
-        sort_user_detail = user_details.sort_by{ |h| h["position"]}.reverse
-        sort_user_detail=sort_user_detail.take(5)
-        final_leader[:today]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
-        final_leader[:week]= {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
-        final_leader[:month] = {"user_position"=>current_user_hash,"top_positions"=> sort_user_detail}
+       puts "today_user_details===#{today_user_details.to_yaml}"  
+       puts "weekly_user_details===#{weekly_user_details.to_yaml}"  
+       puts "monthly_user_details===#{monthly_user_details.to_yaml}"  
+         
+        #Today
+        current_user_hash_for_today =   today_user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
+        sort_user_for_today_detail = today_user_details.sort_by{ |h| h["position"]}.reverse
+        sort_user_for_today_detail =sort_user_for_today_detail.take(5)
+        #Week
+        current_user_hash_for_week =   weekly_user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
+        sort_user_for_week_detail = weekly_user_details.sort_by{ |h| h["position"]}.reverse
+        sort_user_for_week_detail =sort_user_for_week_detail.take(5)
+        #Month
+        current_user_hash_for_month =   monthly_user_details.select{ |hsh| hsh  if hsh.has_value? params[:user_id]}
+        sort_user_for_month_detail = monthly_user_details.sort_by{ |h| h["position"]}.reverse
+        sort_user_for_month_detail = sort_user_for_month_detail.take(5)
+        
+        final_leader[:today]= {"user_position"=>current_user_hash_for_today,"top_positions"=> sort_user_for_today_detail}
+        final_leader[:week]= {"user_position"=>current_user_hash_for_week,"top_positions"=> sort_user_for_week_detail}
+        final_leader[:month] = {"user_position"=>current_user_hash_for_month,"top_positions"=> sort_user_for_month_detail}
         msg = { :status => 200, :message => "Success",:leader_detail=>final_leader}
         else
         msg = { :status => 401, :message => "Failure"}  

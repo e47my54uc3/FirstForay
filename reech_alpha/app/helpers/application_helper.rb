@@ -212,28 +212,6 @@ module ApplicationHelper
   
   
   
-  def get_curio_points user_id
-  @user1 = User.find_by_reecher_id(user_id)
-  points = @user1.points
-  
-  end
-  
-  def get_user_total_question user_id
-  @user2 = User.find_by_reecher_id(user_id)
-  tot_question = @user2.questions.size
-  end
-  
-  def get_user_total_solution user_id
-  sols = Solution.where(:solver_id=>user_id)
-  tot_sol = sols.size
-  end
-  
-  def get_user_total_connection user_id
-  puts "CONNECTION  ==#{user_id}"    
-  @user4 = User.find_by_reecher_id(user_id)
-  tot_question = @user4.friendships.where('status = "accepted"').size
-  
-  end
   
   def make_friendship_standard(friends, user)
     # Proceed only if both the IDs are not same 
@@ -575,6 +553,75 @@ module ApplicationHelper
    c_setting
    
  end
+ 
+ # Leader board cal culation
+ 
+  def get_curio_points user_id
+  @user1 = User.find_by_reecher_id(user_id)
+  points = @user1.points
+  end
+  
+  def get_weekly_points user_sash_id
+   one_week_dd = Time.now - 1.week
+   result1 = ActiveRecord::Base.connection.select("SELECT SUM(`merit_score_points`.`num_points`) AS sum_num_points, score_id AS score_id FROM `merit_score_points` WHERE `merit_score_points`.`score_id` = #{user_sash_id}  AND `merit_score_points`.`created_at`  BETWEEN '#{Time.now}' AND '#{one_week_dd}' GROUP BY score_id")
+   puts "Result1 ===#{result1.inspect}"
+   if result1.blank?
+     return 0
+    else 
+     result1[0]["sum_num_points"]  
+   end
+   
+  end
+  
+  def get_monthly_points user_sash_id
+    one_month_dd = Time.now - 1.month
+    result2 = ActiveRecord::Base.connection.select("SELECT SUM(`merit_score_points`.`num_points`) AS sum_num_points, score_id AS score_id FROM `merit_score_points` WHERE `merit_score_points`.`score_id` = #{user_sash_id}  AND `merit_score_points`.`created_at`  BETWEEN '#{Time.now}' AND '#{one_month_dd}' GROUP BY score_id")
+    puts "Result12===#{result2.inspect}"
+    if result2.blank?
+     return 0
+    else 
+     result2[0]["sum_num_points"]  
+   end
+  end
+  
+  def get_user_total_question user_id  
+  tot_question =  Question.where("posted_by_uid =? AND created_at like '%#{Time.now}'",user_id).count
+  end
+  
+  def get_user_total_week_question user_id
+  one_week_dd = Time.now - 1.week  
+  puts "TODAY TIME===#{Time.now}"
+  puts "Week TIME===#{one_week_dd}"
+  tot_week_question = Question.where("posted_by_uid =?  AND created_at BETWEEN '#{Time.now}' AND '#{one_week_dd}'",user_id).count
+  end
+  
+  def get_user_total_month_question user_id
+  one_month_dd = Time.now - 1.month
+  tot_mont_question = Question.where("posted_by_uid =?  AND created_at BETWEEN '#{Time.now}' AND '#{one_month_dd}'",user_id).count
+  end
+  
+  def get_user_total_solution user_id
+  #sols = Solution.where(:solver_id=>user_id)
+  tot_sol = Solution.where("solver_id =? AND created_at like '%#{Time.now}'",user_id).count
+  end
+  def get_user_total_week_solution user_id
+  one_week_dd = Time.now - 1.week
+  tot_sol =  Solution.where("solver_id =? AND created_at BETWEEN '#{Time.now}' AND '#{one_week_dd}'",user_id).count
+  end
+  def get_user_total_month_solution user_id
+  one_month_dd = Time.now - 1.month  
+  tot_sol = Solution.where("solver_id =?  AND created_at BETWEEN '#{Time.now}' AND '#{one_month_dd}'",user_id).count
+  end
+  
+  def get_user_total_connection user_id
+  puts "CONNECTION  ==#{user_id}"    
+  @user4 = User.find_by_reecher_id(user_id)
+  tot_question = @user4.friendships.where('status = "accepted"').size
+  end
+ 
+ 
+ 
+  
   
  
   

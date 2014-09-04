@@ -68,7 +68,7 @@ Reech::Application.routes.draw do
       get "/profile" => "user_profile#index", :as=>"profile"
       post "/update_profile" => "user_profile#update", :as => "update_profile"
       get "/profile_dash_board" => "user_profile#profile_dash_board", :as => "profile_dash_board"
-      post "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
+      get "/profile_hi5" => "user_profile#profile_hi5", :as=>"profile_hi5"
       post "/add_contact" => "user_profile#add_contact", :as => "add_contact"
       get "/leader_board" => "user_profile#leader_board", :as => "leader_board"
       get "user_profile_info" => "user_profile#user_profile_info", :as => "user_profile_info"

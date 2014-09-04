@@ -1,7 +1,8 @@
 /*
  *= require_self
- *= require bootstrap_and_overrides
- *= require jquery.ui.all
- *= require reech
+ *= require bootstrap.min.css
+ *= require font-awesome.min.css
+ *= require ionicons.min.css
  *= require font_awesome_4/css/font-awesome.min.css
+ *= require reechpro.css
  */

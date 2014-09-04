@@ -5,3 +5,4 @@
 //= require private_pub
 //= require tagit
 //= require modernizer
+//= require app

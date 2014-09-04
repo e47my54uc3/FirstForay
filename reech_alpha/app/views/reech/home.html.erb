@@ -1,3 +1,131 @@
+  <% if current_user %>
+  <div class="box box-primary">
+    <div class="box-header">
+        <h3 class="box-title">My Stats</h3>
+        <!-- tool buttons for question. Uncomment for close and minimize - Add JS -->
+        <div class="box-tools pull-right">
+            <button class="btn btn-primary btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+            
+        </div>
+    </div>
+    <!-- widgets start here -->
+    <div class="box-body">
+        <div class="row">
+             <!-- Questions widget here -->
+            <div class="col-lg-3 col-xs-6"> 
+                <div class="small-box bg-blue" >
+                    <div class="inner">
+                        <h3 class="box-title">
+                            <%= current_user.questions.size %>
+                        </h3>
+                        <p>
+                            Questions 
+                        </p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-ios7-help-outline"></i>
+                    </div>
+                    <p class="small-box-footer">
+                        Questions you have asked
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Solutions widget here -->
+            <div class="col-lg-3 col-xs-6">
+                <div class="small-box bg-green">
+                    <div class="inner">
+                        <h3>
+                            <%= current_user.solutions.size %><sup style="font-size: 20px"></sup>
+                        </h3>
+                        <p>
+                            Solutions
+                        </p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-ios7-checkmark-outline"></i>
+                    </div>
+                    <p class="small-box-footer">
+                        Solutiions you have provided
+                    </p>
+                </div>
+            </div>
+        
+            <div class="col-lg-3 col-xs-6"> 
+                <!-- Unique profile views -->
+                <div class="small-box bg-teal">
+                    <div class="inner">
+                        <h3>
+                            <%= current_user.user_profile.votes_for.size %>
+                        </h3>
+                        <p>
+                            Hi5
+                        </p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-android-hand"></i>
+                    </div>
+                    <p class="small-box-footer">
+                        High fives earned
+                    </p>
+                </div>
+            </div>
+            <div class="col-lg-3 col-xs-6"> 
+                <!-- New connection Stats -->
+                <div class="small-box bg-yellow">
+                    <div class="inner">
+                        <h3>
+                           <%= current_user.friends.size %>
+                        </h3>
+                        <p>
+                            Connections
+                        </p>
+                    </div>
+                    <div class="icon">
+                        <i class="ion ion-person-add"></i>
+                    </div>
+                    <p class="small-box-footer">
+                        Your total Reech
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Question feed starts here -->
+
+<div class="box box-primary">
+  <div class="box-header">
+      <h3 class="box-title">Questions for You</h3>
+      <!-- tool buttons for question. Uncomment for close and minimize - Add JS -->
+      <div class="box-tools pull-right">
+          <div class="btn-group closed">
+              <button class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-filter"></i></button>
+              <ul class="dropdown-menu pull-right" role="menu">
+                  <li><a href="#">My Questions</a></li>
+                  <li><a href="#">Linked Questions</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Show All</a></li>
+              </ul>
+          </div>
+          <div class="btn-group closed">
+              <button class="btn btn-warning btn-sm dropdown-toggle" data-toggle="dropdown"><i class="fa fa-sort"></i></button>
+              <ul class="dropdown-menu pull-right" role="menu">
+                  <li><a href="#">Newest First</a></li>
+                  <li><a href="#">Oldest First</a></li>
+                  <li class="divider"></li>
+                  <li><a href="#">Financial</a></li>
+                  <li><a href="#">Professional Services</a></li>
+                  
+              </ul>
+          </div>
+           <button class="btn btn-primary btn-sm" data-widget="collapse"><i class="fa fa-minus"></i></button>
+      </div>
+  </div>
+  <div class="box-body">
+      <div class="row">
+
 <% if current_user %>
 <div class="row-fluid">
   <div class="span8">
@@ -73,3 +201,4 @@ var currentPage = 1;
 
 });
 </script>
+<% end %>

@@ -10,13 +10,6 @@
         <%= stylesheet_link_tag    :application %>
         <%= csrf_meta_tags %>
         <!-- bootstrap 3.0.2 -->
-        <link rel="stylesheet" href="stylesheets/bootstrap.css">
-        <!-- font Awesome -->
-        <link rel="stylesheet" href="stylesheets/font-awesome.css">
-        <!-- Ionicons -->
-        <link rel="stylesheet" href="stylesheets/ionicons.css">
-        <!-- Theme style -->
-        <link rel="stylesheet" href="stylesheets/reechpro.css">
         
         <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
         <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -32,7 +25,7 @@
         <header class="header">
             <a class="logo" style="background-color: #333333" href="<%= root_url %>">
                 <!-- Add the class icon to your logo image or logo icon to add the margining -->
-                <%= image_tag("Reechlogo.png")%>
+                <img src="../../img/Reechlogo.png" style="height: 40px">
             </a>
             <!-- Header Navbar: style can be found in header.less -->
             
@@ -215,7 +208,7 @@
                             </a>
                         </li>
                         <li>
-                            <a href="question_hub.html">
+                            <a href="<%= questions_url %>">
                                 <i class="fa fa-th"></i> <span>Question Hub</span> <small class="badge pull-right bg-green">new</small>
                             </a>
                         </li>
@@ -310,7 +303,7 @@
             <header class="header">
                 <a class="logo" style="background-color: #367fa9" href="<%= root_url %>">
                     <!-- Add the class icon to your logo image or logo icon to add the margining -->
-                    <%= image_tag("Reechlogo.png")%>
+                    <img src="../../img/Reechlogo.png" style="height: 40px">
                 </a>
                 <nav class="navbar navbar-static-top" role="navigation">
                 
@@ -336,7 +329,7 @@
                     </div>
                 </nav>
             </header>
-            <section class="content">
+            <section class="content" style="background: ../../img/bg.jpg">
                     <%= yield %>
             </section>
 

@@ -101,3 +101,9 @@ group :development do
   gem 'debugger'
   #gem 'bullet'
 end
+
+
+#Performance testing
+gem 'ruby-prof', group: :test
+gem 'test-unit', group: :test
+

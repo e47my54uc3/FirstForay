@@ -4,7 +4,10 @@ class ReechController < ApplicationController
   before_filter :update_newsfeedsstream, :only => [:home]
   
   def home
-    @questions = Question.find(:all)
+    if current_user
+      @questions = Question.get_questions(:feed,current_user)
+    end
+
     respond_to do |format|
       format.html # show.html.erb
       format.json { render :json => @questions}

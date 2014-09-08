@@ -1,8 +1,21 @@
-<% if questions_streams.empty? %>
+<% if @questions.empty? then %>
   <h3> no questions yet </h3>
 <% else %>
-		<% questions_streams.each do |question| %>
-			<div class="questionbody" id="<%=question.question_id %>"> 
+  <% @questions.each do |question| %>
+		<div class="col-md-4"> 
+      <div class="box box-solid bg-light-blue">
+          <div class="box-header">
+              <h3 class="box-title" ><%= question.posted_by %></h3>
+              <h5 class="box-title" style="float: right; padding-right: 10px"><%= TimelineBeautify.beauty_time(question.created_at) %></h5>
+              
+          </div>
+          <div class="box-body">
+              <%= question.post %>
+          </div>
+      </div>
+    </div>
+
+    <!-- <div class="questionbody" id="<%=question.question_id %>"> 
     		<div class="questionimg"><%=image_tag 'default_avatar.png' %></div>
     		<div class="questiontext">
       		<blockquote>
@@ -12,11 +25,11 @@
       		<div class="questiontime">
       	  		<label class="label">asked <%= TimelineBeautify.beauty_time(question.created_at) %></label>
       	  		<label class="label"><%= question.posted_solutions.count %> answers</label>
-			  	
-      		</div>
+			  	</div>
     		</div>
   			<%= render :partial=>"solutions/newsolution",:locals=>{:question=>question} %>
-  			</div>
+  			</div> -->
+
   <% end %>
 <% end %>
 

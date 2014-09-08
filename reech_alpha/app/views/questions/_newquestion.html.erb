@@ -1,13 +1,14 @@
 <%= simple_form_for @question do |f| %>
 <!-- Ask question bar -->
   <div class="input-group" style="margin-left: 10px; margin-right: 10px; padding-bottom: 10px">
-      <div class="input-group-btn">
-          <button type="button" class="btn bg-orange btn-flat" ><i class="fa fa-paperclip"></i></button>
-      </div>
-      <%= f.text_field :post, :placeholder=>"Ask a question, #{current_user.first_name}", :class=>"form-control" %>
-      <div class="input-group-btn">
-          <%= f.submit "Ask a Question", :class=>"btn bg-olive" %>
-      </div><!-- /btn-group -->
+	  <div class="input-group-btn">
+	    
+	      <button type="button" class="btn bg-orange btn-flat"><i class="fa fa-paperclip"></i></button>
+	  </div>
+	  <%= f.text_field :post, :placeholder=>"Ask a question, #{current_user.first_name}", :class=>"form-control" %>
+	  <div class="input-group-btn">
+	      <%= f.submit "Ask a Question", :class=>"btn bg-olive" %>
+	  </div><!-- /btn-group -->
   </div>
   <!-- end ask bar -->
 <% end %>
